@@ -933,14 +933,6 @@ function changeProductStatus(pid, newStatus) {
   render();
 }
 
-function showProductPhoto(file) {
-  if (!file) return;
-  const el = document.getElementById('photo-preview');
-  if (!el) return;
-  const reader = new FileReader();
-  reader.onload = e => { el.src = e.target.result; el.style.display = 'block'; };
-  reader.readAsDataURL(file);
-}
 
 function saveProductEdit(pid) {
   const name  = document.getElementById('edit-name')?.value.trim() || '';
@@ -975,13 +967,6 @@ function pageProductReg() {
     return `
     <div class="page-title">商品登録</div>
     <div class="card">
-      <div style="margin-bottom:16px">
-        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="showProductPhoto(this.files[0])">
-        <label for="photo-input" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#059669;color:#fff;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;width:100%;box-sizing:border-box">
-          <span style="font-size:28px">📷</span> 写真を撮る
-        </label>
-        <img id="photo-preview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px">
-      </div>
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
         <input id="reg-name" class="input" placeholder="商品名を入力">
@@ -1517,13 +1502,6 @@ function renderModal() {
     <div class="modal-bg" onclick="closeModal()">
       <div class="modal" onclick="event.stopPropagation()">
         <div class="modal-header"><h2>新しいロットを作成</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
-        <div style="margin-bottom:14px">
-          <input type="file" id="lot-photo-input" accept="image/*" capture="environment" style="display:none" onchange="showLotPhoto(this.files[0])">
-          <label for="lot-photo-input" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#f0fdf4;color:#065f46;border:1.5px solid #6ee7b7;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
-            <span style="font-size:22px">📷</span> 荷物の写真を撮る（任意）
-          </label>
-          <img id="lot-photo-preview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px">
-        </div>
         <div style="margin-bottom:12px"><label class="field-label">入荷日</label>${dateSelects('mb-date', '')}</div>
         <div class="grid2" style="margin-bottom:12px;gap:8px">
           <div><label class="field-label">箱数</label><input id="mb-boxes" class="input" type="number" placeholder="例: 3" oninput="(function(){const b=document.getElementById('mb-boxes'),p=document.getElementById('mb-perbox'),t=document.getElementById('mb-total');if(b&&p&&t)t.textContent=(parseInt(b.value)||0)*(parseInt(p.value)||0)+'点'})()"></div>
@@ -1864,15 +1842,6 @@ function saveLotEdit(id) {
   S.data.boxes = S.data.boxes.map(b => b.id===id ? {...b, total, date, cost, ship, lineAlbumUrl:lineUrl} : b);
   S.tab.editBox = null;
   saveData(); render();
-}
-
-function showLotPhoto(file) {
-  if (!file) return;
-  const el = document.getElementById('lot-photo-preview');
-  if (!el) return;
-  const reader = new FileReader();
-  reader.onload = e => { el.src = e.target.result; el.style.display = 'block'; };
-  reader.readAsDataURL(file);
 }
 
 function saveBox() {
