@@ -732,7 +732,13 @@ function pageProductDetail() {
     </div>
     <div class="card">
       <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:12px">内容を編集</div>
-      <div style="margin-bottom:10px"><label class="field-label">販売価格（値下げ・変更時に更新）</label><input id="edit-price" class="input" type="number" value="${p.price}"></div>
+      <div style="margin-bottom:10px"><label class="field-label">商品名</label><input id="edit-name" class="input" value="${p.name||''}"></div>
+      <div style="margin-bottom:10px"><label class="field-label">カテゴリー</label>
+        <select id="edit-cat" class="input">
+          ${['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ジュエリー・アクセサリー','電子機器・ケーブル','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','その他'].map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-bottom:10px"><label class="field-label">販売価格</label><input id="edit-price" class="input" type="number" value="${p.price}"></div>
       <div style="margin-bottom:10px"><label class="field-label">LINEアルバムURL</label><input id="edit-album" class="input" value="${p.album||''}"></div>
       <div style="margin-bottom:12px"><label class="field-label">メモ</label><textarea id="edit-memo" class="input">${p.memo||''}</textarea></div>
       <button class="btn btn-primary btn-full" onclick="saveProductEdit('${p.id}')">保存する</button>
@@ -916,11 +922,109 @@ function changeProductStatus(pid, newStatus) {
   render();
 }
 
+// ── AI 写真分析 ──────────────────────────────────────────
+let _aiModel = null;
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function analyzeProductPhoto(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('ai-status');
+  const previewEl = document.getElementById('photo-preview');
+
+  const reader = new FileReader();
+  reader.onload = e => { if (previewEl) { previewEl.src = e.target.result; previewEl.style.display = 'block'; } };
+  reader.readAsDataURL(file);
+
+  if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280">⏳ AIモデル読み込み中（初回のみ時間がかかります）</span>';
+  try {
+    if (!_aiModel) {
+      await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.21.0/dist/tf.min.js');
+      await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js');
+      _aiModel = await mobilenet.load({version:2, alpha:0.5});
+    }
+    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280">⏳ 分析中...</span>';
+    const imgEl = document.getElementById('photo-preview');
+    const preds = await _aiModel.classify(imgEl, 5);
+    const cat   = _mapToJpCat(preds);
+    const names = _mapToJpNames(preds);
+    const catEl  = document.getElementById('reg-cat');
+    const nameEl = document.getElementById('reg-name');
+    const hintsEl = document.getElementById('name-hints');
+    if (catEl) catEl.value = cat;
+    if (nameEl && !nameEl.value && names.length) nameEl.value = names[0];
+    if (hintsEl && names.length) {
+      hintsEl.innerHTML = '<span style="font-size:11px;color:#9ca3af;align-self:center">候補：</span>' +
+        names.map(n=>`<button type="button" onclick="document.getElementById('reg-name').value='${n}'" style="background:#e0f2fe;color:#0369a1;border:none;border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-weight:600">${n}</button>`).join('');
+    }
+    if (statusEl) statusEl.innerHTML = `<span style="color:#059669">✓ 分析完了：${cat}</span>`;
+  } catch(e) {
+    if (statusEl) statusEl.innerHTML = '<span style="color:#ef4444">分析できませんでした。手動で入力してください。</span>';
+  }
+}
+
+function _mapToJpCat(preds) {
+  const kw = preds.map(p => p.className.toLowerCase()).join(' ');
+  if (/necklace|ring|earring|bracelet|jewel|pendant|bead|gem|pearl|chain/.test(kw))           return 'ジュエリー・アクセサリー';
+  if (/cable|cord|wire|adapter|plug|connector|usb|hdmi|keyboard|mouse|remote|hard.?disk|hard.?drive|charger/.test(kw)) return '電子機器・ケーブル';
+  if (/handbag|purse|backpack|wallet|satchel|clutch|tote/.test(kw))                           return 'バッグ・ポーチ';
+  if (/lipstick|perfume|lotion|cream|soap|cosmetic|nail|makeup/.test(kw))                     return 'コスメ・美容';
+  if (/pencil|pen|notebook|paper|folder|ruler|crayon|marker|eraser/.test(kw))                 return '文房具・ノート';
+  if (/cup|mug|plate|bowl|spoon|fork|knife|pan|pot|teapot|glass|kitchen/.test(kw))            return '食器・キッチン';
+  if (/teddy|stuffed|plush|doll|puppet/.test(kw))                                             return 'フィギュア・ぬいぐるみ';
+  if (/toy|puzzle|jigsaw|dice|ball|lego|block/.test(kw))                                      return 'おもちゃ・ゲーム';
+  if (/jersey|shirt|t-shirt|dress|jacket|pants|sneaker|shoe|boot|hat|cap|sock|coat/.test(kw)) return '衣類・ファッション';
+  if (/book|magazine|comic|dvd|cd|disc/.test(kw))                                             return '本・CD・DVD';
+  if (/candle|vase|lamp|cushion|pillow|clock|plant|flower/.test(kw))                          return '雑貨・日用品';
+  return 'その他';
+}
+
+function _mapToJpNames(preds) {
+  const map = [
+    ['ring','リング'],['necklace','ネックレス'],['earring','イヤリング・ピアス'],
+    ['bracelet','ブレスレット'],['pendant','ペンダント'],['brooch','ブローチ'],
+    ['cable','ケーブル'],['adapter','アダプター'],['charger','充電器'],
+    ['keyboard','キーボード'],['mouse','マウス'],['hard disk','ハードディスク'],
+    ['handbag','ハンドバッグ'],['backpack','リュックサック'],['wallet','財布'],['purse','ポーチ'],['tote','トートバッグ'],
+    ['lipstick','リップスティック'],['perfume','香水'],['lotion','ローション'],['cream','クリーム'],
+    ['cup','カップ'],['mug','マグカップ'],['plate','プレート・皿'],['teapot','ティーポット'],['bowl','ボウル'],
+    ['teddy','ぬいぐるみ'],['stuffed','ぬいぐるみ'],['doll','ドール・人形'],['figure','フィギュア'],
+    ['puzzle','パズル'],['toy','おもちゃ'],['game','ゲーム'],
+    ['shirt','シャツ'],['t-shirt','Tシャツ'],['dress','ドレス・ワンピース'],['jacket','ジャケット'],['coat','コート'],
+    ['sneaker','スニーカー'],['shoe','シューズ・靴'],['boot','ブーツ'],['sandal','サンダル'],
+    ['hat','帽子'],['cap','キャップ'],['scarf','スカーフ'],['glove','グローブ'],
+    ['book','本・書籍'],['magazine','雑誌'],['dvd','DVD'],['cd','CD'],
+    ['vase','花瓶'],['candle','キャンドル'],['lamp','ランプ・照明'],['clock','時計'],['cushion','クッション'],
+  ];
+  const results = [];
+  const seen = new Set();
+  for (const pred of preds) {
+    const kw = pred.className.toLowerCase();
+    for (const [en, ja] of map) {
+      if (kw.includes(en) && !seen.has(ja)) { seen.add(ja); results.push(ja); }
+    }
+    if (results.length >= 4) break;
+  }
+  return results;
+}
+// ─────────────────────────────────────────────────────────
+
 function saveProductEdit(pid) {
+  const name  = document.getElementById('edit-name')?.value.trim() || '';
+  const cat   = document.getElementById('edit-cat')?.value || '';
   const price = parseInt(document.getElementById('edit-price')?.value) || 0;
   const album = document.getElementById('edit-album')?.value || '';
   const memo  = document.getElementById('edit-memo')?.value || '';
-  S.data.products = S.data.products.map(p=>p.id===pid?{...p,price,album,memo}:p);
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ジュエリー・アクセサリー':'💍','電子機器・ケーブル':'🔌','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','その他':'📦'};
+  const emoji = emojiMap[cat] || '📦';
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,name,cat,emoji,price,album,memo}:p);
   saveData();
   const btn = event.target;
   btn.textContent = '✓ 保存しました！';
@@ -933,7 +1037,61 @@ function saveProductEdit(pid) {
 // PAGE: PRODUCT REGISTRATION
 // ============================================================
 function pageProductReg() {
-  const cats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','アクセサリー','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','その他'];
+  const cats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ジュエリー・アクセサリー','電子機器・ケーブル','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','その他'];
+  const isOwner = S.mode === 'owner';
+  const defaultBox = S.regBoxId || S.data.boxes[0]?.id || '';
+  const nextNum = (()=>{
+    const prods = S.data.products.filter(p=>p.box===defaultBox);
+    const used = prods.map(p=>{const m=p.id.match(/^[A-Z]+(\d+)$/i);return m?parseInt(m[1]):0;});
+    return used.length>0 ? Math.max(...used)+1 : 1;
+  })();
+  const lotSelector = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <select id="reg-box" class="input" style="flex:0 0 80px" onchange="(function(v){
+        const prods=S.data.products.filter(p=>p.box===v);
+        const used=prods.map(p=>{const m=p.id.match(/^[A-Z]+(\\d+)$/i);return m?parseInt(m[1]):0;});
+        const next=used.length>0?Math.max(...used)+1:1;
+        const ni=document.getElementById('reg-num');if(ni)ni.value=next;
+        updateIdPreview();
+      }).call(this,this.value)">
+        ${S.data.boxes.length ? S.data.boxes.map(b=>`<option value="${b.id}" ${b.id===defaultBox?'selected':''}>${b.id}</option>`).join('') : '<option value="">―</option>'}
+      </select>
+      <span style="font-size:20px;font-weight:700;color:#9ca3af">―</span>
+      <input id="reg-num" class="input" type="number" min="1" max="99" value="${nextNum}" style="flex:0 0 70px;text-align:center;font-weight:700" oninput="updateIdPreview()">
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:#6b7280">商品ID</span>
+      <span id="id-preview" style="font-size:22px;font-weight:700;color:#059669;letter-spacing:2px">${defaultBox}${nextNum}</span>
+      <span style="font-size:11px;color:#9ca3af;margin-left:auto">メルカリタイトルに使用</span>
+    </div>`;
+
+  if (isOwner) {
+    return `
+    <div class="page-title">商品登録</div>
+    <div class="card">
+      <div style="margin-bottom:16px">
+        <label class="field-label">📷 写真でAI分析</label>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="analyzeProductPhoto(this.files[0])">
+        <button class="btn" style="background:#f0fdf4;color:#065f46;border:1.5px solid #6ee7b7;width:100%;padding:12px;font-size:14px" type="button" onclick="document.getElementById('photo-input').click()">📷 写真を撮る → カテゴリー・商品名を自動入力</button>
+        <div id="ai-status" style="font-size:12px;min-height:18px;margin-top:6px;text-align:center"></div>
+        <img id="photo-preview" style="display:none;width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:8px">
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">商品名</label>
+        <input id="reg-name" class="input" placeholder="商品名を入力 または 下の候補をタップ">
+        <div id="name-hints" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">カテゴリー</label>
+        <select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select>
+      </div>
+      <div style="margin-bottom:12px"><label class="field-label">ロット・商品番号</label>${lotSelector}</div>
+      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
+      <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><textarea id="reg-memo" class="input" placeholder="状態・特記事項など"></textarea></div>
+      <button class="btn btn-primary btn-full" onclick="saveProduct()" id="save-btn">登録する</button>
+    </div>`;
+  }
+
   return `
     <div class="page-title">商品登録</div>
     <div class="card">
@@ -945,45 +1103,13 @@ function pageProductReg() {
         </div>
       </div>
       <div style="margin-bottom:12px"><label class="field-label">商品名</label><input id="reg-name" class="input" placeholder="商品名を入力"></div>
-      <div style="margin-bottom:12px">
-        <label class="field-label">ロット・商品番号</label>
-        ${(()=>{
-          const defaultBox = S.regBoxId || S.data.boxes[0]?.id || '';
-          const nextNum = (()=>{
-            const prods = S.data.products.filter(p=>p.box===defaultBox);
-            const used = prods.map(p=>{const m=p.id.match(/^[A-Z]+(\d+)$/i);return m?parseInt(m[1]):0;});
-            return used.length>0 ? Math.max(...used)+1 : 1;
-          })();
-          return `
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <select id="reg-box" class="input" style="flex:0 0 80px" onchange="(function(v){
-              const prods=S.data.products.filter(p=>p.box===v);
-              const used=prods.map(p=>{const m=p.id.match(/^[A-Z]+(\\d+)$/i);return m?parseInt(m[1]):0;});
-              const next=used.length>0?Math.max(...used)+1:1;
-              const ni=document.getElementById('reg-num');if(ni)ni.value=next;
-              updateIdPreview();
-            }).call(this,this.value)">
-              ${S.data.boxes.length ? S.data.boxes.map(b=>`<option value="${b.id}" ${b.id===defaultBox?'selected':''}>${b.id}</option>`).join('') : '<option value="">―</option>'}
-            </select>
-            <span style="font-size:20px;font-weight:700;color:#9ca3af">―</span>
-            <input id="reg-num" class="input" type="number" min="1" max="99" value="${nextNum}" style="flex:0 0 70px;text-align:center;font-weight:700" oninput="updateIdPreview()">
-          </div>
-          <div style="background:#f0fdf4;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px">
-            <span style="font-size:12px;color:#6b7280">商品ID</span>
-            <span id="id-preview" style="font-size:22px;font-weight:700;color:#059669;letter-spacing:2px">${defaultBox}${nextNum}</span>
-            <span style="font-size:11px;color:#9ca3af;margin-left:auto">メルカリタイトルに使用</span>
-          </div>`;
-        })()}
-      </div>
-      <div class="grid2" style="margin-bottom:12px">
-        <div><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
-        <div><label class="field-label">カテゴリー</label><select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
-      </div>
+      <div style="margin-bottom:12px"><label class="field-label">カテゴリー</label><select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div style="margin-bottom:12px"><label class="field-label">ロット・商品番号</label>${lotSelector}</div>
+      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:12px"><label class="field-label">LINEアルバムURL</label><input id="reg-album" class="input" placeholder="https://line.me/..."></div>
       <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><textarea id="reg-memo" class="input" placeholder="状態・特記事項など"></textarea></div>
       <button class="btn btn-primary btn-full" onclick="saveProduct()" id="save-btn">登録する</button>
-    </div>
-  `;
+    </div>`;
 }
 
 // ============================================================
@@ -1753,7 +1879,7 @@ function saveProduct() {
   const cat = document.getElementById('reg-cat')?.value;
   const album = document.getElementById('reg-album')?.value || '';
   const memo = document.getElementById('reg-memo')?.value || '';
-  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','アクセサリー':'💍','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','その他':'📦'};
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ジュエリー・アクセサリー':'💍','電子機器・ケーブル':'🔌','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','その他':'📦'};
   const numInput = parseInt(document.getElementById('reg-num')?.value) || 1;
   const newId = box ? `${box}${numInput}` : genProductId(box);
   if (S.data.products.some(p=>p.id===newId)) { alert(`ID「${newId}」はすでに使われています。番号を変更してください`); return; }
