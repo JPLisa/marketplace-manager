@@ -922,99 +922,14 @@ function changeProductStatus(pid, newStatus) {
   render();
 }
 
-// ── AI 写真分析 ──────────────────────────────────────────
-let _aiModel = null;
-
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
-async function analyzeProductPhoto(file) {
+function showProductPhoto(file) {
   if (!file) return;
-  const statusEl = document.getElementById('ai-status');
-  const previewEl = document.getElementById('photo-preview');
-
+  const el = document.getElementById('photo-preview');
+  if (!el) return;
   const reader = new FileReader();
-  reader.onload = e => { if (previewEl) { previewEl.src = e.target.result; previewEl.style.display = 'block'; } };
+  reader.onload = e => { el.src = e.target.result; el.style.display = 'block'; };
   reader.readAsDataURL(file);
-
-  if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280">⏳ AIモデル読み込み中（初回のみ時間がかかります）</span>';
-  try {
-    if (!_aiModel) {
-      await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.21.0/dist/tf.min.js');
-      await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js');
-      _aiModel = await mobilenet.load({version:2, alpha:0.5});
-    }
-    if (statusEl) statusEl.innerHTML = '<span style="color:#6b7280">⏳ 分析中...</span>';
-    const imgEl = document.getElementById('photo-preview');
-    const preds = await _aiModel.classify(imgEl, 5);
-    const cat   = _mapToJpCat(preds);
-    const names = _mapToJpNames(preds);
-    const catEl  = document.getElementById('reg-cat');
-    const nameEl = document.getElementById('reg-name');
-    const hintsEl = document.getElementById('name-hints');
-    if (catEl) catEl.value = cat;
-    if (nameEl && !nameEl.value && names.length) nameEl.value = names[0];
-    if (hintsEl && names.length) {
-      hintsEl.innerHTML = '<span style="font-size:11px;color:#9ca3af;align-self:center">候補：</span>' +
-        names.map(n=>`<button type="button" onclick="document.getElementById('reg-name').value='${n}'" style="background:#e0f2fe;color:#0369a1;border:none;border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-weight:600">${n}</button>`).join('');
-    }
-    if (statusEl) statusEl.innerHTML = `<span style="color:#059669">✓ 分析完了：${cat}</span>`;
-  } catch(e) {
-    if (statusEl) statusEl.innerHTML = '<span style="color:#ef4444">分析できませんでした。手動で入力してください。</span>';
-  }
 }
-
-function _mapToJpCat(preds) {
-  const kw = preds.map(p => p.className.toLowerCase()).join(' ');
-  if (/necklace|ring|earring|bracelet|jewel|pendant|bead|gem|pearl|chain/.test(kw))           return 'ジュエリー・アクセサリー';
-  if (/cable|cord|wire|adapter|plug|connector|usb|hdmi|keyboard|mouse|remote|hard.?disk|hard.?drive|charger/.test(kw)) return '電子機器・ケーブル';
-  if (/handbag|purse|backpack|wallet|satchel|clutch|tote/.test(kw))                           return 'バッグ・ポーチ';
-  if (/lipstick|perfume|lotion|cream|soap|cosmetic|nail|makeup/.test(kw))                     return 'コスメ・美容';
-  if (/pencil|pen|notebook|paper|folder|ruler|crayon|marker|eraser/.test(kw))                 return '文房具・ノート';
-  if (/cup|mug|plate|bowl|spoon|fork|knife|pan|pot|teapot|glass|kitchen/.test(kw))            return '食器・キッチン';
-  if (/teddy|stuffed|plush|doll|puppet/.test(kw))                                             return 'フィギュア・ぬいぐるみ';
-  if (/toy|puzzle|jigsaw|dice|ball|lego|block/.test(kw))                                      return 'おもちゃ・ゲーム';
-  if (/jersey|shirt|t-shirt|dress|jacket|pants|sneaker|shoe|boot|hat|cap|sock|coat/.test(kw)) return '衣類・ファッション';
-  if (/book|magazine|comic|dvd|cd|disc/.test(kw))                                             return '本・CD・DVD';
-  if (/candle|vase|lamp|cushion|pillow|clock|plant|flower/.test(kw))                          return '雑貨・日用品';
-  return 'その他';
-}
-
-function _mapToJpNames(preds) {
-  const map = [
-    ['ring','リング'],['necklace','ネックレス'],['earring','イヤリング・ピアス'],
-    ['bracelet','ブレスレット'],['pendant','ペンダント'],['brooch','ブローチ'],
-    ['cable','ケーブル'],['adapter','アダプター'],['charger','充電器'],
-    ['keyboard','キーボード'],['mouse','マウス'],['hard disk','ハードディスク'],
-    ['handbag','ハンドバッグ'],['backpack','リュックサック'],['wallet','財布'],['purse','ポーチ'],['tote','トートバッグ'],
-    ['lipstick','リップスティック'],['perfume','香水'],['lotion','ローション'],['cream','クリーム'],
-    ['cup','カップ'],['mug','マグカップ'],['plate','プレート・皿'],['teapot','ティーポット'],['bowl','ボウル'],
-    ['teddy','ぬいぐるみ'],['stuffed','ぬいぐるみ'],['doll','ドール・人形'],['figure','フィギュア'],
-    ['puzzle','パズル'],['toy','おもちゃ'],['game','ゲーム'],
-    ['shirt','シャツ'],['t-shirt','Tシャツ'],['dress','ドレス・ワンピース'],['jacket','ジャケット'],['coat','コート'],
-    ['sneaker','スニーカー'],['shoe','シューズ・靴'],['boot','ブーツ'],['sandal','サンダル'],
-    ['hat','帽子'],['cap','キャップ'],['scarf','スカーフ'],['glove','グローブ'],
-    ['book','本・書籍'],['magazine','雑誌'],['dvd','DVD'],['cd','CD'],
-    ['vase','花瓶'],['candle','キャンドル'],['lamp','ランプ・照明'],['clock','時計'],['cushion','クッション'],
-  ];
-  const results = [];
-  const seen = new Set();
-  for (const pred of preds) {
-    const kw = pred.className.toLowerCase();
-    for (const [en, ja] of map) {
-      if (kw.includes(en) && !seen.has(ja)) { seen.add(ja); results.push(ja); }
-    }
-    if (results.length >= 4) break;
-  }
-  return results;
-}
-// ─────────────────────────────────────────────────────────
 
 function saveProductEdit(pid) {
   const name  = document.getElementById('edit-name')?.value.trim() || '';
@@ -1070,17 +985,15 @@ function pageProductReg() {
     <div class="page-title">商品登録</div>
     <div class="card">
       <div style="margin-bottom:16px">
-        <input type="file" id="photo-input" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:0;height:0" onchange="analyzeProductPhoto(this.files[0])">
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:0;height:0" onchange="showProductPhoto(this.files[0])">
         <label for="photo-input" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#059669;color:#fff;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;width:100%;box-sizing:border-box">
-          <span style="font-size:28px">📷</span> 写真を撮る → AI分析
+          <span style="font-size:28px">📷</span> 写真を撮る
         </label>
-        <div id="ai-status" style="font-size:12px;min-height:18px;margin-top:8px;text-align:center"></div>
         <img id="photo-preview" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin-top:8px">
       </div>
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
-        <input id="reg-name" class="input" placeholder="商品名を入力 または 下の候補をタップ">
-        <div id="name-hints" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+        <input id="reg-name" class="input" placeholder="商品名を入力">
       </div>
       <div style="margin-bottom:12px">
         <label class="field-label">カテゴリー</label>
