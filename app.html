@@ -652,6 +652,10 @@ function pageProducts() {
     <div class="tabs">
       ${['all','出品中','セット中','売卸済','保管中','キャンセル'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${f2==='all'?'すべて':f2}</button>`).join('')}
     </div>
+    ${f==='キャンセル'&&S.data.products.some(p=>p.status==='キャンセル')?`
+    <button onclick="deleteAllCancelled()" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer">
+      🗑 キャンセル済みをすべて削除（${S.data.products.filter(p=>p.status==='キャンセル').length}件）
+    </button>`:''}
     <div id="product-list">
     ${shown.map(p=>`
       <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
@@ -753,6 +757,13 @@ function pageProductDetail() {
       <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer">🗑 この商品を削除する</button>
     </div>
   `;
+}
+
+function deleteAllCancelled() {
+  const cnt = S.data.products.filter(p=>p.status==='キャンセル').length;
+  if (!confirm(`キャンセル済みの商品${cnt}件をすべて削除しますか？\nこの操作は元に戻せません。`)) return;
+  S.data.products = S.data.products.filter(p=>p.status!=='キャンセル');
+  saveData(); render();
 }
 
 function deleteProduct(pid) {
