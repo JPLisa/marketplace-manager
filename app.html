@@ -985,13 +985,6 @@ function pageProductReg() {
   return `
     <div class="page-title">商品登録</div>
     <div class="card">
-      <div style="background:#f0fdf4;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
-        <span style="font-size:24px">📷</span>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:#065f46">写真はLINEアルバムで管理</div>
-          <div style="font-size:12px;color:#6b7280;margin-top:2px">LINEで撮影 → アルバムURLを下の欄に貼り付け</div>
-        </div>
-      </div>
       <div style="margin-bottom:12px"><label class="field-label">商品名</label><input id="reg-name" class="input" placeholder="商品名を入力"></div>
       <div style="margin-bottom:12px"><label class="field-label">カテゴリー</label><select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
       <div style="margin-bottom:12px"><label class="field-label">登録先ロット</label>${lotSelector}</div>
