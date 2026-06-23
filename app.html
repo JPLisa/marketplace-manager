@@ -985,11 +985,11 @@ function pageProductReg() {
     <div class="page-title">商品登録</div>
     <div class="card">
       <div style="margin-bottom:16px">
-        <input type="file" id="photo-input" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:0;height:0" onchange="showProductPhoto(this.files[0])">
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="showProductPhoto(this.files[0])">
         <label for="photo-input" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#059669;color:#fff;border-radius:12px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;width:100%;box-sizing:border-box">
           <span style="font-size:28px">📷</span> 写真を撮る
         </label>
-        <img id="photo-preview" style="display:none;width:100%;max-height:240px;object-fit:cover;border-radius:10px;margin-top:8px">
+        <img id="photo-preview" style="display:none;width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px">
       </div>
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
@@ -1527,7 +1527,7 @@ function renderModal() {
       <div class="modal" onclick="event.stopPropagation()">
         <div class="modal-header"><h2>新しいロットを作成</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
         <div style="margin-bottom:14px">
-          <input type="file" id="lot-photo-input" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:0;height:0" onchange="showLotPhoto(this.files[0])">
+          <input type="file" id="lot-photo-input" accept="image/*" capture="environment" style="display:none" onchange="showLotPhoto(this.files[0])">
           <label for="lot-photo-input" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#f0fdf4;color:#065f46;border:1.5px solid #6ee7b7;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
             <span style="font-size:22px">📷</span> 荷物の写真を撮る（任意）
           </label>
