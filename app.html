@@ -1386,11 +1386,16 @@ function pageAnalytics() {
       ${(()=>{
         const defCost2 = d.defaultCostPerItem??484;
         const totalSold = fBoxes.reduce((a,b)=>a+b.sold,0);
-        const totalRegCount = fProds.length;
+        // ロットに実際の仕入額があればそれを使い、なければ登録商品数×デフォルト原価
+        const totalRealCost = fBoxes.reduce((a,b)=>{
+          const bReg = fProds.filter(p=>p.box===b.id).length;
+          return a + (b.cost>0 ? b.cost : defCost2 * bReg);
+        }, 0);
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
-        const totalInvest = defCost2 * totalRegCount + totalShipIn;
-        const unsoldCost = defCost2 * (totalRegCount - totalSold);
-        const trueProfit = totalProfit - totalShipIn - unsoldCost;
+        const totalInvest = totalRealCost + totalShipIn;
+        // b.profitはdefCost2を差引済み → 元に戻してから実際の仕入額を引く
+        const grossReturn = totalProfit + totalSold * defCost2;
+        const trueProfit = grossReturn - totalInvest;
         const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
         const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
         const achieved = trueProfit >= 0;
@@ -1401,7 +1406,7 @@ function pageAnalytics() {
             <div style="background:#f9fafb;border-radius:10px;padding:12px;text-align:center">
               <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">総投資額</div>
               <div style="font-size:16px;font-weight:700;color:#374151">${fmt(totalInvest)}</div>
-              <div style="font-size:10px;color:#9ca3af;margin-top:2px">仕入${fmt(defCost2*totalRegCount)} + 送料${fmt(totalShipIn)}</div>
+              <div style="font-size:10px;color:#9ca3af;margin-top:2px">仕入${fmt(totalRealCost)} + 送料${fmt(totalShipIn)}</div>
             </div>
             <div style="background:${achieved?'#f0fdf4':'#fff1f2'};border-radius:10px;padding:12px;text-align:center">
               <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">実質利益</div>
@@ -1433,14 +1438,16 @@ function pageAnalytics() {
         const discount = parseFloat(S.tab.discountRate||0);
         const shipOut = 500;
         const defCost2 = d.defaultCostPerItem??484;
-        // 個別出品中・保管中
+        // 個別出品中・保管中（ロットに仕入額があれば1点あたりの実費を使用）
         const indivProds = fProds.filter(p=>p.status==='出品中'||p.status==='保管中');
         const indivCalc = indivProds.map(p=>{
+          const lot = d.boxes.find(b=>b.id===p.box);
+          const lotCostPerItem = lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
           const salePrice = Math.round(p.price * (1 - discount/100));
           const fee = Math.floor(salePrice * 0.1);
           const revenue = salePrice - fee - shipOut;
-          const netProfit = revenue - defCost2;
-          return {revenue, netProfit, items:1};
+          const netProfit = revenue - lotCostPerItem;
+          return {revenue, netProfit, items:1, costPerItem: lotCostPerItem};
         });
         // セット出品中（セット価格で計算）
         const allActiveSets = (d.sets||[]).filter(s=>s.status==='出品中');
@@ -1451,7 +1458,13 @@ function pageAnalytics() {
           const fee = Math.floor(salePrice * 0.1);
           const revenue = salePrice - fee - shipOut;
           const itemCount = s.pids.length;
-          const netProfit = revenue - defCost2 * itemCount;
+          // セット内商品のロット原価を合計
+          const setCost = s.pids.reduce((a,pid)=>{
+            const prod = d.products.find(p=>p.id===pid);
+            const lot = prod ? d.boxes.find(b=>b.id===prod.box) : null;
+            return a + (lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2);
+          }, 0);
+          const netProfit = revenue - setCost;
           return {revenue, netProfit, items: itemCount};
         });
         const allCalc = [...indivCalc, ...setCalc];
@@ -1479,7 +1492,7 @@ function pageAnalytics() {
             ${discount>0?`<div style="font-size:11px;color:#f59e0b;margin-top:2px">${discount}%引き / 割引なし: ${fmt(estRevenueNoDisc)}</div>`:''}
           </div>
           <div style="background:#eff6ff;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算純利益（仕入原価${fmt(defCost2)}×${estItems}点分を差引）</div>
+            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算純利益（手取りから各ロット仕入原価を差引）</div>
             <div style="font-size:26px;font-weight:700;color:${estProfit>=0?'#1d4ed8':'#ef4444'}">${estProfit>=0?'+':''}${fmt(estProfit)}</div>
           </div>
         </div>`;
@@ -1493,9 +1506,11 @@ function pageAnalytics() {
           const bProds = d.products.filter(p=>p.box===b.id);
           const bRegCount = bProds.length;
           const bShipIn = b.ship||0;
-          const bInvest = defCost * bRegCount + bShipIn;
-          const bUnsoldCost = defCost * (bRegCount - b.sold);
-          const trueP = b.profit - bShipIn - bUnsoldCost;
+          const bRealCost = b.cost>0 ? b.cost : defCost * bRegCount;
+          const bInvest = bRealCost + bShipIn;
+          // b.profitはdefCostを差引済み → 元に戻してから実際の仕入額を引く
+          const bGrossReturn = b.profit + b.sold * defCost;
+          const trueP = bGrossReturn - bInvest;
           const avgNet = b.sold>0 ? b.profit/b.sold : 0;
           const remaining = trueP<0&&avgNet>0 ? Math.ceil(-trueP/avgNet) : 0;
           const achieved = bInvest===0||trueP>=0;
@@ -1507,7 +1522,11 @@ function pageAnalytics() {
               <span style="font-size:13px;font-weight:700;color:${achieved?'#059669':'#ef4444'}">${achieved?'🟢 黒字':'🔴 赤字'} ${trueP>=0?'+':''}${fmt(trueP)}</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;font-size:11px;text-align:center">
-              <div style="background:#f9fafb;border-radius:8px;padding:6px"><div style="color:#9ca3af">投資額</div><div style="font-weight:700;color:#374151">${fmt(bInvest)}</div></div>
+              <div style="background:#f9fafb;border-radius:8px;padding:6px">
+                <div style="color:#9ca3af">投資額</div>
+                <div style="font-weight:700;color:#374151">${fmt(bInvest)}</div>
+                <div style="color:#d1d5db;font-size:10px">仕入${fmt(bRealCost)}+送${fmt(bShipIn)}</div>
+              </div>
               <div style="background:#eff6ff;border-radius:8px;padding:6px"><div style="color:#9ca3af">売上</div><div style="font-weight:700;color:#3b82f6">${fmt(b.sales)}</div></div>
               <div style="background:${achieved?'#f0fdf4':'#fff1f2'};border-radius:8px;padding:6px"><div style="color:#9ca3af">実質利益</div><div style="font-weight:700;color:${achieved?'#059669':'#ef4444'}">${trueP>=0?'+':''}${fmt(trueP)}</div></div>
             </div>
