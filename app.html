@@ -447,12 +447,6 @@ function renderMoreMenu() {
 // ============================================================
 function pageDashboard() {
   const d = S.data;
-  const totalSales = d.boxes.reduce((a,b)=>a+b.sales,0);
-  const totalProfit = d.boxes.reduce((a,b)=>a+b.profit,0);
-  const totalItems = d.boxes.reduce((a,b)=>a+b.total,0);
-  const totalSold = d.boxes.reduce((a,b)=>a+b.sold,0);
-  const sr = totalItems ? Math.round(totalSold/totalItems*100) : 0;
-  const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
   const rules = (d.rules||[]).slice().sort((a,b)=>a.days-b.days);
   const ruleAlerts = rules.map(r=>{
     const cnt = d.products.filter(p=>p.status==='出品中'&&(p.days||0)>=r.days).length;
@@ -462,17 +456,6 @@ function pageDashboard() {
     return {r, cnt, isSet, color, nav};
   });
 
-  const statsHTML = S.mode === 'owner' ? `
-    <div class="grid4" style="margin-bottom:12px">
-      <div class="stat-card"><div class="label">受入ロット</div><div class="value">${d.boxes.length}<small style="font-size:12px;color:#9ca3af">件</small></div></div>
-      <div class="stat-card"><div class="label">商品数</div><div class="value">${totalItems}<small style="font-size:12px;color:#9ca3af">点</small></div></div>
-      <div class="stat-card"><div class="label">売上</div><div class="value" style="font-size:16px;color:#3b82f6;font-weight:700">${fmt(totalSales)}</div></div>
-      <div class="stat-card"><div class="label">利益</div><div class="value" style="font-size:16px;color:#ef4444;font-weight:700">${fmt(totalProfit)}</div></div>
-    </div>
-    <div class="grid2" style="margin-bottom:12px">
-      <div class="card" style="margin-bottom:0"><div class="label" style="font-size:11px;color:#9ca3af">売卸率</div><div style="font-size:20px;font-weight:700">${sr}%</div><div class="progress"><div class="progress-fill" style="width:${sr}%"></div></div></div>
-      <div class="card" style="margin-bottom:0"><div class="label" style="font-size:11px;color:#9ca3af">利益率</div><div style="font-size:20px;font-weight:700;color:#ef4444">${pr}%</div><div class="progress"><div class="progress-fill" style="width:${pr}%"></div></div></div>
-    </div>` : '';
 
   const listing  = d.products.filter(p=>p.status==='出品中').length;
   const sold      = d.products.filter(p=>p.status==='売卸済').length;
@@ -568,7 +551,6 @@ function pageDashboard() {
         </div>
       </div>`;
     }).join('')}
-    ${statsHTML}
     <div class="card">
       <div class="card-title flex-row">${icon('bell',16)} アラート</div>
       ${ruleAlerts.map(({r,cnt,color,nav})=>`
