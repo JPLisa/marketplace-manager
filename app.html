@@ -788,6 +788,38 @@ function saveSoldEdit(pid) {
   setTimeout(()=>render(), 1000);
 }
 
+function exportData() {
+  const json = JSON.stringify(S.data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `mercari-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.products || !data.boxes) { alert('無効なバックアップファイルです'); return; }
+      if (!confirm(`バックアップから復元しますか？\n現在のデータはすべて上書きされます。`)) return;
+      S.data = data;
+      saveData();
+      render();
+      alert('復元が完了しました！');
+    } catch {
+      alert('ファイルの読み込みに失敗しました');
+    }
+  };
+  reader.readAsText(file);
+}
+
 function deleteAllCancelled() {
   const cnt = S.data.products.filter(p=>p.status==='キャンセル').length;
   if (!confirm(`キャンセル済みの商品${cnt}件をすべて削除しますか？\nこの操作は元に戻せません。`)) return;
@@ -1495,6 +1527,16 @@ function pageSettings() {
   const eRule = S.tab.editRule;
   return `
     <div class="page-title">設定</div>
+
+    <div class="card" style="border:2px solid #059669">
+      <div class="card-title" style="color:#059669">💾 データバックアップ・復元</div>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">データはこの端末のブラウザにのみ保存されています。定期的にバックアップを取ることを強くおすすめします。</p>
+      <button onclick="exportData()" class="btn btn-primary btn-full" style="margin-bottom:8px">⬇️ バックアップを保存する</button>
+      <label style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#f3f4f6;border-radius:10px;font-size:14px;font-weight:600;color:#374151;cursor:pointer;box-sizing:border-box">
+        ⬆️ バックアップから復元する
+        <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+      </label>
+    </div>
 
     <div class="card">
       <div class="card-title">オーナー名</div>
