@@ -779,7 +779,7 @@ function deleteProduct(pid) {
   if (p.status === '売卸済' && p.soldPrice) {
     const lot = S.data.boxes.find(b=>b.id===p.box);
     if (lot) {
-      S.data.boxes = S.data.boxes.map(b=>b.id===p.box ? {...b, sold:Math.max(0,b.sold-1), sales:b.sales-(p.soldPrice||0), profit:b.profit-(p.soldPrice-(p.soldShip||0)-Math.round(p.soldPrice*0.1))} : b);
+      S.data.boxes = S.data.boxes.map(b=>b.id===p.box ? {...b, sold:Math.max(0,b.sold-1), sales:b.sales-(p.soldPrice||0), profit:b.profit-(p.soldPrice-(p.soldShip||0)-Math.floor(p.soldPrice*0.1))} : b);
     }
   }
   S.data.products = S.data.products.filter(pr=>pr.id!==pid);
@@ -798,7 +798,7 @@ function confirmQuickSale() {
   const price = parseInt(document.getElementById('qs-price')?.value) || 0;
   const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
   if (!price) { alert('販売価格を入力してください'); return; }
-  const fee    = Math.round(price * 0.1);
+  const fee    = Math.floor(price * 0.1);
   const profit = price - ship - fee;
   const pid    = S.selPid;
   const soldDate = today();
@@ -821,7 +821,7 @@ function confirmQuickSale() {
 function updateQuickSalePreview() {
   const price = parseInt(document.getElementById('qs-price')?.value) || 0;
   const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
-  const fee   = Math.round(price * 0.1);
+  const fee   = Math.floor(price * 0.1);
   const profit = price - ship - fee;
   const el = document.getElementById('qs-preview');
   if (el) el.innerHTML = `
@@ -840,7 +840,7 @@ function cancelProduct(pid) {
 function updateSalePreview() {
   const price = parseInt(document.getElementById('sale-price')?.value) || 0;
   const ship = parseInt(document.getElementById('sale-ship')?.value) || 0;
-  const fee = Math.round(price * 0.1);
+  const fee = Math.floor(price * 0.1);
   const profit = price - ship - fee;
   const el = document.getElementById('sale-preview');
   if (!el) return;
@@ -1015,7 +1015,7 @@ function pageSalesInput() {
   const prod = S.selPid ? S.data.products.find(p=>p.id===S.selPid) : null;
   const price = parseInt(S.salePrice) || (prod ? prod.price : 0);
   const ship = parseInt(S.saleShip) || 0;
-  const fee = Math.round(price * 0.1);
+  const fee = Math.floor(price * 0.1);
   const profit = price - ship - fee;
   const stepBar = `<div style="display:flex;gap:6px;margin-bottom:16px">${[1,2,3].map(n=>`<div style="flex:1;height:4px;border-radius:2px;background:${step>=n?'#059669':'#e5e7eb'}"></div>`).join('')}</div>`;
 
@@ -1055,8 +1055,8 @@ function pageSalesInput() {
         <div><label class="field-label">送料（円）</label><input id="sale-ship" class="input" type="number" value="${S.saleShip}" oninput="updateSalePreview()"></div>
       </div>
       <div id="sale-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-${fmt(Math.round((S.salePrice||prod.price)*0.1))}</span></div>
-        <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">${fmt((parseInt(S.salePrice)||prod.price) - (parseInt(S.saleShip)||0) - Math.round((parseInt(S.salePrice)||prod.price)*0.1))}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-${fmt(Math.floor((S.salePrice||prod.price)*0.1))}</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">${fmt((parseInt(S.salePrice)||prod.price) - (parseInt(S.saleShip)||0) - Math.floor((parseInt(S.salePrice)||prod.price)*0.1))}</span></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary" style="flex:1" onclick="S.salesStep=1;render()">← 戻る</button>
@@ -1581,7 +1581,7 @@ function renderModal() {
     const p = S.data.products.find(pr=>pr.id===S.selPid);
     if (!p) return '';
     const defPrice = p.price;
-    const defFee = Math.round(defPrice*0.1);
+    const defFee = Math.floor(defPrice*0.1);
     const defProfit = defPrice - 210 - defFee;
     return `
     <div class="modal-bg" onclick="closeModal()">
