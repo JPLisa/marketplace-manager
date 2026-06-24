@@ -1396,7 +1396,13 @@ function pageAnalytics() {
         // b.profitはdefCost2を差引済み → 元に戻してから実際の仕入額を引く
         const grossReturn = totalProfit + totalSold * defCost2;
         const trueProfit = grossReturn - totalInvest;
-        const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
+        // 平均利益も実際のロット原価で計算（分母と分子を揃える）
+        const avgRealCostPerItem = totalSold>0 ? fBoxes.reduce((a,b)=>{
+          const bReg = fProds.filter(p=>p.box===b.id).length||1;
+          const cpi = b.cost>0 ? b.cost/(b.total||bReg) : defCost2;
+          return a + cpi * b.sold;
+        }, 0) / totalSold : defCost2;
+        const avgNet = totalSold>0 ? (totalProfit/totalSold + defCost2 - avgRealCostPerItem) : 0;
         const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
         const achieved = trueProfit >= 0;
         return `
@@ -1511,7 +1517,9 @@ function pageAnalytics() {
           // b.profitはdefCostを差引済み → 元に戻してから実際の仕入額を引く
           const bGrossReturn = b.profit + b.sold * defCost;
           const trueP = bGrossReturn - bInvest;
-          const avgNet = b.sold>0 ? b.profit/b.sold : 0;
+          // 平均利益も実際のロット原価で計算
+          const bRealCostPerItem = b.cost>0 ? b.cost/(b.total||Math.max(bRegCount,1)) : defCost;
+          const avgNet = b.sold>0 ? (b.profit/b.sold + defCost - bRealCostPerItem) : 0;
           const remaining = trueP<0&&avgNet>0 ? Math.ceil(-trueP/avgNet) : 0;
           const achieved = bInvest===0||trueP>=0;
           const pct = bInvest>0?Math.min(100,Math.max(0,Math.round((bInvest+trueP)/bInvest*100))):100;
