@@ -528,35 +528,44 @@ function pageDashboard() {
     </div>
     ${d.boxes.length===0?`<div class="card" style="text-align:center;padding:32px;color:#9ca3af"><div style="font-size:36px;margin-bottom:8px">📦</div><div>ロットがまだありません</div></div>`:''}
     ${d.boxes.map(b=>{
-      const r = sellRate(b);
-      const activeProds = d.products.filter(p=>p.box===b.id && p.status==='出品中');
-      return `<div class="card" style="margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:${activeProds.length>0?'12px':'0'}">
-          <span style="font-size:26px">📦</span>
+      const bListing = d.products.filter(p=>p.box===b.id&&p.status==='出品中').length;
+      const bStored  = d.products.filter(p=>p.box===b.id&&p.status==='保管中').length;
+      const bSold    = d.products.filter(p=>p.box===b.id&&p.status==='売卸済').length;
+      const bTotal   = d.products.filter(p=>p.box===b.id).length;
+      const pct      = bTotal>0 ? Math.round(bSold/bTotal*100) : 0;
+      return `<div class="card" style="margin-bottom:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:24px">📦</span>
           <div style="flex:1">
-            <div style="font-weight:700;font-size:16px">${b.id}<span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:6px">${b.date}</span></div>
-            <div style="font-size:12px;color:#6b7280">出品中 ${activeProds.length}件 / 全${b.total}点 · 売卸率${r}%</div>
+            <div style="font-weight:700;font-size:16px">ロット${b.id}<span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:6px">${b.date}</span></div>
           </div>
-          ${b.lineAlbumUrl?`<button class="btn btn-sm" style="background:#06c755;color:#fff;border:none;font-size:12px;padding:5px 10px" onclick="window.open('${b.lineAlbumUrl}','_blank')">📷</button>`:''}
-          <button class="btn btn-sm" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;font-size:12px;padding:5px 10px" onclick="S.regBoxId='${b.id}';go('productReg')">＋ 登録</button>
-          <button class="btn btn-sm" style="background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb;font-size:12px;padding:5px 10px" onclick="S.boxId='${b.id}';go('boxDetail')">詳細</button>
+          ${canDo('lots')?`<button class="btn btn-sm" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;font-size:12px;padding:5px 10px" onclick="S.regBoxId='${b.id}';go('productReg')">＋ 登録</button>`:''}
+          <button class="btn btn-sm" style="background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb;font-size:12px;padding:5px 10px" onclick="S.boxId='${b.id}';go('boxDetail')">詳細 ›</button>
         </div>
-        ${activeProds.length===0?`<div style="font-size:12px;color:#9ca3af;padding:8px 0;border-top:1px solid #f3f4f6;text-align:center">出品中の商品がありません</div>`:''}
-        ${activeProds.map(p=>`
-          <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #f3f4f6">
-            <span style="font-size:20px">${p.emoji}</span>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-              <div style="font-size:11px;color:#9ca3af">¥${p.price.toLocaleString()}${p.days>0?' · '+p.days+'日':''}
-              </div>
-            </div>
-            <button onclick="openQuickSale('${p.id}')" style="background:#059669;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">売れた！</button>
-            <button onclick="cancelProduct('${p.id}')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:7px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">取消</button>
-          </div>`).join('')}
-        ${S.mode==='owner'&&b.sales>0?`<div style="display:flex;gap:16px;padding:10px 0;border-top:1px solid #f3f4f6;font-size:12px">
-          <span style="color:#3b82f6;font-weight:700">売上 ${fmt(b.sales)}</span>
-          <span style="color:#ef4444;font-weight:700">利益 ${fmt(b.profit)}</span>
-        </div>`:''}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:#059669;font-weight:600;margin-bottom:2px">📢 出品中</div>
+            <div style="font-size:22px;font-weight:800;color:#059669">${bListing}</div>
+            <div style="font-size:10px;color:#6b7280">点</div>
+          </div>
+          <div style="background:#eff6ff;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:#3b82f6;font-weight:600;margin-bottom:2px">✅ 売れた</div>
+            <div style="font-size:22px;font-weight:800;color:#3b82f6">${bSold}</div>
+            <div style="font-size:10px;color:#6b7280">点</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:10px;color:#6b7280;font-weight:600;margin-bottom:2px">📋 登録</div>
+            <div style="font-size:22px;font-weight:800;color:#374151">${bTotal}</div>
+            <div style="font-size:10px;color:#6b7280">点</div>
+          </div>
+        </div>
+        <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden">
+          <div style="background:#3b82f6;height:100%;width:${pct}%;border-radius:99px;transition:width 0.3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:#9ca3af">
+          <span>売卸率 ${pct}%</span>
+          ${S.mode==='owner'&&b.sales>0?`<span>売上 ${fmt(b.sales)} ／ 利益 ${fmt(b.profit)}</span>`:''}
+        </div>
       </div>`;
     }).join('')}
     ${statsHTML}
