@@ -1228,6 +1228,8 @@ function pageAnalytics() {
   const totalSales = d.boxes.reduce((a,b)=>a+b.sales,0);
   const totalProfit = d.boxes.reduce((a,b)=>a+b.profit,0);
   const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
+  const soldWithDays = d.products.filter(p=>p.status==='売卸済'&&p.daysToSell!=null);
+  const avgDays = soldWithDays.length ? Math.round(soldWithDays.reduce((a,p)=>a+p.daysToSell,0)/soldWithDays.length) : null;
 
   if (!canDo('analytics')) return `<div class="page-title">分析</div><div class="card" style="text-align:center;padding:40px;color:#9ca3af"><div style="font-size:40px;margin-bottom:8px">🔒</div><div>権限設定でオフになっています</div></div>`;
 
@@ -1240,7 +1242,7 @@ function pageAnalytics() {
       <div class="grid4" style="margin-bottom:12px">
         <div class="stat-card"><div class="label">総売上</div><div class="value" style="font-size:16px;color:#3b82f6;font-weight:700">${fmt(totalSales)}</div></div>
         <div class="stat-card"><div class="label">総利益</div><div class="value" style="font-size:16px;color:#ef4444;font-weight:700">${fmt(totalProfit)}</div></div>
-        <div class="stat-card"><div class="label">平均販売日数</div><div class="value">18日</div></div>
+        <div class="stat-card"><div class="label">平均販売日数</div><div class="value">${avgDays!=null?avgDays+'日':'―'}</div></div>
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
       </div>
       ${(()=>{
