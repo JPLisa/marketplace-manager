@@ -1355,7 +1355,13 @@ function pageAnalytics() {
   const fProds  = selLot === 'all' ? d.products : d.products.filter(p=>p.box===selLot);
 
   const totalSales  = fBoxes.reduce((a,b)=>a+b.sales,0);
-  const totalProfit = fBoxes.reduce((a,b)=>a+b.profit,0);
+  // 商品ごとの実データから計算（b.profitはdefaultCostPerItem差引済みのため使わない）
+  const soldProds = fProds.filter(p=>p.status==='売卸済');
+  const grossSaleProfit = soldProds.reduce((a,p)=>{
+    const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
+    return a + (p.soldPrice||0) - (p.soldShip||0) - fee;
+  }, 0);
+  const totalProfit = grossSaleProfit;
   const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
   const soldWithDays = fProds.filter(p=>p.status==='売卸済'&&p.daysToSell!=null);
   const avgDays = soldWithDays.length ? Math.round(soldWithDays.reduce((a,p)=>a+p.daysToSell,0)/soldWithDays.length) : null;
@@ -1393,12 +1399,10 @@ function pageAnalytics() {
         }, 0);
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
         const totalInvest = totalRealCost + totalShipIn;
-        // b.profitはdefCost2を差引済み → 元に戻してから実際の仕入額を引く
-        const grossReturn = totalProfit + totalSold * defCost2;
+        // grossSaleProfit = 商品実データから算出した純売上（price-fee-ship）= totalProfit
+        const grossReturn = totalProfit;
         const trueProfit = grossReturn - totalInvest;
-        // 1個追加で売れると trueProfit は「販売価格 − 発送 − 手数料」分だけ改善する
-        // （仕入コストは固定の総投資額として計上済みなので各売上では引かない）
-        const avgNet = totalSold>0 ? (totalProfit/totalSold + defCost2) : 0;
+        const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
         const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
         const achieved = trueProfit >= 0;
         const recoverPct = totalInvest>0 ? Math.min(100,Math.max(0,Math.round(grossReturn/totalInvest*100))) : 100;
