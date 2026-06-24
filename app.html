@@ -754,15 +754,38 @@ function pageProductDetail() {
       <button class="btn btn-primary btn-full" onclick="saveProductEdit('${p.id}')">保存する</button>
     </div>`:`
     <div class="card">
-      <div style="text-align:center;padding:16px;color:#9ca3af">
-        <div style="font-size:32px;margin-bottom:8px">✅</div>
-        <div style="font-size:14px;font-weight:600">売卸済み</div>
-      </div>
+      <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:12px">売却情報を編集</div>
+      <div style="margin-bottom:10px"><label class="field-label">販売価格</label><input id="sold-price" class="input" type="number" value="${p.soldPrice||''}"></div>
+      <div style="margin-bottom:10px"><label class="field-label">売却日</label>${dateSelects('sold-date', p.soldDate||today())}</div>
+      <div style="margin-bottom:10px"><label class="field-label">送料</label><input id="sold-ship" class="input" type="number" value="${p.soldShip||0}"></div>
+      <div style="margin-bottom:12px"><label class="field-label">手数料</label><input id="sold-fee" class="input" type="number" value="${p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1)}"></div>
+      <button class="btn btn-primary btn-full" onclick="saveSoldEdit('${p.id}')">保存する</button>
     </div>`}
     <div style="margin-top:8px;padding-top:4px">
       <button onclick="deleteProduct('${p.id}')" style="width:100%;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer">🗑 この商品を削除する</button>
     </div>
   `;
+}
+
+function saveSoldEdit(pid) {
+  const p = S.data.products.find(pr=>pr.id===pid);
+  if (!p) return;
+  const newPrice = parseInt(document.getElementById('sold-price')?.value) || p.soldPrice || 0;
+  const newShip  = parseInt(document.getElementById('sold-ship')?.value)  || 0;
+  const newFee   = parseInt(document.getElementById('sold-fee')?.value)   || 0;
+  const newDate  = getDateFromSelects('sold-date') || p.soldDate || today();
+  const newProfit = newPrice - newShip - newFee;
+  const oldProfit = (p.soldPrice||0) - (p.soldShip||0) - (p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1));
+  const profitDiff = newProfit - oldProfit;
+  const priceDiff  = newPrice - (p.soldPrice||0);
+  S.data.products = S.data.products.map(pr=>pr.id===pid?{...pr,soldPrice:newPrice,soldShip:newShip,soldFee:newFee,soldDate:newDate}:pr);
+  S.data.boxes = S.data.boxes.map(b=>b.id===p.box?{...b,sales:b.sales+priceDiff,profit:b.profit+profitDiff}:b);
+  saveData();
+  const btn = event.target;
+  btn.textContent = '✓ 保存しました！';
+  btn.style.background = '#059669';
+  btn.disabled = true;
+  setTimeout(()=>render(), 1000);
 }
 
 function deleteAllCancelled() {
