@@ -1243,19 +1243,76 @@ function pageAnalytics() {
         <div class="stat-card"><div class="label">平均販売日数</div><div class="value">18日</div></div>
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
       </div>
+      ${(()=>{
+        const totalInvest = d.boxes.reduce((a,b)=>a+(b.cost||0)+(b.ship||0),0);
+        const totalSold = d.boxes.reduce((a,b)=>a+b.sold,0);
+        const trueProfit = totalProfit - totalInvest;
+        const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
+        const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
+        const achieved = trueProfit >= 0;
+        return `
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">損益分岐点</div>
+          <div class="grid2" style="gap:8px;margin-bottom:12px">
+            <div style="background:#f9fafb;border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">総投資額</div>
+              <div style="font-size:16px;font-weight:700;color:#374151">${fmt(totalInvest)}</div>
+            </div>
+            <div style="background:${achieved?'#f0fdf4':'#fff1f2'};border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">実質利益</div>
+              <div style="font-size:16px;font-weight:700;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</div>
+            </div>
+          </div>
+          ${totalInvest===0?'<div style="text-align:center;color:#9ca3af;font-size:13px;padding:8px">ロットを登録すると表示されます</div>':achieved?`
+          <div style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🎉</div>
+            <div style="font-size:14px;font-weight:700;color:#059669">黒字達成！</div>
+            <div style="font-size:12px;color:#6b7280;margin-top:4px">投資回収済み・${fmt(trueProfit)}の利益</div>
+          </div>`:`
+          <div style="background:#fff1f2;border-radius:10px;padding:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:13px;color:#6b7280">損益分岐まで</span>
+              <span style="font-size:20px;font-weight:700;color:#ef4444">あと${remaining}個</span>
+            </div>
+            <div style="background:#fecaca;border-radius:6px;height:8px;overflow:hidden">
+              <div style="background:#ef4444;height:100%;width:${Math.min(100,Math.round(totalProfit/totalInvest*100))}%;border-radius:6px;transition:width 0.3s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px">
+              <span style="font-size:11px;color:#9ca3af">回収率 ${totalInvest>0?Math.round(totalProfit/totalInvest*100):0}%</span>
+              <span style="font-size:11px;color:#9ca3af">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
+            </div>
+          </div>`}
+        </div>`;
+      })()}
       <div class="card"><div class="card-title">売上・利益の推移</div><div class="chart-box-lg"><canvas id="chart-line"></canvas></div></div>
     `:''}
     ${tab==='boxes'?`
+      <div class="card"><div class="card-title">ロット別損益分岐点</div>
+        ${d.boxes.length===0?'<div style="text-align:center;color:#9ca3af;padding:20px">ロットがありません</div>':d.boxes.map(b=>{
+          const invest = (b.cost||0)+(b.ship||0);
+          const trueP = b.profit - invest;
+          const avgNet = b.sold>0 ? b.profit/b.sold : 0;
+          const remaining = trueP<0&&avgNet>0 ? Math.ceil(-trueP/avgNet) : 0;
+          const achieved = invest===0||trueP>=0;
+          const pct = invest>0?Math.min(100,Math.round(b.profit/invest*100)):100;
+          return `
+          <div style="padding:12px 0;border-bottom:1px solid #f3f4f6">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <span style="font-size:14px;font-weight:700">${b.id}ロット</span>
+              <span style="font-size:13px;font-weight:700;color:${achieved?'#059669':'#ef4444'}">${achieved?'🟢 黒字':'🔴 赤字'} ${trueP>=0?'+':''}${fmt(trueP)}</span>
+            </div>
+            <div style="background:#f3f4f6;border-radius:6px;height:6px;overflow:hidden;margin-bottom:4px">
+              <div style="background:${achieved?'#059669':'#ef4444'};height:100%;width:${pct}%;border-radius:6px"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#9ca3af">
+              <span>投資 ${fmt(invest)} / 回収 ${fmt(b.profit)}（${pct}%）</span>
+              <span>${achieved?'達成済み':'あと'+remaining+'個'}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
       <div class="card"><div class="card-title">ロット別売上</div><div class="chart-box-lg"><canvas id="chart-bar-sales"></canvas></div></div>
       <div class="card"><div class="card-title">ロット別利益</div><div class="chart-box-lg"><canvas id="chart-bar-profit"></canvas></div></div>
-      <div class="card"><div class="card-title">利益ランキング</div>
-        ${d.boxes.sort((a,b2)=>b2.profit-a.profit).map((b,i)=>`
-          <div class="rank-item">
-            <div class="rank-num" style="background:${i===0?'#059669':i===1?'#3b82f6':i===2?'#f59e0b':'#e5e7eb'};color:${i<3?'#fff':'#374151'}">${i+1}</div>
-            <span style="flex:1;font-size:13px;font-weight:500">${b.id}</span>
-            <span style="font-weight:700;color:#ef4444">${fmt(b.profit)}</span>
-          </div>`).join('')}
-      </div>
     `:''}
     ${tab==='category'?`
       <div class="card"><div class="card-title">カテゴリー別売卸率</div><div class="chart-box-lg"><canvas id="chart-donut"></canvas></div></div>
