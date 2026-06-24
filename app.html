@@ -1348,19 +1348,26 @@ function pageAnalytics() {
       })()}
       ${(()=>{
         const discount = parseFloat(S.tab.discountRate||0);
-        const ship = 500;
+        const shipOut = 500;
         const active = d.products.filter(p=>p.status==='出品中'||p.status==='保管中'||p.status==='セット中');
         const calc = active.map(p=>{
+          const lot = d.boxes.find(b=>b.id===p.box);
+          const costPerItem = lot&&lot.total ? Math.round((lot.cost||0)/lot.total) : 0;
+          const shipPerItem = lot&&lot.total ? Math.round((lot.ship||0)/lot.total) : 0;
           const salePrice = Math.round(p.price * (1 - discount/100));
           const fee = Math.floor(salePrice * 0.1);
-          return salePrice - fee - ship;
+          const revenue = salePrice - fee - shipOut;
+          const netProfit = revenue - costPerItem - shipPerItem;
+          return {revenue, netProfit};
         });
-        const estTotal = calc.reduce((a,b)=>a+b,0);
+        const estRevenue = calc.reduce((a,b)=>a+b.revenue,0);
+        const estProfit  = calc.reduce((a,b)=>a+b.netProfit,0);
         const estCount = active.length;
+        const estRevenueNoDisc = active.reduce((a,p)=>a+p.price-Math.floor(p.price*0.1)-shipOut,0);
         return `
         <div class="card" style="margin-bottom:12px">
           <div class="card-title">概算売上シミュレーション</div>
-          <div style="font-size:12px;color:#6b7280;margin-bottom:12px">出品中・保管中・セット中（${estCount}件）が現在価格で全て売れた場合</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:12px">出品中・保管中・セット中（${estCount}件）が全て売れた場合</div>
           <div style="margin-bottom:12px">
             <label class="field-label">割引率（%）</label>
             <div style="display:flex;gap:8px;align-items:center">
@@ -1369,10 +1376,14 @@ function pageAnalytics() {
               <button onclick="S.tab.discountRate=document.getElementById('discount-rate').value;render()" style="background:#3b82f6;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">計算</button>
             </div>
           </div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算手取り（手数料10%・送料500円差引）</div>
-            <div style="font-size:28px;font-weight:700;color:#059669">${fmt(estTotal)}</div>
-            ${discount>0?`<div style="font-size:12px;color:#f59e0b;margin-top:4px">${discount}%引き適用中 / 割引なし: ${fmt(d.products.filter(p=>p.status==='出品中'||p.status==='保管中'||p.status==='セット中').reduce((a,p)=>a+p.price-Math.floor(p.price*0.1)-500,0))}</div>`:''}
+          <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:8px">
+            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算手取り（手数料10%・発送送料500円差引）</div>
+            <div style="font-size:26px;font-weight:700;color:#059669">${fmt(estRevenue)}</div>
+            ${discount>0?`<div style="font-size:11px;color:#f59e0b;margin-top:2px">${discount}%引き / 割引なし: ${fmt(estRevenueNoDisc)}</div>`:''}
+          </div>
+          <div style="background:#eff6ff;border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算純利益（上記から仕入れ・入荷送料も差引）</div>
+            <div style="font-size:26px;font-weight:700;color:${estProfit>=0?'#1d4ed8':'#ef4444'}">${estProfit>=0?'+':''}${fmt(estProfit)}</div>
           </div>
         </div>`;
       })()}
