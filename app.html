@@ -490,7 +490,7 @@ function pageDashboard() {
             <span style="font-size:20px">${p.emoji}</span>
             <div style="flex:1;min-width:0">
               <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-              <div style="font-size:11px;color:#9ca3af">${p.id} · ¥${p.price.toLocaleString()}${p.days>0?' · '+p.days+'日':''}
+              <div style="font-size:11px;color:#9ca3af">¥${p.price.toLocaleString()}${p.days>0?' · '+p.days+'日':''}
               </div>
             </div>
             <button onclick="openQuickSale('${p.id}')" style="background:#059669;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">売れた！</button>
@@ -624,7 +624,7 @@ function pageBoxDetail() {
       <div class="card" style="margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.id} · ${p.days}日経過</div>${p.memo?`<div style="font-size:12px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
           <div style="text-align:right">${badge(p.status)}<div style="font-size:14px;font-weight:700;margin-top:4px">${fmt(p.price)}</div>${p.album?'<div style="font-size:10px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
         </div>
         ${p.album?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6"><a href="${p.album}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#065f46;font-size:13px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none">📷 LINEアルバムを開く</a></div>`:''}
@@ -664,7 +664,7 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:12px" onclick="S.viewPid='${p.id}';go('productDetail')" style="cursor:pointer">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.id} · ${p.box}${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
+          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:14px;font-weight:700">${fmt(p.price)}</div></div>
             <button onclick="event.stopPropagation();deleteProduct('${p.id}')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer">🗑</button>
@@ -695,7 +695,7 @@ function pageProductDetail() {
         <span style="font-size:48px">${p.emoji}</span>
         <div>
           <div style="font-size:18px;font-weight:700;color:#111827">${p.name}</div>
-          <div style="font-size:13px;color:#9ca3af;margin-top:2px">${p.id}</div>
+          <div style="font-size:13px;color:#9ca3af;margin-top:2px">${p.box}ロット</div>
           ${badge(p.status)}
         </div>
       </div>
@@ -775,7 +775,7 @@ function deleteAllCancelled() {
 function deleteProduct(pid) {
   const p = S.data.products.find(pr=>pr.id===pid);
   if (!p) return;
-  if (!confirm(`「${p.name}」（${p.id}）を削除しますか？\nこの操作は元に戻せません。`)) return;
+  if (!confirm(`「${p.name}」を削除しますか？\nこの操作は元に戻せません。`)) return;
   if (p.status === '売卸済' && p.soldPrice) {
     const lot = S.data.boxes.find(b=>b.id===p.box);
     if (lot) {
@@ -832,7 +832,7 @@ function updateQuickSalePreview() {
 function cancelProduct(pid) {
   const p = S.data.products.find(pr=>pr.id===pid);
   if (!p) return;
-  if (!confirm(`「${p.name}」（${p.id}）を取消にしますか？`)) return;
+  if (!confirm(`「${p.name}」を取消にしますか？`)) return;
   S.data.products = S.data.products.map(pr=>pr.id===pid?{...pr,status:'キャンセル',cancelDate:today()}:pr);
   saveData(); render();
 }
@@ -919,7 +919,7 @@ function filterProductList(q) {
     <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:26px">${p.emoji}</span>
-        <div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.id} · ${p.box}${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
         <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge(p.status)}<div style="font-size:14px;font-weight:700">${fmt(p.price)}</div>${p.album?'<div style="font-size:10px;color:#059669">📷 写真あり</div>':''}<span style="font-size:16px;color:#d1d5db">›</span></div>
       </div>
     </div>`).join('') + (shown.length===0?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':'');
@@ -1128,7 +1128,7 @@ function pageSetDetail() {
       </div>
     </div>
     <div class="card"><div class="card-title">セット内容（${prods.length}点）</div>
-      ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.id}</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
+      ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.box}ロット</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
     </div>
     ${s.notes?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
       <div style="font-weight:700;color:#b45309;margin-bottom:8px;font-size:14px">⚠️ このセットは必ずまとめて発送してください</div>
@@ -1358,7 +1358,7 @@ function pageAlertAction() {
           <span style="font-size:24px">${p.emoji}</span>
           <div style="flex:1;min-width:0">
             <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-            <div style="font-size:11px;color:#9ca3af">${p.id} · ${p.box} · <span style="color:${color};font-weight:700">${p.days}日経過</span></div>
+            <div style="font-size:11px;color:#9ca3af">${p.box}ロット · <span style="color:${color};font-weight:700">${p.days}日経過</span></div>
           </div>
           <button onclick="S.viewPid='${p.id}';go('productDetail')" style="font-size:11px;color:#6b7280;background:#f3f4f6;border:none;border-radius:6px;padding:4px 8px;cursor:pointer">詳細</button>
         </div>
@@ -1584,7 +1584,7 @@ function renderModal() {
         <div class="modal-header"><h2>売上を記録</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
         <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#f0fdf4;border-radius:10px;margin-bottom:16px">
           <span style="font-size:28px">${p.emoji}</span>
-          <div><div style="font-weight:700;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.id} · ${p.box}</div></div>
+          <div><div style="font-weight:700;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット</div></div>
         </div>
         <div class="grid2" style="gap:8px;margin-bottom:12px">
           <div><label class="field-label">実売価格（円）</label><input id="qs-price" class="input" type="number" value="${defPrice}" oninput="updateQuickSalePreview()"></div>
