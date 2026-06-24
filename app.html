@@ -1452,7 +1452,7 @@ function pageAnalytics() {
       })()}
       ${(()=>{
         const discount = parseFloat(S.tab.discountRate||0);
-        const shipOut = 500;
+        const shipOut = parseInt(S.tab.simShipOut??500);
         const defCost2 = d.defaultCostPerItem??484;
         // 個別出品中・保管中（ロットに仕入額があれば1点あたりの実費を使用）
         const indivProds = fProds.filter(p=>p.status==='出品中'||p.status==='保管中');
@@ -1474,7 +1474,6 @@ function pageAnalytics() {
           const fee = Math.floor(salePrice * 0.1);
           const revenue = salePrice - fee - shipOut;
           const itemCount = s.pids.length;
-          // セット内商品のロット原価を合計
           const setCost = s.pids.reduce((a,pid)=>{
             const prod = d.products.find(p=>p.id===pid);
             const lot = prod ? d.boxes.find(b=>b.id===prod.box) : null;
@@ -1488,28 +1487,39 @@ function pageAnalytics() {
         const estProfit  = allCalc.reduce((a,b)=>a+b.netProfit,0);
         const estItems   = allCalc.reduce((a,b)=>a+b.items,0);
         const estListings = indivProds.length + relevantSets.length;
-        const estRevenueNoDisc = indivProds.reduce((a,p)=>a+p.price-Math.floor(p.price*0.1)-shipOut,0)
-          + relevantSets.reduce((a,s)=>a+s.price-Math.floor(s.price*0.1)-shipOut,0);
+        const estProfitNoDisc = indivProds.reduce((a,p)=>{
+          const lot = d.boxes.find(b=>b.id===p.box);
+          const cpi = lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
+          return a + p.price - Math.floor(p.price*0.1) - shipOut - cpi;
+        },0) + relevantSets.reduce((a,s)=>{
+          const fee = Math.floor(s.price*0.1);
+          const setCost = s.pids.reduce((ac,pid)=>{
+            const prod=d.products.find(p=>p.id===pid);
+            const lot=prod?d.boxes.find(b=>b.id===prod.box):null;
+            return ac+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+          },0);
+          return a + s.price - fee - shipOut - setCost;
+        },0);
         return `
         <div class="card" style="margin-bottom:12px">
           <div class="card-title">概算売上シミュレーション${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
-          <div style="font-size:12px;color:#6b7280;margin-bottom:12px">${estListings}件（個別${indivProds.length}点 + セット${relevantSets.length}件/${estItems-indivProds.length}点）が全て売れた場合</div>
-          <div style="margin-bottom:12px">
-            <label class="field-label">割引率（%）</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="discount-rate" class="input" type="number" min="0" max="99" value="${discount}" placeholder="0" style="width:80px;text-align:center;font-weight:700">
-              <span style="font-size:13px;color:#6b7280">% 値引き</span>
-              <button onclick="S.tab.discountRate=document.getElementById('discount-rate').value;render()" style="background:#3b82f6;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">計算</button>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:12px">${estListings}件（個別${indivProds.length}点 + セット${relevantSets.length}件）が全て売れた場合</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <div>
+              <label class="field-label">割引率（%）</label>
+              <input id="discount-rate" class="input" type="number" min="0" max="99" value="${discount}" placeholder="0" style="text-align:center;font-weight:700">
+            </div>
+            <div>
+              <label class="field-label">発送送料（円）</label>
+              <input id="sim-ship-out" class="input" type="number" min="0" value="${shipOut}" placeholder="500" style="text-align:center;font-weight:700">
             </div>
           </div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:8px">
-            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算手取り（手数料10%・発送送料500円差引）</div>
-            <div style="font-size:26px;font-weight:700;color:#059669">${fmt(estRevenue)}</div>
-            ${discount>0?`<div style="font-size:11px;color:#f59e0b;margin-top:2px">${discount}%引き / 割引なし: ${fmt(estRevenueNoDisc)}</div>`:''}
-          </div>
-          <div style="background:#eff6ff;border-radius:10px;padding:14px">
-            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算純利益（手取りから各ロット仕入原価を差引）</div>
-            <div style="font-size:26px;font-weight:700;color:${estProfit>=0?'#1d4ed8':'#ef4444'}">${estProfit>=0?'+':''}${fmt(estProfit)}</div>
+          <button onclick="S.tab.discountRate=document.getElementById('discount-rate').value;S.tab.simShipOut=document.getElementById('sim-ship-out').value;render()" style="width:100%;background:#3b82f6;color:white;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px">計算する</button>
+          <div style="background:#f0fdf4;border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算手取り（手数料・送料${fmt(shipOut)}・仕入コスト差引）</div>
+            <div style="font-size:26px;font-weight:700;color:${estProfit>=0?'#059669':'#ef4444'}">${estProfit>=0?'+':''}${fmt(estProfit)}</div>
+            ${discount>0?`<div style="font-size:11px;color:#f59e0b;margin-top:4px">${discount}%引き / 割引なし: ${estProfitNoDisc>=0?'+':''}${fmt(estProfitNoDisc)}</div>`:''}
+            <div style="font-size:10px;color:#9ca3af;margin-top:4px">手数料・送料のみ差引: ${fmt(estRevenue)}</div>
           </div>
         </div>`;
       })()}
