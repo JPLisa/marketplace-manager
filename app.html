@@ -745,7 +745,7 @@ function pageProductDetail() {
       <div style="margin-bottom:10px"><label class="field-label">商品名</label><input id="edit-name" class="input" value="${p.name||''}"></div>
       <div style="margin-bottom:10px"><label class="field-label">カテゴリー</label>
         <select id="edit-cat" class="input">
-          ${['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','その他'].map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}
+          ${['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','キャンプ用品','その他'].map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </div>
       <div style="margin-bottom:10px"><label class="field-label">販売価格</label><input id="edit-price" class="input" type="number" value="${p.price}"></div>
@@ -946,7 +946,7 @@ function saveProductEdit(pid) {
   const price = parseInt(document.getElementById('edit-price')?.value) || 0;
   const album = document.getElementById('edit-album')?.value || '';
   const memo  = document.getElementById('edit-memo')?.value || '';
-  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','その他':'📦'};
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','キャンプ用品':'⛺','その他':'📦'};
   const emoji = emojiMap[cat] || '📦';
   S.data.products = S.data.products.map(p=>p.id===pid?{...p,name,cat,emoji,price,album,memo}:p);
   saveData();
@@ -961,7 +961,7 @@ function saveProductEdit(pid) {
 // PAGE: PRODUCT REGISTRATION
 // ============================================================
 function pageProductReg() {
-  const allCats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','その他'];
+  const allCats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','キャンプ用品','その他'];
   const catCount = {};
   S.data.products.forEach(p=>{ if(p.cat) catCount[p.cat]=(catCount[p.cat]||0)+1; });
   const cats = [...allCats].sort((a,b)=>(catCount[b]||0)-(catCount[a]||0));
@@ -1831,7 +1831,7 @@ function saveProduct() {
   const cat = document.getElementById('reg-cat')?.value;
   const album = document.getElementById('reg-album')?.value || '';
   const memo = document.getElementById('reg-memo')?.value || '';
-  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','その他':'📦'};
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','キャンプ用品':'⛺','その他':'📦'};
   const newId = genProductId(box);
   S.data.products.push({id:newId,name,box,status:'出品中',listPrice:price,price,cat,emoji:emojiMap[cat]||'📦',days:0,registeredDate:today(),album,memo});
   saveData();
