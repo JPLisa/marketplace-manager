@@ -496,6 +496,32 @@ function pageDashboard() {
       <span style="font-size:13px;font-weight:600;color:#92400e">📦 保管中</span>
       <span style="font-size:20px;font-weight:800;color:#b45309">${stored}点</span>
     </div>`:''}
+    ${d.boxes.length>0?`<div class="card" style="margin-bottom:14px;padding:12px 14px">
+      <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;letter-spacing:0.5px">ロット別 出品状況</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${d.boxes.map(b=>{
+          const bListing = d.products.filter(p=>p.box===b.id&&p.status==='出品中').length;
+          const bStored  = d.products.filter(p=>p.box===b.id&&p.status==='保管中').length;
+          const bSold    = d.products.filter(p=>p.box===b.id&&p.status==='売卸済').length;
+          const bTotal   = d.products.filter(p=>p.box===b.id).length;
+          const pct      = bTotal>0 ? Math.round(bSold/bTotal*100) : 0;
+          return `<div onclick="S.boxId='${b.id}';go('boxDetail')" style="cursor:pointer">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:13px;font-weight:700;color:#111827">ロット${b.id}</span>
+              <div style="display:flex;gap:10px;font-size:12px">
+                <span style="color:#059669;font-weight:700">📢 出品中 ${bListing}点</span>
+                ${bStored>0?`<span style="color:#d97706;font-weight:700">📦 保管中 ${bStored}点</span>`:''}
+                <span style="color:#3b82f6;font-weight:700">✅ 売れた ${bSold}点</span>
+              </div>
+            </div>
+            <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden">
+              <div style="background:#3b82f6;height:100%;width:${pct}%;border-radius:99px;transition:width 0.3s"></div>
+            </div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px;text-align:right">登録${bTotal}点中 ${pct}%売卸済</div>
+          </div>`;
+        }).join('<div style="border-top:1px solid #f3f4f6"></div>')}
+      </div>
+    </div>`:''}
     <div class="flex-between" style="margin-bottom:10px">
       <div style="font-size:16px;font-weight:700;color:#111827">📦 ロット管理</div>
       ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
