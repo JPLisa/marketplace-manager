@@ -1323,9 +1323,14 @@ function pageAnalytics() {
       </div>
       ${(()=>{
         const defCost2 = d.defaultCostPerItem??484;
-        const totalInvest = d.boxes.reduce((a,b)=>a+(b.cost>0?b.cost:defCost2*(b.total||0))+(b.ship||0),0);
         const totalSold = d.boxes.reduce((a,b)=>a+b.sold,0);
-        const trueProfit = totalProfit - totalInvest;
+        // 登録済み商品数 × 仕入原価 + 全ロット入荷送料
+        const totalRegCount = d.products.length;
+        const totalShipIn = d.boxes.reduce((a,b)=>a+(b.ship||0),0);
+        const totalInvest = defCost2 * totalRegCount + totalShipIn;
+        // b.profitは売却時に仕入原価を差引済み → 未売商品分の原価を追加差引
+        const unsoldCost = defCost2 * (totalRegCount - totalSold);
+        const trueProfit = totalProfit - totalShipIn - unsoldCost;
         const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
         const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
         const achieved = trueProfit >= 0;
@@ -1354,10 +1359,10 @@ function pageAnalytics() {
               <span style="font-size:20px;font-weight:700;color:#ef4444">あと${remaining}個</span>
             </div>
             <div style="background:#fecaca;border-radius:6px;height:8px;overflow:hidden">
-              <div style="background:#ef4444;height:100%;width:${Math.min(100,Math.round(totalProfit/totalInvest*100))}%;border-radius:6px;transition:width 0.3s"></div>
+              <div style="background:#ef4444;height:100%;width:${Math.min(100,Math.max(0,Math.round((totalInvest+trueProfit)/totalInvest*100)))}%;border-radius:6px;transition:width 0.3s"></div>
             </div>
             <div style="display:flex;justify-content:space-between;margin-top:4px">
-              <span style="font-size:11px;color:#9ca3af">回収率 ${totalInvest>0?Math.round(totalProfit/totalInvest*100):0}%</span>
+              <span style="font-size:11px;color:#9ca3af">回収率 ${totalInvest>0?Math.max(0,Math.round((totalInvest+trueProfit)/totalInvest*100)):0}%</span>
               <span style="font-size:11px;color:#9ca3af">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
             </div>
           </div>`}
