@@ -885,6 +885,8 @@ function matchProductSearch(p, raw) {
 
   // 商品名の部分一致
   if (pname.includes(q.toLowerCase())) return true;
+  // カテゴリーの部分一致
+  if ((p.cat||'').toLowerCase().includes(q.toLowerCase())) return true;
   // ID完全一致（A1はA14にヒットしない）
   if (pid === q) return true;
   // 数字のみ → 全ロットの同番号にヒット（例: "1" → A1, B1, C1）
