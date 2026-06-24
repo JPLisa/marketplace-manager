@@ -1401,27 +1401,29 @@ function pageAnalytics() {
         }, 0);
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
         const totalInvest = totalRealCost + totalShipIn;
-        // 損益分岐はgrossSaleProfit（仕入コス差引前）vs 総投資額で比較
-        const grossReturn = grossSaleProfit;
-        const trueProfit = grossReturn - totalInvest;
+        // 利益累計（totalProfit）vs 未回収投資額で損益分岐を計算
+        const recoveredCost = soldProds.length * defCost2;
+        const remainInvest = totalInvest - recoveredCost;
+        const grossReturn = totalProfit;
+        const trueProfit = grossReturn - remainInvest;
         const avgNet = totalSold>0 ? grossSaleProfit/totalSold : 0;
         const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
         const achieved = trueProfit >= 0;
-        const recoverPct = totalInvest>0 ? Math.min(100,Math.max(0,Math.round(grossReturn/totalInvest*100))) : 100;
+        const recoverPct = totalInvest>0 ? Math.min(100,Math.max(0,Math.round((recoveredCost+Math.max(0,grossReturn))/totalInvest*100))) : 100;
         return `
         <div class="card" style="margin-bottom:12px">
           <div class="card-title">損益分岐点${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
           <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:12px;color:#6b7280">総投資額</span>
-              <span style="font-size:15px;font-weight:700;color:#374151">${fmt(totalInvest)}</span>
+              <span style="font-size:12px;color:#6b7280">未回収投資額</span>
+              <span style="font-size:15px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
             </div>
-            <div style="font-size:10px;color:#9ca3af;text-align:right;margin-bottom:8px">仕入${fmt(totalRealCost)} + 入荷送料${fmt(totalShipIn)}</div>
+            <div style="font-size:10px;color:#9ca3af;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:12px;color:#6b7280">売上手取り累計</span>
+              <span style="font-size:12px;color:#6b7280">利益累計</span>
               <span style="font-size:15px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
             </div>
-            <div style="font-size:10px;color:#9ca3af;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費</div>
+            <div style="font-size:10px;color:#9ca3af;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
             <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:12px;font-weight:600;color:#374151">現在の損益</span>
               <span style="font-size:17px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
