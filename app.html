@@ -1777,6 +1777,7 @@ function initCharts() {
 // ACTIONS
 // ============================================================
 function go(page, params={}) {
+  if (page === 'productReg') S.prevPage = S.page;
   Object.assign(S, params);
   S.page = page;
   S.showMore = false;
@@ -1833,11 +1834,11 @@ function saveProduct() {
   saveData();
   const btn = document.getElementById('save-btn');
   if (btn) {
-    btn.textContent = `✓ ${newId} で登録しました！`;
+    btn.textContent = '✓ 登録しました！';
     btn.style.background = '#059669';
     btn.disabled = true;
   }
-  setTimeout(()=>go('products'), 1500);
+  setTimeout(()=>go(S.prevPage||'home'), 1500);
 }
 
 function saveSale(price, ship, profit) {
