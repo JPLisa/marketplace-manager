@@ -961,7 +961,10 @@ function saveProductEdit(pid) {
 // PAGE: PRODUCT REGISTRATION
 // ============================================================
 function pageProductReg() {
-  const cats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','その他'];
+  const allCats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','その他'];
+  const catCount = {};
+  S.data.products.forEach(p=>{ if(p.cat) catCount[p.cat]=(catCount[p.cat]||0)+1; });
+  const cats = [...allCats].sort((a,b)=>(catCount[b]||0)-(catCount[a]||0));
   const isOwner = S.mode === 'owner';
   const defaultBox = S.regBoxId || S.data.boxes[0]?.id || '';
   const lotSelector = `
