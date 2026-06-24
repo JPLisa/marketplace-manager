@@ -1346,6 +1346,36 @@ function pageAnalytics() {
           </div>`}
         </div>`;
       })()}
+      ${(()=>{
+        const discount = parseFloat(S.tab.discountRate||0);
+        const ship = 500;
+        const active = d.products.filter(p=>p.status==='出品中'||p.status==='保管中'||p.status==='セット中');
+        const calc = active.map(p=>{
+          const salePrice = Math.round(p.price * (1 - discount/100));
+          const fee = Math.floor(salePrice * 0.1);
+          return salePrice - fee - ship;
+        });
+        const estTotal = calc.reduce((a,b)=>a+b,0);
+        const estCount = active.length;
+        return `
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">概算売上シミュレーション</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:12px">出品中・保管中・セット中（${estCount}件）が現在価格で全て売れた場合</div>
+          <div style="margin-bottom:12px">
+            <label class="field-label">割引率（%）</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="discount-rate" class="input" type="number" min="0" max="99" value="${discount}" placeholder="0" style="width:80px;text-align:center;font-weight:700">
+              <span style="font-size:13px;color:#6b7280">% 値引き</span>
+              <button onclick="S.tab.discountRate=document.getElementById('discount-rate').value;render()" style="background:#3b82f6;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">計算</button>
+            </div>
+          </div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:#6b7280;margin-bottom:4px">概算手取り（手数料10%・送料500円差引）</div>
+            <div style="font-size:28px;font-weight:700;color:#059669">${fmt(estTotal)}</div>
+            ${discount>0?`<div style="font-size:12px;color:#f59e0b;margin-top:4px">${discount}%引き適用中 / 割引なし: ${fmt(d.products.filter(p=>p.status==='出品中'||p.status==='保管中'||p.status==='セット中').reduce((a,p)=>a+p.price-Math.floor(p.price*0.1)-500,0))}</div>`:''}
+          </div>
+        </div>`;
+      })()}
       <div class="card"><div class="card-title">売上・利益の推移</div><div class="chart-box-lg"><canvas id="chart-line"></canvas></div></div>
     `:''}
     ${tab==='boxes'?`
