@@ -196,6 +196,7 @@ const INIT = {
   messages:[],
   work:[],
   aiSugg:[],
+  defaultCostPerItem: 484,
   addresses:[
     {id:1,emoji:'🏠',name:'自宅',address:'',main:true},
   ],
@@ -1315,7 +1316,8 @@ function pageAnalytics() {
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
       </div>
       ${(()=>{
-        const totalInvest = d.boxes.reduce((a,b)=>a+(b.cost||0)+(b.ship||0),0);
+        const defCost2 = d.defaultCostPerItem??484;
+        const totalInvest = d.boxes.reduce((a,b)=>a+(b.cost>0?b.cost:defCost2*(b.total||0))+(b.ship||0),0);
         const totalSold = d.boxes.reduce((a,b)=>a+b.sold,0);
         const trueProfit = totalProfit - totalInvest;
         const avgNet = totalSold>0 ? totalProfit/totalSold : 0;
@@ -1401,7 +1403,8 @@ function pageAnalytics() {
     ${tab==='boxes'?`
       <div class="card"><div class="card-title">ロット別損益分岐点</div>
         ${d.boxes.length===0?'<div style="text-align:center;color:#9ca3af;padding:20px">ロットがありません</div>':d.boxes.map(b=>{
-          const invest = (b.cost||0)+(b.ship||0);
+          const defCost = d.defaultCostPerItem??484;
+          const invest = (b.cost>0?b.cost:defCost*(b.total||0))+(b.ship||0);
           const trueP = b.profit - invest;
           const avgNet = b.sold>0 ? b.profit/b.sold : 0;
           const remaining = trueP<0&&avgNet>0 ? Math.ceil(-trueP/avgNet) : 0;
@@ -1609,6 +1612,16 @@ function pageSettings() {
       <div style="display:flex;gap:8px">
         <input id="owner-name-input" class="input" style="flex:1" value="${S.ownerName}" placeholder="オーナー名を入力">
         <button class="btn btn-primary btn-sm" onclick="(function(){const v=document.getElementById('owner-name-input').value.trim();if(v){S.ownerName=v;localStorage.setItem('aidesklapp_owner',v);render();}})()">保存</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">デフォルト仕入原価（1点あたり）</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px">ロット登録時に原価を入力しなかった場合に使用されます</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="default-cost-input" class="input" style="flex:1" type="number" value="${S.data.defaultCostPerItem??484}" placeholder="484">
+        <span style="font-size:13px;color:#6b7280">円</span>
+        <button class="btn btn-primary btn-sm" onclick="(function(){const v=parseInt(document.getElementById('default-cost-input').value);if(!isNaN(v)&&v>=0){S.data.defaultCostPerItem=v;saveData();render();alert('保存しました');}})()">保存</button>
       </div>
     </div>
 
@@ -1873,9 +1886,15 @@ function destroyCharts() {
 function initCharts() {
   destroyCharts();
   const d = S.data;
-  const labels = [...d.boxes].reverse().map(b=>b.id);
-  const salesD = [...d.boxes].reverse().map(b=>b.sales);
-  const profitD = [...d.boxes].reverse().map(b=>b.profit);
+  const defaultCost = d.defaultCostPerItem ?? 484;
+  const sortedBoxes = [...d.boxes].reverse();
+  const labels  = sortedBoxes.map(b=>b.id+'ロット');
+  const salesD  = sortedBoxes.map(b=>b.sales);
+  const profitD = sortedBoxes.map(b=>{
+    const lotCost = b.cost > 0 ? b.cost : defaultCost * (b.total||0);
+    const lotShip = b.ship || 0;
+    return b.profit - lotCost - lotShip;
+  });
   const opts6 = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#f9fafb'},ticks:{font:{size:10},callback:v=>'¥'+v.toLocaleString()}}}};
 
   function mkChart(id, type, data, options) {
