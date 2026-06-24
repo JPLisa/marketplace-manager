@@ -1527,7 +1527,10 @@ function pageAnalytics() {
           <div style="padding:14px 0;border-bottom:1px solid #f3f4f6">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <span style="font-size:15px;font-weight:700">ロット${b.id}</span>
-              <span style="font-size:13px;font-weight:700;color:${achieved?'#059669':'#ef4444'}">${achieved?'🟢 黒字':'🔴 赤字'} ${trueP>=0?'+':''}${fmt(trueP)}</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:13px;font-weight:700;color:${achieved?'#059669':'#ef4444'}">${achieved?'🟢 黒字':'🔴 赤字'} ${trueP>=0?'+':''}${fmt(trueP)}</span>
+                <button onclick="S.boxId='${b.id}';S.tab.editBox='${b.id}';go('boxDetail')" style="font-size:11px;padding:3px 8px;background:#f3f4f6;color:#6b7280;border:none;border-radius:6px;cursor:pointer">編集</button>
+              </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;font-size:11px;text-align:center">
               <div style="background:#f9fafb;border-radius:8px;padding:6px">
