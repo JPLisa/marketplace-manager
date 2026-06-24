@@ -1427,15 +1427,31 @@ function pageAnalytics() {
       <div class="card"><div class="card-title">ロット別利益</div><div class="chart-box-lg"><canvas id="chart-bar-profit"></canvas></div></div>
     `:''}
     ${tab==='category'?`
-      <div class="card"><div class="card-title">カテゴリー別売卸率</div><div class="chart-box-lg"><canvas id="chart-donut"></canvas></div></div>
-      <div class="card"><div class="card-title">売れやすいカテゴリー</div>
-        ${[['キャラクター',42,'#059669'],['雑貨',28,'#f59e0b'],['バッグ・ポーチ',16,'#8b5cf6'],['文房具',8,'#3b82f6'],['その他',6,'#6b7280']].map(([n,v,c])=>`
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <span style="font-size:13px;width:100px;flex-shrink:0">${n}</span>
-            <div class="progress" style="flex:1"><div class="progress-fill" style="width:${v*2}%;background:${c}"></div></div>
-            <span style="font-size:13px;font-weight:700;width:30px;text-align:right">${v}%</span>
-          </div>`).join('')}
-      </div>
+      <div class="card"><div class="card-title">カテゴリー別登録数</div><div class="chart-box-lg"><canvas id="chart-donut"></canvas></div></div>
+      ${(()=>{
+        const colors = ['#059669','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16','#f97316','#ec4899','#6b7280'];
+        const cats = {};
+        d.products.forEach(p=>{
+          const c = p.cat||'その他';
+          if (!cats[c]) cats[c] = {total:0,sold:0,revenue:0};
+          cats[c].total++;
+          if (p.status==='売卸済'){cats[c].sold++;cats[c].revenue+=(p.soldPrice||0);}
+        });
+        const sorted = Object.entries(cats).sort((a,b)=>b[1].total-a[1].total);
+        if (!sorted.length) return '<div class="card"><p style="text-align:center;color:#9ca3af;padding:20px">商品を登録すると表示されます</p></div>';
+        return '<div class="card"><div class="card-title">カテゴリー別実績</div>' +
+          sorted.map(([name,s],i)=>{
+            const rate = s.total>0?Math.round(s.sold/s.total*100):0;
+            const col = colors[i%colors.length];
+            return '<div style="margin-bottom:12px">' +
+              '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+              '<span style="font-size:13px;font-weight:600">'+name+'</span>' +
+              '<span style="font-size:12px;color:#6b7280">'+s.total+'件中 '+s.sold+'件売却（'+rate+'%）</span></div>' +
+              '<div class="progress"><div class="progress-fill" style="width:'+rate+'%;background:'+col+'"></div></div>' +
+              (s.revenue>0?'<div style="font-size:11px;color:#6b7280;margin-top:2px">売上合計: '+fmt(s.revenue)+'</div>':'') +
+              '</div>';
+          }).join('') + '</div>';
+      })()}
     `:''}
   `;
 }
@@ -1886,11 +1902,17 @@ function initCharts() {
     labels, datasets:[{data:profitD,backgroundColor:'#ef4444',borderRadius:4}]
   }, {...opts6, plugins:{legend:{display:false}}});
 
-  // Analytics donut
-  mkChart('chart-donut', 'doughnut', {
-    labels:['キャラクター','雑貨','バッグ・ポーチ','文房具','その他'],
-    datasets:[{data:[42,28,16,8,6],backgroundColor:['#059669','#f59e0b','#8b5cf6','#3b82f6','#6b7280'],borderWidth:0}]
-  },{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:11},padding:8,boxWidth:12}}}});
+  // Analytics donut — real data
+  const catCount2 = {};
+  S.data.products.forEach(p=>{ const c=p.cat||'その他'; catCount2[c]=(catCount2[c]||0)+1; });
+  const donutColors = ['#059669','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16','#f97316','#ec4899','#6b7280'];
+  const donutEntries = Object.entries(catCount2).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if (donutEntries.length) {
+    mkChart('chart-donut','doughnut',{
+      labels: donutEntries.map(e=>e[0]),
+      datasets:[{data:donutEntries.map(e=>e[1]),backgroundColor:donutColors.slice(0,donutEntries.length),borderWidth:0}]
+    },{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:11},padding:8,boxWidth:12}}}});
+  }
 }
 
 // ============================================================
