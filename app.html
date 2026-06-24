@@ -736,7 +736,7 @@ function pageProductDetail() {
         </div>
       </div>
       ${p.memo?`<div style="background:#fffbeb;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:11px;color:#9ca3af;margin-bottom:4px">メモ</div><div style="font-size:14px;color:#374151">${p.memo}</div></div>`:''}
-      ${sold&&p.soldPrice?`<div style="background:#eff6ff;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:11px;color:#9ca3af;margin-bottom:8px">売却情報</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"><div><div style="font-size:11px;color:#6b7280">実売価格</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${fmt(p.soldPrice)}</div></div><div><div style="font-size:11px;color:#6b7280">売却日</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.soldDate||'―'}</div></div><div><div style="font-size:11px;color:#6b7280">販売日数</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.daysToSell!=null?p.daysToSell+'日':'―'}</div></div></div><div style="border-top:1px solid #dbeafe;padding-top:8px;display:flex;flex-wrap:wrap;gap:10px"><div><div style="font-size:11px;color:#6b7280">送料</div><div style="font-size:14px;font-weight:700;color:#374151">-${fmt(p.soldShip||0)}</div></div><div><div style="font-size:11px;color:#6b7280">メルカリ手数料(10%)</div><div style="font-size:14px;font-weight:700;color:#374151">-${fmt(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))}</div></div><div><div style="font-size:11px;color:#6b7280">純利益</div><div style="font-size:14px;font-weight:700;color:#059669">+${fmt((p.soldPrice||0)-(p.soldShip||0)-(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1)))}</div></div></div></div>`:''}
+      ${sold&&p.soldPrice?`<div style="background:#eff6ff;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:11px;color:#9ca3af;margin-bottom:8px">売却情報</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"><div><div style="font-size:11px;color:#6b7280">実売価格</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${fmt(p.soldPrice)}</div></div><div><div style="font-size:11px;color:#6b7280">売却日</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.soldDate||'―'}</div></div><div><div style="font-size:11px;color:#6b7280">販売日数</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.daysToSell!=null?p.daysToSell+'日':'―'}</div></div></div><div style="border-top:1px solid #dbeafe;padding-top:8px;display:flex;flex-wrap:wrap;gap:10px"><div><div style="font-size:11px;color:#6b7280">送料</div><div style="font-size:14px;font-weight:700;color:#374151">-${fmt(p.soldShip||0)}</div></div><div><div style="font-size:11px;color:#6b7280">手数料(10%)</div><div style="font-size:14px;font-weight:700;color:#374151">-${fmt(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))}</div></div><div><div style="font-size:11px;color:#6b7280">仕入原価</div><div style="font-size:14px;font-weight:700;color:#374151">-${fmt(p.soldCost??S.data.defaultCostPerItem??484)}</div></div><div><div style="font-size:11px;color:#6b7280">純利益</div><div style="font-size:14px;font-weight:700;color:#059669">+${fmt((p.soldPrice||0)-(p.soldShip||0)-(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))-(p.soldCost??S.data.defaultCostPerItem??484))}</div></div></div></div>`:''}
       ${p.album?`<a href="${p.album}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#dcfce7;color:#065f46;font-size:14px;font-weight:600;padding:12px;border-radius:10px;text-decoration:none;margin-bottom:16px">📷 LINEアルバムを開く</a>`:''}
     </div>
     ${!sold?`
@@ -864,7 +864,8 @@ function confirmQuickSale() {
   const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
   if (!price) { alert('販売価格を入力してください'); return; }
   const fee    = Math.floor(price * 0.1);
-  const profit = price - ship - fee;
+  const costPerItem = S.data.defaultCostPerItem ?? 484;
+  const profit = price - ship - fee - costPerItem;
   const pid    = S.selPid;
   const soldDate = today();
   const prod   = S.data.products.find(p=>p.id===pid);
@@ -887,10 +888,12 @@ function updateQuickSalePreview() {
   const price = parseInt(document.getElementById('qs-price')?.value) || 0;
   const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
   const fee   = Math.floor(price * 0.1);
-  const profit = price - ship - fee;
+  const costPerItem = S.data.defaultCostPerItem ?? 484;
+  const profit = price - ship - fee - costPerItem;
   const el = document.getElementById('qs-preview');
   if (el) el.innerHTML = `
     <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span>-¥${fee.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span>-¥${costPerItem.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px"><span>利益</span><span style="color:#ef4444">¥${profit.toLocaleString()}</span></div>`;
 }
 
@@ -906,11 +909,13 @@ function updateSalePreview() {
   const price = parseInt(document.getElementById('sale-price')?.value) || 0;
   const ship = parseInt(document.getElementById('sale-ship')?.value) || 0;
   const fee = Math.floor(price * 0.1);
-  const profit = price - ship - fee;
+  const costPerItem = S.data.defaultCostPerItem ?? 484;
+  const profit = price - ship - fee - costPerItem;
   const el = document.getElementById('sale-preview');
   if (!el) return;
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-¥${fee.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span style="color:#ef4444">-¥${costPerItem.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">¥${profit.toLocaleString()}</span></div>
   `;
 }
@@ -1081,7 +1086,8 @@ function pageSalesInput() {
   const price = parseInt(S.salePrice) || (prod ? prod.price : 0);
   const ship = parseInt(S.saleShip) || 0;
   const fee = Math.floor(price * 0.1);
-  const profit = price - ship - fee;
+  const costPerItem = S.data.defaultCostPerItem ?? 484;
+  const profit = price - ship - fee - costPerItem;
   const stepBar = `<div style="display:flex;gap:6px;margin-bottom:16px">${[1,2,3].map(n=>`<div style="flex:1;height:4px;border-radius:2px;background:${step>=n?'#059669':'#e5e7eb'}"></div>`).join('')}</div>`;
 
   if (step === 1) return `
@@ -2005,6 +2011,9 @@ function saveProduct() {
 function saveSale(price, ship, profit) {
   if (!S.selPid) return;
   const pid = S.selPid;
+  const fee = Math.floor(price * 0.1);
+  const costPerItem = S.data.defaultCostPerItem ?? 484;
+  const trueProfit = price - ship - fee - costPerItem;
   const soldDate = today();
   const prod = S.data.products.find(p=>p.id===pid);
   const lotId = prod?.box;
@@ -2014,9 +2023,9 @@ function saveSale(price, ship, profit) {
     const b = new Date(soldDate.replace(/\//g,'-'));
     return Math.round((b-a)/(1000*60*60*24));
   })();
-  S.data.products = S.data.products.map(p => p.id===pid ? {...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldDate,daysToSell} : p);
+  S.data.products = S.data.products.map(p => p.id===pid ? {...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell} : p);
   if (lotId) {
-    S.data.boxes = S.data.boxes.map(b => b.id===lotId ? {...b,sold:b.sold+1,sales:b.sales+price,profit:b.profit+profit} : b);
+    S.data.boxes = S.data.boxes.map(b => b.id===lotId ? {...b,sold:b.sold+1,sales:b.sales+price,profit:b.profit+trueProfit} : b);
   }
   saveData();
   S.selPid = null; S.salesStep = 1; S.salePrice = ''; S.saleShip = '210';
