@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>返品物販 管理アプリ</title>
+<title>メルカリ売上管理</title>
 <script>/**
  * Skipped minification because the original files appears to be already minified.
  * Original file: /npm/chart.js@4.4.0/dist/chart.umd.js
@@ -397,7 +397,7 @@ function renderSidebar() {
     {id:'permissions',ico:'user',label:'権限設定'},
   ];
   return `<div class="sidebar">
-    <div class="sidebar-logo"><h1>返品物販 管理アプリ</h1><p>2026年6月</p></div>
+    <div class="sidebar-logo"><h1>メルカリ売上管理</h1><p>2026年6月</p></div>
     <button class="mode-chip ${S.mode}" onclick="toggleMode()">
       <span style="font-size:18px">${S.mode==='owner'?'👑':'🐰'}</span>
       <div><span class="label">${S.mode==='owner'?S.ownerName+'（オーナー）':'スタッフモード'}</span><span class="sub">クリックで切り替え</span></div>
@@ -411,7 +411,7 @@ function renderSidebar() {
 
 function renderTopBar() {
   return `<div class="top-bar">
-    <div><h2>返品物販 管理</h2><p>${pageTitle()}</p></div>
+    <div><h2>メルカリ売上管理</h2><p>${pageTitle()}</p></div>
     <div class="top-actions">
       <button class="mode-toggle ${S.mode}" onclick="toggleMode()">${S.mode==='owner'?'👑 '+S.ownerName:'🐰 スタッフ'}</button>
     </div>
