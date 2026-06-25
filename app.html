@@ -1063,7 +1063,7 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:12px" onclick="S.viewPid='${p.id}';go('productDetail')" style="cursor:pointer">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:19px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:12px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
+          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:21px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:12px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:14px;font-weight:700">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
