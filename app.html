@@ -636,94 +636,163 @@ function pageDashboard() {
     </div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">配送方法・必要資材ガイド</div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;font-weight:700;color:#059669;background:#f0fdf4;border-radius:8px;padding:6px 10px;margin-bottom:8px">ゆうゆうメルカリ便（日本郵便）</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="background:#f9fafb;color:#6b7280">
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">サービス</th>
-            <th style="text-align:center;padding:6px 4px;border-bottom:1px solid #e5e7eb">料金</th>
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">サイズ・重さ</th>
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">必要資材</th>
+      <div style="font-size:10px;color:#9ca3af;margin-bottom:10px">※2026年5月時点 / メルカリ公式資料より</div>
+
+      <!-- ゆうゆうメルカリ便 -->
+      <div style="background:#f0fdf4;border-radius:10px;padding:10px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:#059669;margin-bottom:8px">📮 ゆうゆうメルカリ便（日本郵便）　発送：郵便局・ローソン・Smari</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="color:#6b7280;border-bottom:2px solid #bbf7d0">
+            <th style="text-align:left;padding:5px 6px">サービス</th>
+            <th style="text-align:center;padding:5px 4px;white-space:nowrap">送料</th>
+            <th style="text-align:left;padding:5px 6px">最大サイズ</th>
+            <th style="text-align:center;padding:5px 4px">重さ</th>
+            <th style="text-align:left;padding:5px 6px">資材</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ゆうパケットポストmini</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥160</td>
-              <td style="padding:7px 8px;color:#6b7280">〜1kg</td>
-              <td style="padding:7px 8px;color:#374151">専用封筒（メルカリストア）</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">ゆうパケットポストmini</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥160</td>
+              <td style="padding:6px 6px;color:#374151">内寸 21.1×16.8cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">2kg</td>
+              <td style="padding:6px 6px;color:#374151">専用封筒 <span style="color:#ef4444;font-weight:600">¥20</span></td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ゆうパケットポスト</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥215</td>
-              <td style="padding:7px 8px;color:#6b7280">〜2kg</td>
-              <td style="padding:7px 8px;color:#374151">専用箱 または 専用シール（メルカリストア）</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#f9fffe">
+              <td style="padding:6px 6px;font-weight:700">ゆうパケットポスト</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥215</td>
+              <td style="padding:6px 6px;color:#374151">32.7×22.8×3cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">2kg</td>
+              <td style="padding:6px 6px;color:#374151">専用箱 <span style="color:#ef4444;font-weight:600">¥65</span> or 専用シール <span style="color:#ef4444;font-weight:600">¥5</span></td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ゆうパケット</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥230</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺60cm・最長辺34cm・厚3cm・〜1kg</td>
-              <td style="padding:7px 8px;color:#374151">任意の袋・封筒（OPP袋・クラフト封筒等）</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">ゆうパケット</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥230</td>
+              <td style="padding:6px 6px;color:#374151">34×23×3cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">1kg</td>
+              <td style="padding:6px 6px;color:#374151">任意の袋・封筒</td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ゆうパック 60</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥770</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺60cm以内・〜25kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#f9fffe">
+              <td style="padding:6px 6px;font-weight:700">ゆうパケットプラス</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥455</td>
+              <td style="padding:6px 6px;color:#374151">17×24×7cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">2kg</td>
+              <td style="padding:6px 6px;color:#374151">専用箱 <span style="color:#ef4444;font-weight:600">¥65</span></td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ゆうパック 80</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥870</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺80cm以内・〜25kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">ゆうパック 60</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥750</td>
+              <td style="padding:6px 6px;color:#374151">3辺60cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">25kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
             </tr>
-            <tr>
-              <td style="padding:7px 8px;font-weight:600">ゆうパック 100〜170</td>
-              <td style="padding:7px 4px;text-align:center;color:#059669;font-weight:700">¥1,050〜</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺100〜170cm・〜25kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #d1fae5;background:#f9fffe">
+              <td style="padding:6px 6px;font-weight:700">ゆうパック 80</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥870</td>
+              <td style="padding:6px 6px;color:#374151">3辺80cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">25kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
+            </tr>
+            <tr style="border-bottom:1px solid #d1fae5;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">ゆうパック 100</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#059669;font-size:13px">¥1,070</td>
+              <td style="padding:6px 6px;color:#374151">3辺100cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">25kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
+            </tr>
+            <tr style="background:#f9fffe">
+              <td style="padding:6px 6px;font-weight:700;color:#9ca3af">ゆうパック 120〜170</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#9ca3af;font-size:13px">¥1,200〜</td>
+              <td style="padding:6px 6px;color:#9ca3af">3辺120〜170cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#9ca3af">25kg</td>
+              <td style="padding:6px 6px;color:#9ca3af">ダンボール・緩衝材</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#3b82f6;background:#eff6ff;border-radius:8px;padding:6px 10px;margin-bottom:8px">らくらくメルカリ便（ヤマト運輸）</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="background:#f9fafb;color:#6b7280">
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">サービス</th>
-            <th style="text-align:center;padding:6px 4px;border-bottom:1px solid #e5e7eb">料金</th>
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">サイズ・重さ</th>
-            <th style="text-align:left;padding:6px 8px;border-bottom:1px solid #e5e7eb">必要資材</th>
+
+      <!-- らくらくメルカリ便 -->
+      <div style="background:#fffbeb;border-radius:10px;padding:10px;margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:8px">🚚 らくらくメルカリ便（ヤマト運輸）　発送：ヤマト営業所・セブン・ファミマ・PUDO</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="color:#6b7280;border-bottom:2px solid #fde68a">
+            <th style="text-align:left;padding:5px 6px">サービス</th>
+            <th style="text-align:center;padding:5px 4px;white-space:nowrap">送料</th>
+            <th style="text-align:left;padding:5px 6px">最大サイズ</th>
+            <th style="text-align:center;padding:5px 4px">重さ</th>
+            <th style="text-align:left;padding:5px 6px">資材</th>
           </tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">ネコポス</td>
-              <td style="padding:7px 4px;text-align:center;color:#3b82f6;font-weight:700">¥210</td>
-              <td style="padding:7px 8px;color:#6b7280">A4・厚2.5cm・〜1kg</td>
-              <td style="padding:7px 8px;color:#374151">A4クッション封筒・OPP袋＋厚紙</td>
+            <tr style="border-bottom:1px solid #fde68a;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">ネコポス</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#d97706;font-size:13px">¥210</td>
+              <td style="padding:6px 6px;color:#374151">A4（31.2×22.8cm）厚3cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">1kg</td>
+              <td style="padding:6px 6px;color:#374151">A4封筒・クッション封筒</td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">宅急便コンパクト</td>
-              <td style="padding:7px 4px;text-align:center;color:#3b82f6;font-weight:700">¥450</td>
-              <td style="padding:7px 8px;color:#6b7280">専用BOXに入るもの</td>
-              <td style="padding:7px 8px;color:#374151">専用BOX（コンビニ・ヤマト営業所で購入 ¥70）</td>
+            <tr style="border-bottom:1px solid #fde68a;background:#fffdf0">
+              <td style="padding:6px 6px;font-weight:700">宅急便コンパクト</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#d97706;font-size:13px">¥450</td>
+              <td style="padding:6px 6px;color:#374151">箱型 20×25×5cm<br><span style="color:#9ca3af">薄型 24.8×34cm</span></td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">制限なし</td>
+              <td style="padding:6px 6px;color:#374151">専用BOX <span style="color:#ef4444;font-weight:600">¥70</span>（コンビニ・営業所）</td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">宅急便 60</td>
-              <td style="padding:7px 4px;text-align:center;color:#3b82f6;font-weight:700">¥750</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺60cm以内・〜2kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #fde68a;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">宅急便 60</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#d97706;font-size:13px">¥750</td>
+              <td style="padding:6px 6px;color:#374151">3辺60cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">2kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
             </tr>
-            <tr style="border-bottom:1px solid #f3f4f6">
-              <td style="padding:7px 8px;font-weight:600">宅急便 80</td>
-              <td style="padding:7px 4px;text-align:center;color:#3b82f6;font-weight:700">¥870</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺80cm以内・〜5kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #fde68a;background:#fffdf0">
+              <td style="padding:6px 6px;font-weight:700">宅急便 80</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#d97706;font-size:13px">¥850</td>
+              <td style="padding:6px 6px;color:#374151">3辺80cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">5kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
             </tr>
-            <tr>
-              <td style="padding:7px 8px;font-weight:600">宅急便 100〜160</td>
-              <td style="padding:7px 4px;text-align:center;color:#3b82f6;font-weight:700">¥1,050〜</td>
-              <td style="padding:7px 8px;color:#6b7280">3辺100〜160cm・〜30kg</td>
-              <td style="padding:7px 8px;color:#374151">ダンボール箱・緩衝材</td>
+            <tr style="border-bottom:1px solid #fde68a;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">宅急便 100</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#d97706;font-size:13px">¥1,050</td>
+              <td style="padding:6px 6px;color:#374151">3辺100cm以内</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">10kg</td>
+              <td style="padding:6px 6px;color:#374151">ダンボール・緩衝材</td>
+            </tr>
+            <tr style="background:#fffdf0">
+              <td style="padding:6px 6px;font-weight:700;color:#9ca3af">宅急便 120〜160</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#9ca3af;font-size:13px">¥1,200〜</td>
+              <td style="padding:6px 6px;color:#9ca3af">3辺120〜160cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#9ca3af">〜25kg</td>
+              <td style="padding:6px 6px;color:#9ca3af">ダンボール・緩衝材</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- レターパック -->
+      <div style="background:#f5f3ff;border-radius:10px;padding:10px">
+        <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px">✉️ レターパック（日本郵便）　発送：郵便局・ポスト</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="color:#6b7280;border-bottom:2px solid #ddd6fe">
+            <th style="text-align:left;padding:5px 6px">サービス</th>
+            <th style="text-align:center;padding:5px 4px">送料</th>
+            <th style="text-align:left;padding:5px 6px">サイズ</th>
+            <th style="text-align:center;padding:5px 4px">重さ</th>
+            <th style="text-align:left;padding:5px 6px">特徴</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #ddd6fe;background:#fff">
+              <td style="padding:6px 6px;font-weight:700">レターパックライト</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#7c3aed;font-size:13px">¥430</td>
+              <td style="padding:6px 6px;color:#374151">34×24.8cm 厚3cm</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">4kg</td>
+              <td style="padding:6px 6px;color:#374151">ポスト投函・専用封筒使用</td>
+            </tr>
+            <tr style="background:#faf8ff">
+              <td style="padding:6px 6px;font-weight:700">レターパックプラス</td>
+              <td style="padding:6px 4px;text-align:center;font-weight:800;color:#7c3aed;font-size:13px">¥600</td>
+              <td style="padding:6px 6px;color:#374151">34×24.8cm 厚さ自由</td>
+              <td style="padding:6px 4px;text-align:center;color:#6b7280">4kg</td>
+              <td style="padding:6px 6px;color:#374151">対面手渡し・厚みあるものOK</td>
             </tr>
           </tbody>
         </table>
