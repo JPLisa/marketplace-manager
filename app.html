@@ -573,7 +573,92 @@ function pageDashboard() {
         <div style="font-size:11px;color:${color.txt};opacity:0.85;padding-left:22px">推奨アクション：${r.action}</div>
       </div>`).join('')}
     </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">値引き交渉シミュレーター</div>
+      <div style="margin-bottom:10px">
+        <label class="field-label">販売価格（円）</label>
+        <input id="neg-price" class="input" type="number" min="0" placeholder="例: 1500" oninput="updateNegCalc()" style="font-weight:700">
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="field-label">送料</label>
+        <select id="neg-ship" class="input" onchange="updateNegCalc()">
+          <option value="">-- 選択してください --</option>
+          <optgroup label="らくらくメルカリ便">
+            <option value="210">ネコポス ¥210</option>
+            <option value="450">宅急便コンパクト ¥450</option>
+            <option value="750">宅急便 60サイズ ¥750</option>
+            <option value="870">宅急便 80サイズ ¥870</option>
+            <option value="1050">宅急便 100サイズ ¥1,050</option>
+            <option value="1200">宅急便 120サイズ ¥1,200</option>
+            <option value="1450">宅急便 140サイズ ¥1,450</option>
+            <option value="1700">宅急便 160サイズ ¥1,700</option>
+          </optgroup>
+          <optgroup label="ゆうゆうメルカリ便">
+            <option value="160">ゆうパケットポストmini ¥160</option>
+            <option value="215">ゆうパケットポスト ¥215</option>
+            <option value="230">ゆうパケット ¥230</option>
+            <option value="770">ゆうパック 60サイズ ¥770</option>
+            <option value="870">ゆうパック 80サイズ ¥870</option>
+            <option value="1050">ゆうパック 100サイズ ¥1,050</option>
+            <option value="1200">ゆうパック 120サイズ ¥1,200</option>
+            <option value="1450">ゆうパック 140サイズ ¥1,450</option>
+            <option value="1700">ゆうパック 160サイズ ¥1,700</option>
+            <option value="1900">ゆうパック 170サイズ ¥1,900</option>
+          </optgroup>
+          <optgroup label="レターパック">
+            <option value="430">レターパックライト ¥430</option>
+            <option value="600">レターパックプラス ¥600</option>
+          </optgroup>
+          <optgroup label="その他">
+            <option value="other">その他（手入力）</option>
+          </optgroup>
+        </select>
+      </div>
+      <div id="neg-ship-other-wrap" style="display:none;margin-bottom:10px">
+        <label class="field-label">送料を入力（円）</label>
+        <input id="neg-ship-other" class="input" type="number" min="0" placeholder="例: 350" oninput="updateNegCalc()">
+      </div>
+      <div id="neg-result" style="display:none;background:#f9fafb;border-radius:10px;padding:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+          <span style="color:#6b7280">手数料 (10%)</span><span id="neg-fee" style="font-weight:600"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+          <span style="color:#6b7280">送料</span><span id="neg-ship-disp" style="font-weight:600"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+          <span style="color:#6b7280">仕入コスト</span><span id="neg-cost" style="font-weight:600"></span>
+        </div>
+        <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between">
+          <span style="font-size:14px;font-weight:700">利益</span>
+          <span id="neg-profit" style="font-size:20px;font-weight:800"></span>
+        </div>
+      </div>
+    </div>
   `;
+}
+
+function updateNegCalc() {
+  const price = parseInt(document.getElementById('neg-price')?.value) || 0;
+  const shipSel = document.getElementById('neg-ship')?.value || '';
+  const otherWrap = document.getElementById('neg-ship-other-wrap');
+  if (otherWrap) otherWrap.style.display = shipSel === 'other' ? 'block' : 'none';
+  const ship = shipSel === 'other'
+    ? (parseInt(document.getElementById('neg-ship-other')?.value) || 0)
+    : (parseInt(shipSel) || 0);
+  const result = document.getElementById('neg-result');
+  if (!price || (!ship && shipSel !== 'other')) { if (result) result.style.display = 'none'; return; }
+  const fee = Math.floor(price * 0.1);
+  const cost = S.data.defaultCostPerItem ?? 484;
+  const profit = price - fee - ship - cost;
+  if (result) {
+    result.style.display = 'block';
+    document.getElementById('neg-fee').textContent = '-¥' + fee.toLocaleString();
+    document.getElementById('neg-ship-disp').textContent = '-¥' + ship.toLocaleString();
+    document.getElementById('neg-cost').textContent = '-¥' + cost.toLocaleString();
+    const el = document.getElementById('neg-profit');
+    el.textContent = (profit >= 0 ? '+' : '') + '¥' + profit.toLocaleString();
+    el.style.color = profit >= 0 ? '#059669' : '#ef4444';
+  }
 }
 
 // ============================================================
@@ -724,7 +809,10 @@ function pageProducts() {
           <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:14px;font-weight:700">${fmt(p.price)}</div></div>
-            <button onclick="event.stopPropagation();deleteProduct('${p.id}')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer">🗑</button>
+            <div style="display:flex;gap:4px">
+              ${p.status==='出品中'?`<button onclick="event.stopPropagation();openQuickSale('${p.id}')" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+              <button onclick="event.stopPropagation();deleteProduct('${p.id}')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer">🗑</button>
+            </div>
           </div>
         </div>
       </div>`).join('')}
@@ -923,7 +1011,7 @@ function confirmQuickSale() {
     const b = new Date(soldDate.replace(/\//g,'-'));
     return Math.round((b-a)/(1000*60*60*24));
   })();
-  S.data.products = S.data.products.map(p=>p.id===pid?{...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldDate,daysToSell}:p);
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell}:p);
   if (lotId) S.data.boxes = S.data.boxes.map(b=>b.id===lotId?{...b,sold:b.sold+1,sales:b.sales+price,profit:b.profit+profit}:b);
   saveData();
   S.selPid = null;
