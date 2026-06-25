@@ -1725,10 +1725,10 @@ function pageAnalytics() {
   const fBoxes = selLot === 'all' ? d.boxes : d.boxes.filter(b=>b.id===selLot);
   const fProds  = selLot === 'all' ? d.products : d.products.filter(p=>p.box===selLot);
 
-  const totalSales  = fBoxes.reduce((a,b)=>a+b.sales,0);
   const defCost2 = d.defaultCostPerItem ?? 484;
-  // 商品ごとの実データから計算（b.profitはdefaultCostPerItem差引済みのため使わない）
+  // すべて商品レコードから計算（b.sales/b.profitは蓄積誤差があるため使わない）
   const soldProds = fProds.filter(p=>p.status==='売卸済');
+  const totalSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
   const grossSaleProfit = soldProds.reduce((a,p)=>{
     const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
     return a + (p.soldPrice||0) - (p.soldShip||0) - fee;
@@ -1764,7 +1764,7 @@ function pageAnalytics() {
       </div>
       ${(()=>{
         const defCost2 = d.defaultCostPerItem??484;
-        const totalSold = fBoxes.reduce((a,b)=>a+b.sold,0);
+        const totalSold = soldProds.length;
         // ロットに実際の仕入額があればそれを使い、なければ登録商品数×デフォルト原価
         const totalRealCost = fBoxes.reduce((a,b)=>{
           const bReg = fProds.filter(p=>p.box===b.id).length;
