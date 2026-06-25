@@ -1916,15 +1916,21 @@ function pageAnalytics() {
           const bProds = d.products.filter(p=>p.box===b.id);
           const bRegCount = bProds.length;
           const bShipIn = b.ship||0;
-          const bRealCost = b.cost>0 ? b.cost : defCost * bRegCount;
+          const bRealCost = b.cost||0;
           const bInvest = bRealCost + bShipIn;
-          // b.profitはdefCostを差引済み → 元に戻してから実際の仕入額を引く
-          const bGrossReturn = b.profit + b.sold * defCost;
-          const trueP = bGrossReturn - bInvest;
-          const avgNet = b.sold>0 ? (b.profit/b.sold + defCost) : 0;
+          // 商品レコードから計算
+          const bSoldProds = bProds.filter(p=>p.status==='売卸済');
+          const bSales = bSoldProds.reduce((a,p)=>a+(p.soldPrice||0),0);
+          const bGrossSaleProfit = bSoldProds.reduce((a,p)=>{
+            const fee = p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1);
+            return a+(p.soldPrice||0)-(p.soldShip||0)-fee;
+          },0);
+          const bNetProfit = bGrossSaleProfit - bSoldProds.length*defCost;
+          const trueP = bNetProfit - bInvest;
+          const avgNet = bSoldProds.length>0 ? bGrossSaleProfit/bSoldProds.length : 0;
           const remaining = trueP<0&&avgNet>0 ? Math.ceil(-trueP/avgNet) : 0;
-          const achieved = bInvest===0||trueP>=0;
-          const pct = bInvest>0?Math.min(100,Math.max(0,Math.round((bInvest+trueP)/bInvest*100))):100;
+          const achieved = bInvest===0 ? bNetProfit>=0 : trueP>=0;
+          const pct = bInvest>0?Math.min(100,Math.max(0,Math.round((bInvest+bNetProfit)/bInvest*100))):100;
           return `
           <div style="padding:14px 0;border-bottom:1px solid #f3f4f6">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -1940,7 +1946,7 @@ function pageAnalytics() {
                 <div style="font-weight:700;color:#374151">${fmt(bInvest)}</div>
                 <div style="color:#d1d5db;font-size:10px">仕入${fmt(bRealCost)}+送${fmt(bShipIn)}</div>
               </div>
-              <div style="background:#eff6ff;border-radius:8px;padding:6px"><div style="color:#9ca3af">売上</div><div style="font-weight:700;color:#3b82f6">${fmt(b.sales)}</div></div>
+              <div style="background:#eff6ff;border-radius:8px;padding:6px"><div style="color:#9ca3af">売上</div><div style="font-weight:700;color:#3b82f6">${fmt(bSales)}</div></div>
               <div style="background:${achieved?'#f0fdf4':'#fff1f2'};border-radius:8px;padding:6px"><div style="color:#9ca3af">実質利益</div><div style="font-weight:700;color:${achieved?'#059669':'#ef4444'}">${trueP>=0?'+':''}${fmt(trueP)}</div></div>
             </div>
             <div style="background:#f3f4f6;border-radius:6px;height:6px;overflow:hidden;margin-bottom:4px">
