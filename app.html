@@ -994,10 +994,15 @@ function openQuickSale(pid) {
   render();
 }
 
+function getQsShip() {
+  const sel = document.getElementById('qs-ship')?.value || '';
+  return sel === 'other' ? (parseInt(document.getElementById('qs-ship-other')?.value) || 0) : (parseInt(sel) || 0);
+}
 function confirmQuickSale() {
   const price = parseInt(document.getElementById('qs-price')?.value) || 0;
-  const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
+  const ship  = getQsShip();
   if (!price) { alert('販売価格を入力してください'); return; }
+  if (!ship && document.getElementById('qs-ship')?.value === '') { alert('送料を選択してください'); return; }
   const fee    = Math.floor(price * 0.1);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
@@ -1020,16 +1025,24 @@ function confirmQuickSale() {
 }
 
 function updateQuickSalePreview() {
+  const shipSel = document.getElementById('qs-ship')?.value || '';
+  const otherWrap = document.getElementById('qs-ship-other-wrap');
+  if (otherWrap) otherWrap.style.display = shipSel === 'other' ? 'block' : 'none';
   const price = parseInt(document.getElementById('qs-price')?.value) || 0;
-  const ship  = parseInt(document.getElementById('qs-ship')?.value)  || 0;
+  const ship  = getQsShip();
+  const el = document.getElementById('qs-preview');
+  if (!price || (!ship && shipSel !== 'other')) { if (el) el.style.display='none'; return; }
   const fee   = Math.floor(price * 0.1);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
-  const el = document.getElementById('qs-preview');
-  if (el) el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span>-¥${fee.toLocaleString()}</span></div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span>-¥${costPerItem.toLocaleString()}</span></div>
-    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px"><span>利益</span><span style="color:#ef4444">¥${profit.toLocaleString()}</span></div>`;
+  if (el) {
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span>-¥${fee.toLocaleString()}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">送料</span><span>-¥${ship.toLocaleString()}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span>-¥${costPerItem.toLocaleString()}</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px"><span>利益</span><span style="color:${profit>=0?'#059669':'#ef4444'}">${profit>=0?'+':''}¥${profit.toLocaleString()}</span></div>`;
+  }
 }
 
 function cancelProduct(pid) {
@@ -1982,14 +1995,50 @@ function renderModal() {
           <span style="font-size:28px">${p.emoji}</span>
           <div><div style="font-weight:700;font-size:14px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット</div></div>
         </div>
-        <div class="grid2" style="gap:8px;margin-bottom:12px">
-          <div><label class="field-label">実売価格（円）</label><input id="qs-price" class="input" type="number" value="${defPrice}" oninput="updateQuickSalePreview()"></div>
-          <div><label class="field-label">送料（円）</label><input id="qs-ship" class="input" type="number" value="210" oninput="updateQuickSalePreview()"></div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">実売価格（円）</label>
+          <input id="qs-price" class="input" type="number" value="${defPrice}" oninput="updateQuickSalePreview()">
         </div>
-        <div id="qs-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span>-¥${defFee.toLocaleString()}</span></div>
-          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px"><span>利益</span><span style="color:#ef4444">¥${defProfit.toLocaleString()}</span></div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">送料</label>
+          <select id="qs-ship" class="input" onchange="updateQuickSalePreview()">
+            <option value="">-- 選択してください --</option>
+            <optgroup label="ゆうゆうメルカリ便">
+              <option value="160">ゆうパケットポストmini ¥160</option>
+              <option value="215">ゆうパケットポスト ¥215</option>
+              <option value="230">ゆうパケット ¥230</option>
+              <option value="770">ゆうパック 60サイズ ¥770</option>
+              <option value="870">ゆうパック 80サイズ ¥870</option>
+              <option value="1050">ゆうパック 100サイズ ¥1,050</option>
+              <option value="1200">ゆうパック 120サイズ ¥1,200</option>
+              <option value="1450">ゆうパック 140サイズ ¥1,450</option>
+              <option value="1700">ゆうパック 160サイズ ¥1,700</option>
+              <option value="1900">ゆうパック 170サイズ ¥1,900</option>
+            </optgroup>
+            <optgroup label="らくらくメルカリ便">
+              <option value="210">ネコポス ¥210</option>
+              <option value="450">宅急便コンパクト ¥450</option>
+              <option value="750">宅急便 60サイズ ¥750</option>
+              <option value="870">宅急便 80サイズ ¥870</option>
+              <option value="1050">宅急便 100サイズ ¥1,050</option>
+              <option value="1200">宅急便 120サイズ ¥1,200</option>
+              <option value="1450">宅急便 140サイズ ¥1,450</option>
+              <option value="1700">宅急便 160サイズ ¥1,700</option>
+            </optgroup>
+            <optgroup label="レターパック">
+              <option value="430">レターパックライト ¥430</option>
+              <option value="600">レターパックプラス ¥600</option>
+            </optgroup>
+            <optgroup label="その他">
+              <option value="other">その他（手入力）</option>
+            </optgroup>
+          </select>
         </div>
+        <div id="qs-ship-other-wrap" style="display:none;margin-bottom:10px">
+          <label class="field-label">送料を入力（円）</label>
+          <input id="qs-ship-other" class="input" type="number" min="0" placeholder="例: 350" oninput="updateQuickSalePreview()">
+        </div>
+        <div id="qs-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;display:none"></div>
         <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="confirmQuickSale()">✓ 売上を登録する</button>
         <button class="btn btn-secondary btn-full" onclick="closeModal()">キャンセル</button>
       </div>
