@@ -954,9 +954,10 @@ function pageBoxDetail() {
   const b = S.data.boxes.find(x=>x.id===S.boxId);
   if (!b) return '<p>ロットが見つかりません</p>';
   const prods = S.data.products.filter(p=>p.box===S.boxId);
+  const defectProds = prods.filter(p=>p.defective);
   const r = sellRate(b);
   const tab = S.tab.boxDetail || 'all';
-  const shown = tab==='all' ? prods : tab==='sold' ? prods.filter(p=>p.status==='売卸済') : prods.filter(p=>p.status!=='売卸済');
+  const shown = tab==='all' ? prods : tab==='sold' ? prods.filter(p=>p.status==='売卸済') : tab==='不良品' ? defectProds : prods.filter(p=>p.status!=='売卸済');
   return `
     <div class="flex-between" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px">
@@ -991,11 +992,21 @@ function pageBoxDetail() {
           <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fca5a5" onclick="deleteLot('${b.id}')">削除</button>`:``}
         </div>
       </div>
-      <div class="grid3" style="text-align:center;margin-bottom:16px">
+      <div class="grid3" style="text-align:center;margin-bottom:${defectProds.length?'10px':'16px'}">
         <div><div style="font-size:11px;color:#9ca3af">商品数</div><div style="font-size:22px;font-weight:700">${b.total}</div></div>
         <div><div style="font-size:11px;color:#9ca3af">売卸済</div><div style="font-size:22px;font-weight:700;color:#059669">${b.sold}</div></div>
         <div><div style="font-size:11px;color:#9ca3af">未売卸</div><div style="font-size:22px;font-weight:700;color:#ef4444">${b.total-b.sold}</div></div>
       </div>
+      ${defectProds.length?`<div style="background:#fff1f2;border-radius:8px;padding:10px 12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">⚠️</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#dc2626">不良品 ${defectProds.length}点</div>
+            <div style="font-size:11px;color:#9ca3af">${defectProds.map(p=>p.name).join('、').slice(0,40)}${defectProds.map(p=>p.name).join('、').length>40?'…':''}</div>
+          </div>
+        </div>
+        <button onclick="S.tab.boxDetail='不良品';render()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">一覧 ›</button>
+      </div>`:''}
       <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>売卸率</span><span style="font-weight:700">${r}%</span></div><div class="progress"><div class="progress-fill" style="width:${r}%"></div></div></div>
       ${S.mode==='owner'?`<div class="grid2" style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;text-align:center">
         <div><div style="font-size:11px;color:#9ca3af">売上</div><div style="font-size:18px;font-weight:700;color:#3b82f6">${fmt(b.sales)}</div></div>
@@ -1006,6 +1017,7 @@ function pageBoxDetail() {
       <button class="tab ${tab==='all'?'active':''}" onclick="S.tab.boxDetail='all';render()">すべて</button>
       <button class="tab ${tab==='unsold'?'active':''}" onclick="S.tab.boxDetail='unsold';render()">未売卸</button>
       <button class="tab ${tab==='sold'?'active':''}" onclick="S.tab.boxDetail='sold';render()">売卸済</button>
+      ${defectProds.length?`<button class="tab ${tab==='不良品'?'active':''}" onclick="S.tab.boxDetail='不良品';render()" style="${tab==='不良品'?'':'color:#dc2626'}">⚠️ 不良品(${defectProds.length})</button>`:''}
     </div>
     ${shown.map(p=>`
       <div class="card" style="margin-bottom:8px">
@@ -1028,7 +1040,7 @@ function pageProducts() {
   const minDays = S.tab.productMinDays || 0;
   const shown = S.data.products.filter(p=>{
     const mq = !q || matchProductSearch(p, q);
-    const mf = f==='all' || p.status===f;
+    const mf = f==='all' || (f==='不良品' ? p.defective : p.status===f);
     const md = !minDays || (p.days||0) >= minDays;
     return mq && mf && md;
   });
@@ -1040,7 +1052,7 @@ function pageProducts() {
     </div>
     <div class="search-bar">${icon('search')}<input id="prod-search" placeholder="商品名・IDで検索" value="${S.tab.productSearch||''}" oninput="filterProductList(this.value)"></div>
     <div class="tabs">
-      ${['all','出品中','セット中','売卸済','保管中','キャンセル'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${f2==='all'?'すべて':f2}</button>`).join('')}
+      ${['all','出品中','セット中','売卸済','保管中','キャンセル','不良品'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${f2==='all'?'すべて':f2==='不良品'?'⚠️不良品':f2}</button>`).join('')}
     </div>
     ${f==='キャンセル'&&S.data.products.some(p=>p.status==='キャンセル')?`
     <button onclick="deleteAllCancelled()" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer">
@@ -1051,7 +1063,7 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:12px" onclick="S.viewPid='${p.id}';go('productDetail')" style="cursor:pointer">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:19px">${p.name}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}</div>
+          <div style="flex:1;cursor:pointer"><div style="font-weight:600;font-size:19px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:12px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:12px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:12px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:14px;font-weight:700">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
@@ -1141,6 +1153,17 @@ function pageProductDetail() {
       <div style="margin-bottom:10px"><label class="field-label">販売価格</label><input id="edit-price" class="input" type="number" value="${p.price}"></div>
       <div style="margin-bottom:10px"><label class="field-label">LINEアルバムURL</label><input id="edit-album" class="input" value="${p.album||''}"></div>
       <div style="margin-bottom:12px"><label class="field-label">メモ</label><textarea id="edit-memo" class="input">${p.memo||''}</textarea></div>
+      <div style="margin-bottom:10px">
+        <label class="field-label">不良品・不具合</label>
+        <label style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid ${p.defective?'#ef4444':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${p.defective?'#fff1f2':'#fff'}">
+          <input type="checkbox" id="edit-defective" ${p.defective?'checked':''} style="width:18px;height:18px;accent-color:#ef4444" onchange="this.closest('label').style.borderColor=this.checked?'#ef4444':'#e5e7eb';this.closest('label').style.background=this.checked?'#fff1f2':'#fff';document.getElementById('edit-defect-wrap').style.display=this.checked?'block':'none'">
+          <span style="font-size:13px;font-weight:600">⚠️ 不良品・不具合あり</span>
+        </label>
+      </div>
+      <div id="edit-defect-wrap" style="margin-bottom:12px;display:${p.defective?'block':'none'}">
+        <label class="field-label">不具合の詳細</label>
+        <textarea id="edit-defect-memo" class="input" placeholder="例：ボタンが取れている、汚れあり、動作不良">${p.defectMemo||''}</textarea>
+      </div>
       <button class="btn btn-primary btn-full" onclick="saveProductEdit('${p.id}')">保存する</button>
     </div>`:`
     <div class="card">
@@ -1410,10 +1433,12 @@ function saveProductEdit(pid) {
   const cat   = document.getElementById('edit-cat')?.value || '';
   const price = parseInt(document.getElementById('edit-price')?.value) || 0;
   const album = document.getElementById('edit-album')?.value || '';
-  const memo  = document.getElementById('edit-memo')?.value || '';
+  const memo       = document.getElementById('edit-memo')?.value || '';
+  const defective  = document.getElementById('edit-defective')?.checked || false;
+  const defectMemo = document.getElementById('edit-defect-memo')?.value || '';
   const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','キャンプ用品':'⛺','工具':'🔧','その他':'📦'};
   const emoji = emojiMap[cat] || '📦';
-  S.data.products = S.data.products.map(p=>p.id===pid?{...p,name,cat,emoji,price,album,memo}:p);
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,name,cat,emoji,price,album,memo,defective,defectMemo}:p);
   saveData();
   const btn = event.target;
   btn.textContent = '✓ 保存しました！';
