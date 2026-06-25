@@ -1766,10 +1766,7 @@ function pageAnalytics() {
         const defCost2 = d.defaultCostPerItem??484;
         const totalSold = soldProds.length;
         // ロットに実際の仕入額があればそれを使い、なければ登録商品数×デフォルト原価
-        const totalRealCost = fBoxes.reduce((a,b)=>{
-          const bReg = fProds.filter(p=>p.box===b.id).length;
-          return a + (b.cost>0 ? b.cost : defCost2 * bReg);
-        }, 0);
+        const totalRealCost = fBoxes.reduce((a,b)=>a+(b.cost||0), 0);
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
         const totalInvest = totalRealCost + totalShipIn;
         // 利益累計（totalProfit）vs 未回収投資額で損益分岐を計算
