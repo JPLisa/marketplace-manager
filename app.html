@@ -2418,6 +2418,21 @@ function render() {
   migrateLotIds();
   migrateProductIds();
   migratePermissions();
+  // p.days を registeredDate から毎回動的に計算
+  const todayStr = today();
+  S.data.products = S.data.products.map(p => {
+    if (!p.registeredDate) return p;
+    const a = new Date(p.registeredDate.replace(/\//g,'-'));
+    const b = new Date(todayStr.replace(/\//g,'-'));
+    const d = Math.max(0, Math.round((b-a)/(1000*60*60*24)));
+    // 売卸済で daysToSell 未設定なら soldDate から算出
+    if (p.status==='売卸済' && p.daysToSell==null && p.soldDate) {
+      const s = new Date(p.soldDate.replace(/\//g,'-'));
+      const ds = Math.max(0, Math.round((s-a)/(1000*60*60*24)));
+      return {...p, days:d, daysToSell:ds};
+    }
+    return {...p, days:d};
+  });
   const root = document.getElementById('root');
   root.innerHTML = `
     <div class="app">
