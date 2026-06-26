@@ -467,7 +467,7 @@ function pageDashboard() {
 
   return `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;margin-top:4px">
-      <div onclick="go('products')" style="background:linear-gradient(135deg,#059669,#34d399);border-radius:14px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,0.25)">
+      <div onclick="S.tab.productFilter='出品中';go('products')" style="background:linear-gradient(135deg,#059669,#34d399);border-radius:14px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,0.25)">
         <div style="font-size:11px;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:0.5px;margin-bottom:6px">📢 出品中（実出品数）</div>
         <div style="font-size:36px;font-weight:800;color:#fff;line-height:1">${totalListings}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px">件${listingProds>0?` 個別${listingProds}点`:''}${activeSets>0?` + セット${activeSets}件`:''}</div>
