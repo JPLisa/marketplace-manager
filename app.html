@@ -458,7 +458,8 @@ function pageDashboard() {
 
 
   const listingProds = d.products.filter(p=>p.status==='出品中').length;
-  const activeSets   = (d.sets||[]).filter(s=>s.status==='出品中').length;
+  const activeSets   = (d.sets||[]).filter(s=>s.status==='出品中').reduce((a,s)=>a+(s.qty||1),0);
+  const activeSetCount = (d.sets||[]).filter(s=>s.status==='出品中').length;
   const totalListings = listingProds + activeSets;
   const sold      = d.products.filter(p=>p.status==='売卸済').length;
   const stored    = d.products.filter(p=>p.status==='保管中').length;
@@ -470,7 +471,7 @@ function pageDashboard() {
       <div onclick="S.tab.productFilter='出品中';go('products')" style="background:linear-gradient(135deg,#059669,#34d399);border-radius:14px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,0.25)">
         <div style="font-size:11px;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:0.5px;margin-bottom:6px">📢 出品中（実出品数）</div>
         <div style="font-size:36px;font-weight:800;color:#fff;line-height:1">${totalListings}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px">件${listingProds>0?` 個別${listingProds}点`:''}${activeSets>0?` + セット${activeSets}件`:''}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:4px">件${listingProds>0?` 個別${listingProds}点`:''}${activeSets>0?` + セット${activeSets}点（${activeSetCount}種）`:''}</div>
       </div>
       <div onclick="go('products')" style="background:linear-gradient(135deg,#3b82f6,#60a5fa);border-radius:14px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.25)">
         <div style="font-size:11px;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:0.5px;margin-bottom:6px">✅ 売れた</div>
@@ -1602,7 +1603,7 @@ function pageSets() {
         </div>
         <div style="font-size:12px;color:#9ca3af;margin-bottom:8px">${s.id} · ${s.created}</div>
         <div style="display:flex;gap:4px;margin-bottom:8px">${prods.map(p=>`<span style="font-size:22px" title="${p.name}">${p.emoji}</span>`).join('')} <span style="font-size:12px;color:#9ca3af;align-self:center">${prods.length}点</span></div>
-        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><span style="font-size:12px;color:#9ca3af">${s.platform}</span></div>
+        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><div style="text-align:right"><span style="font-size:12px;color:#9ca3af">${s.platform}</span>${(s.qty||1)>1?`<div style="font-size:12px;font-weight:700;color:#7c3aed">${s.qty}セット出品</div>`:''}</div></div>
       </div>`;
     }).join('')}
   `;
@@ -1625,6 +1626,7 @@ function pageSetDetail() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px;margin-top:8px">
         <div><span style="color:#9ca3af">作成日: </span>${s.created}</div>
         <div><span style="color:#9ca3af">販売価格: </span><strong>${fmt(s.price)}</strong></div>
+        <div><span style="color:#9ca3af">出品数: </span><strong>${s.qty||1}セット</strong></div>
         <div><span style="color:#9ca3af">出品先: </span>${s.platform}</div>
         ${s.ship?`<div><span style="color:#9ca3af">発送: </span>${s.ship}</div>`:''}
       </div>
@@ -2343,6 +2345,11 @@ function renderModal() {
           ${prePids.length>0?`<script>setTimeout(updateSetPreview,50)<\/script>`:''}
           <div style="margin-bottom:16px"><label class="field-label">セット名</label><input id="ms-name" class="input" placeholder="例: サンリオまとめセット"></div>
           <div style="margin-bottom:16px">
+            <label class="field-label">出品数（何セット出品しますか）</label>
+            <input id="ms-qty" class="input" type="number" min="1" value="1" placeholder="例: 3">
+            <div style="font-size:11px;color:#9ca3af;margin-top:4px">※ ホーム画面の出品数合計に加算されます</div>
+          </div>
+          <div style="margin-bottom:16px">
             <label class="field-label">セットに入れる商品をタップして選択</label>
             ${avail.length===0?`<div style="text-align:center;padding:24px;color:#9ca3af;font-size:13px">出品中・セット中の商品がありません</div>`:
             avail.map(p=>{const pre=prePids.includes(p.id); return`
@@ -2710,11 +2717,12 @@ function saveSet() {
   const price = parseInt(document.getElementById('ms-price')?.value) || 0;
   const ship = document.getElementById('ms-ship')?.value || '';
   const notes = document.getElementById('ms-notes')?.value || '';
+  const qty = Math.max(1, parseInt(document.getElementById('ms-qty')?.value) || 1);
   const pids = S.data.products.filter(p=>document.getElementById('ms-pid-'+p.id)?.checked).map(p=>p.id);
   if (pids.length === 0) { alert('商品を1点以上選択してください'); return; }
   const usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
   const newId = 'S' + (Math.max(29, ...usedNums) + 1);
-  S.data.sets.unshift({id:newId,name,pids,price,status:'準備中',created:today(),platform:'メルカリ',ship,notes});
+  S.data.sets.unshift({id:newId,name,pids,price,status:'準備中',created:today(),platform:'メルカリ',ship,notes,qty});
   S.data.products = S.data.products.map(p=>pids.includes(p.id)?{...p,status:'セット中'}:p);
   saveData();
   closeModal();
