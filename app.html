@@ -1054,6 +1054,10 @@ function pageProducts() {
     <div class="tabs">
       ${['all','出品中','セット中','売卸済','保管中','キャンセル','不良品'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${f2==='all'?'すべて':f2==='不良品'?'⚠️不良品':f2}</button>`).join('')}
     </div>
+    ${f==='セット中'&&S.data.products.some(p=>p.status==='セット中')?`
+    <button onclick="S.createSetPrePids=S.data.products.filter(p=>p.status==='セット中').map(p=>p.id);openModal('createSet')" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #ddd6fe;border-radius:12px;background:#f5f3ff;color:#7c3aed;font-size:14px;font-weight:600;cursor:pointer">
+      📦 セット中の商品をセット登録する（${S.data.products.filter(p=>p.status==='セット中').length}点）
+    </button>`:''}
     ${f==='キャンセル'&&S.data.products.some(p=>p.status==='キャンセル')?`
     <button onclick="deleteAllCancelled()" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:14px;font-weight:600;cursor:pointer">
       🗑 キャンセル済みをすべて削除（${S.data.products.filter(p=>p.status==='キャンセル').length}件）
@@ -2318,7 +2322,8 @@ function renderModal() {
     </div>`;
   }
   if (S.showModal === 'createSet') {
-    const avail = S.data.products.filter(p=>p.status==='出品中');
+    const avail = S.data.products.filter(p=>p.status==='出品中'||p.status==='セット中');
+    const prePids = S.createSetPrePids || [];
     const _usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
     const nextSetNum = Math.max(29, ..._usedNums) + 1;
     const nextSetId = 'S' + nextSetNum;
@@ -2331,21 +2336,22 @@ function renderModal() {
             <span style="font-size:22px;font-weight:700;color:#059669;letter-spacing:2px">${nextSetId}</span>
             <span style="font-size:11px;color:#9ca3af;margin-left:auto">自動採番</span>
           </div>
+          ${prePids.length>0?`<script>setTimeout(updateSetPreview,50)<\/script>`:''}
           <div style="margin-bottom:16px"><label class="field-label">セット名</label><input id="ms-name" class="input" placeholder="例: サンリオまとめセット"></div>
           <div style="margin-bottom:16px">
             <label class="field-label">セットに入れる商品をタップして選択</label>
-            ${avail.length===0?`<div style="text-align:center;padding:24px;color:#9ca3af;font-size:13px">出品中の商品がありません</div>`:
-            avail.map(p=>`
-              <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all 0.15s"
+            ${avail.length===0?`<div style="text-align:center;padding:24px;color:#9ca3af;font-size:13px">出品中・セット中の商品がありません</div>`:
+            avail.map(p=>{const pre=prePids.includes(p.id); return`
+              <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid ${pre?'#059669':'#e5e7eb'};border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;background:${pre?'#f0fdf4':'#fff'}"
                      onclick="this.style.borderColor=document.getElementById('ms-pid-${p.id}').checked?'#e5e7eb':'#059669';this.style.background=document.getElementById('ms-pid-${p.id}').checked?'':'#f0fdf4';updateSetPreview()">
-                <input type="checkbox" id="ms-pid-${p.id}" style="accent-color:#059669;width:18px;height:18px" onclick="event.stopPropagation()">
+                <input type="checkbox" id="ms-pid-${p.id}" ${pre?'checked':''} style="accent-color:#059669;width:18px;height:18px" onclick="event.stopPropagation()">
                 <span style="font-size:22px">${p.emoji}</span>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
                   <div style="font-size:11px;color:#9ca3af">${p.id} · ${p.box}</div>
                 </div>
                 <div style="font-size:13px;font-weight:700;color:#374151;white-space:nowrap">${fmt(p.price)}</div>
-              </label>`).join('')}
+              </label>`}).join('')}
           </div>
           <div id="set-preview" style="background:#f9fafb;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;display:none">
             <div style="display:flex;justify-content:space-between"><span style="color:#6b7280">選択中</span><span id="set-preview-count" style="font-weight:700">0点</span></div>
@@ -2547,6 +2553,7 @@ function openModal(name) {
 
 function closeModal() {
   S.showModal = null;
+  S.createSetPrePids = [];
   render();
 }
 
