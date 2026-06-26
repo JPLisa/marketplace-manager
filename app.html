@@ -1048,7 +1048,11 @@ function pageProducts() {
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
       <div class="page-title" style="margin-bottom:0">商品一覧</div>
-      ${minDays ? `<button onclick="S.tab.productMinDays=0;render()" style="font-size:11px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🔴 ${minDaysLabel} ✕</button>` : ''}
+      <div style="display:flex;gap:6px;align-items:center">
+        ${minDays ? `<button onclick="S.tab.productMinDays=0;render()" style="font-size:11px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🔴 ${minDaysLabel} ✕</button>` : ''}
+        <button onclick="S.createSetPrePids=[];openModal('createSet')" style="background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer">📦 セット登録</button>
+        <button onclick="go('productReg')" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer">＋ 商品登録</button>
+      </div>
     </div>
     <div class="search-bar">${icon('search')}<input id="prod-search" placeholder="商品名・IDで検索" value="${S.tab.productSearch||''}" oninput="filterProductList(this.value)"></div>
     <div class="tabs">
