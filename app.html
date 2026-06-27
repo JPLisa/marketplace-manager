@@ -1603,7 +1603,33 @@ function pageSetDetail() {
       <div style="font-weight:700;color:#b45309;margin-bottom:8px;font-size:14px">⚠️ このセットは必ずまとめて発送してください</div>
       <div style="font-size:13px;color:#374151;white-space:pre-line">${s.notes}</div>
     </div>`:'' }
-    <button class="btn btn-primary btn-full" onclick="alert('確認しました')">確認しました</button>
+    ${(()=>{
+      const soldRecs = s.soldRecords||[];
+      const soldQty = soldRecs.length;
+      const remQty = (s.qty||1) - soldQty;
+      return `
+      ${soldRecs.length>0?`<div class="card" style="margin-bottom:10px">
+        <div class="card-title">販売記録（${soldQty}件）</div>
+        ${soldRecs.map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;${i>0?'border-top:1px solid #f3f4f6':''}">
+          <span style="font-size:12px;color:#9ca3af">${r.soldDate}</span>
+          <span style="font-size:14px;font-weight:700;color:#059669">${fmt(r.soldPrice)}</span>
+          <span style="font-size:11px;color:#6b7280">送料 ${fmt(r.soldShip||0)}</span>
+        </div>`).join('')}
+      </div>`:''}
+      ${remQty>0?`<div class="card" style="background:#f0fdf4;border:1px solid #6ee7b7">
+        <div style="font-size:14px;font-weight:700;color:#059669;margin-bottom:12px">📦 セットが売れた！（残り${remQty}セット）</div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">実際の販売価格（円）</label>
+          <input id="set-sold-price" class="input" type="number" min="0" value="${s.price}" style="font-weight:700">
+        </div>
+        <div style="margin-bottom:12px">
+          <label class="field-label">送料（円）</label>
+          <input id="set-sold-ship" class="input" type="number" min="0" value="0">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="recordSetSale('${s.id}')">売上を記録する</button>
+      </div>`:`<div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;color:#059669;font-weight:600">✅ 全${s.qty||1}セット販売済み</div>`}
+      `;
+    })()}
   `;
 }
 
@@ -1703,13 +1729,28 @@ function pageAnalytics() {
   const defCost2 = d.defaultCostPerItem ?? 484;
   // すべて商品レコードから計算（b.sales/b.profitは蓄積誤差があるため使わない）
   const soldProds = fProds.filter(p=>p.status==='売卸済');
-  const totalSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
+  const indivSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
   const grossSaleProfit = soldProds.reduce((a,p)=>{
     const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
     return a + (p.soldPrice||0) - (p.soldShip||0) - fee;
   }, 0);
-  // 総利益 = 手取り売上合計 − 仕入コスト(484円×販売数)
-  const totalProfit = grossSaleProfit - soldProds.length * defCost2;
+  const indivProfit = grossSaleProfit - soldProds.length * defCost2;
+  // セット売上（独立集計）
+  const soldSetsAll = (d.sets||[]).filter(s=>(s.soldRecords||[]).length>0);
+  const setsSales = soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldPrice||0),0)+a,0);
+  const setsProfit = soldSetsAll.reduce((a,s)=>{
+    const itemCost = s.pids.reduce((b,pid)=>{
+      const prod = d.products.find(p=>p.id===pid);
+      const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
+      return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+    },0);
+    return a+(s.soldRecords||[]).reduce((b,r)=>{
+      const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
+      return b+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
+    },0);
+  },0);
+  const totalSales = indivSales + setsSales;
+  const totalProfit = indivProfit + setsProfit;
   const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
   const soldWithDays = fProds.filter(p=>p.status==='売卸済'&&p.daysToSell!=null);
   const avgDays = soldWithDays.length ? Math.round(soldWithDays.reduce((a,p)=>a+p.daysToSell,0)/soldWithDays.length) : null;
@@ -1925,6 +1966,63 @@ function pageAnalytics() {
             ${discount>0?`<div style="font-size:11px;color:#f59e0b;margin-top:4px">${discount}%引き / 割引なし: ${estProfitNoDisc>=0?'+':''}${fmt(estProfitNoDisc)}</div>`:''}
             <div style="font-size:10px;color:#9ca3af;margin-top:4px">手数料・送料のみ差引: ${fmt(estRevenue)}</div>
           </div>
+        </div>`;
+      })()}
+      ${(()=>{
+        const defCost2 = d.defaultCostPerItem??484;
+        const soldSets = d.sets.filter(s=>(s.soldRecords||[]).length>0);
+        if (soldSets.length===0) return '';
+        const setTotalSales = soldSets.reduce((a,s)=>a+(s.soldRecords||[]).reduce((b,r)=>b+(r.soldPrice||0),0),0);
+        const setTotalProfit = soldSets.reduce((a,s)=>{
+          const itemCost = s.pids.reduce((b,pid)=>{
+            const prod = d.products.find(p=>p.id===pid);
+            const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
+            return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+          },0);
+          return a+(s.soldRecords||[]).reduce((b,r)=>{
+            const fee = r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
+            return b+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
+          },0);
+        },0);
+        const setTotalCount = soldSets.reduce((a,s)=>a+(s.soldRecords||[]).length,0);
+        return `<div class="card" style="margin-bottom:12px">
+          <div class="card-title">📦 セット売上（独立集計）</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div style="background:#f5f3ff;border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:10px;color:#7c3aed;margin-bottom:2px">販売数</div>
+              <div style="font-size:20px;font-weight:700;color:#7c3aed">${setTotalCount}</div>
+              <div style="font-size:10px;color:#9ca3af">セット</div>
+            </div>
+            <div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:10px;color:#3b82f6;margin-bottom:2px">売上</div>
+              <div style="font-size:15px;font-weight:700;color:#3b82f6">${fmt(setTotalSales)}</div>
+            </div>
+            <div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center">
+              <div style="font-size:10px;color:#059669;margin-bottom:2px">利益</div>
+              <div style="font-size:15px;font-weight:700;color:${setTotalProfit>=0?'#059669':'#ef4444'}">${setTotalProfit>=0?'+':''}${fmt(setTotalProfit)}</div>
+            </div>
+          </div>
+          ${soldSets.map(s=>{
+            const itemCost = s.pids.reduce((b,pid)=>{
+              const prod = d.products.find(p=>p.id===pid);
+              const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
+              return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+            },0);
+            const recs = s.soldRecords||[];
+            const sSales = recs.reduce((a,r)=>a+(r.soldPrice||0),0);
+            const sProfit = recs.reduce((a,r)=>{
+              const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
+              return a+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
+            },0);
+            const lots = [...new Set(s.pids.map(pid=>{ const p=d.products.find(q=>q.id===pid); return p?p.box:'?'; }))];
+            return `<div style="padding:8px 0;border-top:1px solid #f3f4f6">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+                <span style="font-size:13px;font-weight:600">${s.name}</span>
+                <span style="font-size:13px;font-weight:700;color:${sProfit>=0?'#059669':'#ef4444'}">${sProfit>=0?'+':''}${fmt(sProfit)}</span>
+              </div>
+              <div style="font-size:11px;color:#9ca3af">${recs.length}件販売 · 売上${fmt(sSales)} · ロット${lots.join('+')}の商品</div>
+            </div>`;
+          }).join('')}
         </div>`;
       })()}
       <div class="card"><div class="card-title">売上・利益の推移</div><div class="chart-box-lg"><canvas id="chart-line"></canvas></div></div>
@@ -2737,6 +2835,26 @@ function saveSet() {
   S.data.products = S.data.products.map(p=>pids.includes(p.id)?{...p,status:'セット中'}:p);
   saveData();
   closeModal();
+}
+
+function recordSetSale(setId) {
+  const soldPrice = parseInt(document.getElementById('set-sold-price')?.value) || 0;
+  const soldShip  = parseInt(document.getElementById('set-sold-ship')?.value)  || 0;
+  const soldFee   = Math.floor(soldPrice * 0.1);
+  const rec = {soldPrice, soldFee, soldShip, soldDate: today()};
+  S.data.sets = S.data.sets.map(s => {
+    if (s.id !== setId) return s;
+    const recs = [...(s.soldRecords||[]), rec];
+    const allSold = recs.length >= (s.qty||1);
+    const newStatus = allSold ? '売却済' : s.status;
+    if (allSold) {
+      S.data.products = S.data.products.map(p =>
+        s.pids.includes(p.id) ? {...p, status:'売卸済', soldPrice: Math.round(soldPrice/s.pids.length), soldDate: today()} : p
+      );
+    }
+    return {...s, soldRecords: recs, status: newStatus};
+  });
+  saveData(); render();
 }
 
 function completeWork(id) {
