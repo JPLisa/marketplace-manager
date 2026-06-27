@@ -68,7 +68,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 @media(min-width:768px){.bottom-nav{display:none}}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;font-size:12px;color:#9ca3af;cursor:pointer;border:none;background:none;gap:3px}
 .bnav-btn.active{color:#059669}
-.bnav-btn svg{width:26px;height:26px}
+.bnav-btn svg{width:26px;height:26px;flex-shrink:0}
 /* Cards */
 .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:12px}
 .card-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:12px}
@@ -423,7 +423,7 @@ function renderBottomNav() {
   return `<nav class="bottom-nav">
     ${ownerTabs.map(t=>`
       <button class="bnav-btn ${S.page===t.id?'active':''}" onclick="${t.id==='_more'?'toggleMore()':'go(\''+t.id+'\')'}">
-        ${icon(t.ico,22)}
+        ${icon(t.ico,26)}
         ${t.label}
       </button>`).join('')}
   </nav>`;
@@ -1829,11 +1829,56 @@ function pageAnalytics() {
         </div>`;
       })()}
       ${(()=>{
+        const defectStats = fBoxes.map(b=>{
+          const bProds = d.products.filter(p=>p.box===b.id);
+          const totalReg = bProds.length;
+          const defectCount = bProds.filter(p=>p.defective).length;
+          const cancelCount = bProds.filter(p=>p.status==='キャンセル').length;
+          const activeCount = bProds.filter(p=>['出品中','セット中','売卸済'].includes(p.status)).length;
+          const defectRate = totalReg>0 ? Math.round(defectCount/totalReg*100) : 0;
+          const listRate = (b.total||75)>0 ? Math.round(activeCount/(b.total||75)*100) : 0;
+          const defColor = defectRate<=5?'#059669':defectRate<=15?'#f59e0b':'#ef4444';
+          const defLabel = defectRate<=5?'良好':defectRate<=15?'要注意':'高い';
+          const listColor = listRate>=80?'#059669':listRate>=50?'#f59e0b':'#ef4444';
+          return {b,totalReg,defectCount,cancelCount,activeCount,defectRate,listRate,defColor,defLabel,listColor};
+        });
+        if (defectStats.length===0) return '';
+        return `<div class="card" style="margin-bottom:12px">
+          <div class="card-title">不良品率・出品可能率${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
+          ${defectStats.map(({b,totalReg,defectCount,cancelCount,activeCount,defectRate,listRate,defColor,defLabel,listColor})=>`
+          <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f3f4f6">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:14px;font-weight:700;color:#111827">ロット${b.id}</span>
+              <span style="font-size:11px;background:${defColor}1a;color:${defColor};border-radius:99px;padding:2px 10px;font-weight:700">⚠️ 不良品率 ${defectRate}%（${defLabel}）</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+              <div style="background:#f9fafb;border-radius:8px;padding:8px">
+                <div style="font-size:10px;color:#9ca3af;margin-bottom:2px">不良品数</div>
+                <div style="font-size:18px;font-weight:700;color:${defColor}">${defectCount}点</div>
+                <div style="font-size:10px;color:#9ca3af">登録${totalReg}点中</div>
+              </div>
+              <div style="background:#f9fafb;border-radius:8px;padding:8px">
+                <div style="font-size:10px;color:#9ca3af;margin-bottom:2px">出品可能率</div>
+                <div style="font-size:18px;font-weight:700;color:${listColor}">${listRate}%</div>
+                <div style="font-size:10px;color:#9ca3af">${activeCount}点 / ${b.total||75}点</div>
+              </div>
+            </div>
+            <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden;margin-bottom:2px">
+              <div style="background:${defColor};height:100%;width:${Math.min(defectRate,100)}%;border-radius:99px;transition:width 0.3s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af">
+              <span>不良品率</span>
+              <span>${cancelCount>0?`キャンセル${cancelCount}点含む`:''}</span>
+            </div>
+          </div>`).join('')}
+        </div>`;
+      })()}
+      ${(()=>{
         const discount = parseFloat(S.tab.discountRate||0);
         const shipOut = parseInt(S.tab.simShipOut??500);
         const defCost2 = d.defaultCostPerItem??484;
-        // 個別出品中・保管中（ロットに仕入額があれば1点あたりの実費を使用）
-        const indivProds = fProds.filter(p=>p.status==='出品中'||p.status==='保管中');
+        // 出品中のみ（キャンセル・保管中・不良品は概算から除外）
+        const indivProds = fProds.filter(p=>p.status==='出品中');
         const indivCalc = indivProds.map(p=>{
           const lot = d.boxes.find(b=>b.id===p.box);
           const lotCostPerItem = lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
@@ -2441,6 +2486,7 @@ function render() {
   migrateLotIds();
   migrateProductIds();
   migratePermissions();
+  if (!S.data.rules || S.data.rules.length === 0) { S.data.rules = JSON.parse(JSON.stringify(INIT.rules)); saveData(); }
   // p.days を registeredDate から毎回動的に計算
   const todayStr = today();
   S.data.products = S.data.products.map(p => {
