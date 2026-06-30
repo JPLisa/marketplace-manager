@@ -1727,6 +1727,11 @@ function pageAnalytics() {
   const fProds  = selLot === 'all' ? d.products : d.products.filter(p=>p.box===selLot);
 
   const defCost2 = d.defaultCostPerItem ?? 484;
+  // ロットに実際の仕入額があればそれを使い（1点あたり）、なければデフォルト原価
+  const lotCostFor = p => {
+    const lot = d.boxes.find(b=>b.id===p.box);
+    return lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
+  };
   // すべて商品レコードから計算（b.sales/b.profitは蓄積誤差があるため使わない）
   const soldProds = fProds.filter(p=>p.status==='売卸済');
   const indivSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
@@ -1734,7 +1739,10 @@ function pageAnalytics() {
     const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
     return a + (p.soldPrice||0) - (p.soldShip||0) - fee;
   }, 0);
-  const indivProfit = grossSaleProfit - soldProds.length * defCost2;
+  const indivProfit = soldProds.reduce((a,p)=>{
+    const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
+    return a + (p.soldPrice||0) - (p.soldShip||0) - fee - lotCostFor(p);
+  }, 0);
   // セット売上（独立集計）
   const soldSetsAll = (d.sets||[]).filter(s=>(s.soldRecords||[]).length>0);
   const setsSales = soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldPrice||0),0)+a,0);
@@ -1786,7 +1794,7 @@ function pageAnalytics() {
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
         const totalInvest = totalRealCost + totalShipIn;
         // 利益累計（totalProfit）vs 未回収投資額で損益分岐を計算
-        const recoveredCost = soldProds.length * defCost2;
+        const recoveredCost = soldProds.reduce((a,p)=>a+lotCostFor(p),0);
         const remainInvest = totalInvest - recoveredCost;
         const grossReturn = totalProfit;
         const trueProfit = grossReturn - remainInvest;
