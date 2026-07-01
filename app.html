@@ -1247,6 +1247,18 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
+function restoreFromFirebase() {
+  if (!window.firebaseSync) { alert('Firebase接続がありません'); return; }
+  if (!confirm('Firebaseに保存されているデータを復元しますか？\n現在のデータは上書きされます。')) return;
+  window.firebaseSync(data => {
+    if (!data) { alert('Firebaseにデータが見つかりませんでした'); return; }
+    S.data = {...JSON.parse(JSON.stringify(INIT)), ...data};
+    saveData();
+    render();
+    alert('Firebaseからデータを復元しました！');
+  });
+}
+
 function importData(input) {
   const file = input.files[0];
   if (!file) return;
@@ -2576,6 +2588,7 @@ function pageSettings() {
       <div class="card-title" style="color:#059669">💾 データバックアップ・復元</div>
       <p style="font-size:16px;color:#6b7280;margin-bottom:12px">データはこの端末のブラウザにのみ保存されています。定期的にバックアップを取ることを強くおすすめします。</p>
       <button onclick="exportData()" class="btn btn-primary btn-full" style="margin-bottom:8px">⬇️ バックアップを保存する</button>
+      <button onclick="restoreFromFirebase()" class="btn btn-full" style="margin-bottom:8px;background:#f59e0b;color:white;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer">☁️ Firebaseからデータを復元する</button>
       <label style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#f3f4f6;border-radius:10px;font-size:16px;font-weight:600;color:#374151;cursor:pointer;box-sizing:border-box">
         ⬆️ バックアップから復元する
         <input type="file" accept=".json" style="display:none" onchange="importData(this)">
