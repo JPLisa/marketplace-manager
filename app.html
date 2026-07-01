@@ -448,14 +448,6 @@ function renderMoreMenu() {
 // ============================================================
 function pageDashboard() {
   const d = S.data;
-  const rules = (d.rules||[]).slice().sort((a,b)=>a.days-b.days);
-  const ruleAlerts = rules.map(r=>{
-    const cnt = d.products.filter(p=>p.status==='出品中'&&(p.days||0)>=r.days).length;
-    const isSet = r.action.includes('セット');
-    const color = r.days>=30?{bg:'#f3f4f6',txt:'#6b7280',ico:'⚫'}:r.days>=21?{bg:'#fff7ed',txt:'#c2410c',ico:'🟠'}:r.days>=14?{bg:'#fffbeb',txt:'#b45309',ico:'🟡'}:{bg:'#fee2e2',txt:'#dc2626',ico:'🔴'};
-    const nav = isSet ? `go('sets')` : `goAlertFilter(${r.days})`;
-    return {r, cnt, isSet, color, nav};
-  });
 
 
   const listingProds = d.products.filter(p=>p.status==='出品中').length;
@@ -564,19 +556,6 @@ function pageDashboard() {
           </div>`;
         }).join('')}
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title flex-row">${icon('bell',16)} アラート</div>
-      ${ruleAlerts.map(({r,cnt,color,nav})=>`
-      <div class="alert-row" style="background:${color.bg};cursor:pointer;flex-direction:column;align-items:flex-start;gap:2px" onclick="${nav}">
-        <div style="display:flex;align-items:center;width:100%;gap:6px">
-          <span>${color.ico}</span>
-          <span style="font-size:16px;font-weight:600;color:${color.txt}">${r.days}日以上未売卸</span>
-          <span style="margin-left:auto;font-weight:700;color:${color.txt}">${cnt}件</span>
-          <span style="color:${color.txt};font-size:16px">›</span>
-        </div>
-        <div style="font-size:16px;color:${color.txt};opacity:0.85;padding-left:22px">推奨アクション：${r.action}</div>
-      </div>`).join('')}
     </div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">値引き交渉シミュレーター</div>
