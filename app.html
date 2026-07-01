@@ -2924,6 +2924,7 @@ function renderPage() {
 }
 
 function render() {
+  try {
   migrateLotIds();
   migrateProductIds();
   migratePermissions();
@@ -2961,6 +2962,9 @@ function render() {
   `;
   initCharts();
   window.scrollTo(0,0);
+  } catch(e) {
+    document.getElementById('root').innerHTML = '<div style="padding:20px;color:red;font-size:14px;white-space:pre-wrap"><b>エラー発生</b><br>'+e.message+'<br><br>'+e.stack+'</div>';
+  }
 }
 
 // ============================================================
