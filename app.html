@@ -1030,13 +1030,13 @@ function pageBoxDetail() {
       ${defectProds.length?`<button class="tab ${tab==='不良品'?'active':''}" onclick="S.tab.boxDetail='不良品';render()" style="${tab==='不良品'?'':'color:#dc2626'}">⚠️ 不良品(${defectProds.length})</button>`:''}
     </div>
     ${shown.map(p=>`
-      <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
+      <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
           <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700;margin-top:4px">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
-            ${p.status==='出品中'?`<button onclick="event.stopPropagation();openQuickSale('${p.id}')" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+            ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
           </div>
         </div>
         ${p.album?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6"><a href="${p.album}" onclick="event.stopPropagation()" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#065f46;font-size:16px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none">📷 LINEアルバムを開く</a></div>`:''}
@@ -1081,15 +1081,15 @@ function pageProducts() {
     </button>`:''}
     <div id="product-list">
     ${shown.map(p=>`
-      <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
+      <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
           <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:14px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:14px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:14px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
-              ${p.status==='出品中'?`<button onclick="event.stopPropagation();openQuickSale('${p.id}')" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
-              <button onclick="event.stopPropagation();deleteProduct('${p.id}')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer">🗑</button>
+              ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+              <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer">🗑</button>
             </div>
           </div>
         </div>
