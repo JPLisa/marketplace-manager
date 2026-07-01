@@ -71,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .bnav-btn svg{width:26px;height:26px;flex-shrink:0}
 /* Cards */
 .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:12px}
-.card-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:12px}
+.card-title{font-size:17px;font-weight:700;color:#111827;margin-bottom:12px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
@@ -531,36 +531,36 @@ function pageDashboard() {
           const regColor = regPct>=80?'#059669':regPct>=50?'#f59e0b':'#ef4444';
           return `<div class="card" style="padding:12px;cursor:pointer" onclick="S.boxId='${b.id}';go('boxDetail')">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:16px;font-weight:800;color:#111827">ロット${b.id}</span>
-              <span style="font-size:16px;color:#9ca3af">${b.date}</span>
+              <span style="font-size:15px;font-weight:800;color:#111827">ロット${b.id}</span>
+              <span style="font-size:12px;color:#9ca3af">${b.date}</span>
             </div>
             <div style="margin-bottom:6px">
               <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
-                <span style="font-size:16px;color:#6b7280">登録数</span>
-                <span style="font-size:16px;font-weight:700;color:${regColor}">${bReg}<span style="font-size:16px;font-weight:400;color:#9ca3af"> / ${lotTotal}点</span></span>
+                <span style="font-size:12px;color:#6b7280">登録数</span>
+                <span style="font-size:13px;font-weight:700;color:${regColor}">${bReg}<span style="font-size:12px;font-weight:400;color:#9ca3af"> / ${lotTotal}点</span></span>
               </div>
               <div style="background:#f3f4f6;border-radius:99px;height:5px;overflow:hidden">
                 <div style="background:${regColor};height:100%;width:${regPct}%;border-radius:99px;transition:width 0.3s"></div>
               </div>
-              <div style="font-size:16px;color:#9ca3af;text-align:right;margin-top:2px">登録率 ${regPct}%</div>
+              <div style="font-size:11px;color:#9ca3af;text-align:right;margin-top:2px">登録率 ${regPct}%</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">
               <div style="background:#f0fdf4;border-radius:6px;padding:5px 6px;text-align:center">
-                <div style="font-size:16px;color:#059669">📢 出品中</div>
-                <div style="font-size:16px;font-weight:700;color:#059669">${bListing}</div>
+                <div style="font-size:11px;color:#059669">📢 出品中</div>
+                <div style="font-size:15px;font-weight:700;color:#059669">${bListing}</div>
               </div>
               <div style="background:#eff6ff;border-radius:6px;padding:5px 6px;text-align:center">
-                <div style="font-size:16px;color:#3b82f6">✅ 売れた</div>
-                <div style="font-size:16px;font-weight:700;color:#3b82f6">${bSold}</div>
+                <div style="font-size:11px;color:#3b82f6">✅ 売れた</div>
+                <div style="font-size:15px;font-weight:700;color:#3b82f6">${bSold}</div>
               </div>
             </div>
             ${(bStored>0||bInSet>0||bDefect>0||bCancel>0)?`<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">
-              ${bStored>0?`<span style="font-size:16px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:4px;padding:3px 7px;font-weight:600">📦保管 ${bStored}</span>`:''}
-              ${bInSet>0?`<span style="font-size:16px;background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:4px;padding:3px 7px;font-weight:600">🔗セット中 ${bInSet}</span>`:''}
-              ${bDefect>0?`<span style="font-size:16px;background:#fff1f2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:3px 7px;font-weight:600">⚠️不良 ${bDefect}</span>`:''}
-              ${bCancel>0?`<span style="font-size:16px;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;border-radius:4px;padding:3px 7px;font-weight:600">取消 ${bCancel}</span>`:''}
+              ${bStored>0?`<span style="font-size:11px;background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:4px;padding:2px 6px;font-weight:600">📦保管 ${bStored}</span>`:''}
+              ${bInSet>0?`<span style="font-size:11px;background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:4px;padding:2px 6px;font-weight:600">🔗セット中 ${bInSet}</span>`:''}
+              ${bDefect>0?`<span style="font-size:11px;background:#fff1f2;color:#dc2626;border:1px solid #fecaca;border-radius:4px;padding:2px 6px;font-weight:600">⚠️不良 ${bDefect}</span>`:''}
+              ${bCancel>0?`<span style="font-size:11px;background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;border-radius:4px;padding:2px 6px;font-weight:600">取消 ${bCancel}</span>`:''}
             </div>`:''}
-            ${canDo('lots')?`<button onclick="event.stopPropagation();S.regBoxId='${b.id}';go('productReg')" style="width:100%;background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px;font-size:16px;font-weight:600;cursor:pointer">＋ 商品登録</button>`:''}
+            ${canDo('lots')?`<button onclick="event.stopPropagation();S.regBoxId='${b.id}';go('productReg')" style="width:100%;background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px;font-size:13px;font-weight:600;cursor:pointer">＋ 商品登録</button>`:''}
           </div>`;
         }).join('')}
       </div>
@@ -1084,7 +1084,7 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:21px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:16px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:16px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:14px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:14px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:14px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:14px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
@@ -1598,7 +1598,7 @@ function pageSalesInput() {
         <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;cursor:pointer;background:${S.selPid===p.id?'#ecfdf5':'#f9fafb'};border:2px solid ${S.selPid===p.id?'#059669':'transparent'}" onclick="S.selPid='${p.id}';render()">
           <span style="font-size:24px">${p.emoji}</span>
           <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box} · ${p.days}日経過</div></div>
-          <div style="font-weight:700;font-size:15px">${fmt(p.price)}</div>
+          <div style="font-weight:700;font-size:17px">${fmt(p.price)}</div>
           ${S.selPid===p.id?'<span style="color:#059669;font-size:18px">✓</span>':''}
         </div>`).join('')
       }
@@ -1883,9 +1883,9 @@ function pageAnalytics() {
     </div>
     ${tab==='summary'?`
       <div class="grid4" style="margin-bottom:12px">
-        <div class="stat-card"><div class="label">売却済商品数</div><div class="value" style="font-size:16px;color:#374151;font-weight:700">${soldProds.length}点</div></div>
-        <div class="stat-card"><div class="label">${selLot==='all'?'総売上':'売上'}</div><div class="value" style="font-size:16px;color:#3b82f6;font-weight:700">${fmt(totalSales)}</div></div>
-        <div class="stat-card"><div class="label">${selLot==='all'?'総利益':'利益'}</div><div class="value" style="font-size:16px;color:${totalProfit>=0?'#059669':'#ef4444'};font-weight:700">${fmt(totalProfit)}</div></div>
+        <div class="stat-card"><div class="label">売却済商品数</div><div class="value" style="color:#374151">${soldProds.length}点</div></div>
+        <div class="stat-card"><div class="label">${selLot==='all'?'総売上':'売上'}</div><div class="value" style="color:#3b82f6">${fmt(totalSales)}</div></div>
+        <div class="stat-card"><div class="label">${selLot==='all'?'総利益':'利益'}</div><div class="value" style="color:${totalProfit>=0?'#059669':'#ef4444'}">${fmt(totalProfit)}</div></div>
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
       </div>
       <div class="card" style="margin-bottom:12px">
@@ -1907,7 +1907,7 @@ function pageAnalytics() {
           const stateLabel = isComplete2?'完了':'販売中';
           const stateColor = isComplete2?'#059669':'#3b82f6';
           return `<div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6;gap:8px" onclick="S.tab.analytics='boxes';render()" style="cursor:pointer">
-            <div style="font-size:15px;font-weight:800;color:#111827;min-width:52px">ロット${b.id}</div>
+            <div style="font-size:17px;font-weight:800;color:#111827;min-width:52px">ロット${b.id}</div>
             <div style="flex:1">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
                 <span style="font-size:16px;font-weight:700;color:${bProfit2>=0?'#059669':'#ef4444'}">利益：${bProfit2>=0?'+':''}${fmt(bProfit2)}</span>
@@ -1945,14 +1945,14 @@ function pageAnalytics() {
           <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <span style="font-size:16px;color:#6b7280">未回収投資額</span>
-              <span style="font-size:15px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
+              <span style="font-size:17px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
             </div>
-            <div style="font-size:16px;color:#9ca3af;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
+            <div style="font-size:14px;color:#9ca3af;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <span style="font-size:16px;color:#6b7280">利益累計</span>
-              <span style="font-size:15px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
+              <span style="font-size:17px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
             </div>
-            <div style="font-size:16px;color:#9ca3af;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
+            <div style="font-size:14px;color:#9ca3af;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
             <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:16px;font-weight:600;color:#374151">現在の損益</span>
               <span style="font-size:17px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
@@ -2084,12 +2084,12 @@ function pageAnalytics() {
             <div style="font-size:16px;color:#9ca3af;margin-bottom:6px;font-weight:600">固定コスト</div>
             <div style="display:flex;gap:12px">
               <div style="flex:1;text-align:center;background:#fff;border-radius:8px;padding:8px">
-                <div style="font-size:16px;color:#9ca3af">メルカリ手数料</div>
-                <div style="font-size:15px;font-weight:700;color:#374151">10%</div>
+                <div style="font-size:14px;color:#9ca3af">メルカリ手数料</div>
+                <div style="font-size:17px;font-weight:700;color:#374151">10%</div>
               </div>
               <div style="flex:1;text-align:center;background:#fff;border-radius:8px;padding:8px">
-                <div style="font-size:16px;color:#9ca3af">仕入コスト</div>
-                <div style="font-size:15px;font-weight:700;color:#374151">${fmt(defCost2)}/点</div>
+                <div style="font-size:14px;color:#9ca3af">仕入コスト</div>
+                <div style="font-size:17px;font-weight:700;color:#374151">${fmt(defCost2)}/点</div>
               </div>
             </div>
           </div>
@@ -2141,12 +2141,12 @@ function pageAnalytics() {
               <div style="font-size:16px;color:#9ca3af">セット</div>
             </div>
             <div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center">
-              <div style="font-size:16px;color:#3b82f6;margin-bottom:2px">売上</div>
-              <div style="font-size:15px;font-weight:700;color:#3b82f6">${fmt(setTotalSales)}</div>
+              <div style="font-size:14px;color:#3b82f6;margin-bottom:2px">売上</div>
+              <div style="font-size:17px;font-weight:700;color:#3b82f6">${fmt(setTotalSales)}</div>
             </div>
             <div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center">
-              <div style="font-size:16px;color:#059669;margin-bottom:2px">利益</div>
-              <div style="font-size:15px;font-weight:700;color:${setTotalProfit>=0?'#059669':'#ef4444'}">${setTotalProfit>=0?'+':''}${fmt(setTotalProfit)}</div>
+              <div style="font-size:14px;color:#059669;margin-bottom:2px">利益</div>
+              <div style="font-size:17px;font-weight:700;color:${setTotalProfit>=0?'#059669':'#ef4444'}">${setTotalProfit>=0?'+':''}${fmt(setTotalProfit)}</div>
             </div>
           </div>
           ${soldSets.map(s=>{
@@ -2223,76 +2223,76 @@ function pageAnalytics() {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:16px">
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">商品数</div>
-              <div style="font-weight:700;color:#374151;font-size:15px">${b.total||'―'}点</div>
+              <div style="font-weight:700;color:#374151;font-size:17px">${b.total||'―'}点</div>
             </div>
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">仕入金額</div>
-              <div style="font-weight:700;color:#374151;font-size:15px">${fmt(bRealCost)}</div>
+              <div style="font-weight:700;color:#374151;font-size:17px">${fmt(bRealCost)}</div>
             </div>
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">送料</div>
-              <div style="font-weight:700;color:#374151;font-size:15px">${fmt(bShipIn)}</div>
+              <div style="font-weight:700;color:#374151;font-size:17px">${fmt(bShipIn)}</div>
             </div>
             <div style="background:#fff3cd;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">合計投資額</div>
-              <div style="font-weight:700;color:#b45309;font-size:15px">${fmt(bInvest)}</div>
+              <div style="font-weight:700;color:#b45309;font-size:17px">${fmt(bInvest)}</div>
             </div>
           </div>
           <div style="font-size:16px;font-weight:600;color:#6b7280;margin-bottom:6px;border-bottom:1px solid #f3f4f6;padding-bottom:4px">【販売結果】</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;font-size:16px">
             <div style="background:#f0fdf4;border-radius:8px;padding:8px;text-align:center">
               <div style="color:#9ca3af;margin-bottom:2px">売却済</div>
-              <div style="font-weight:700;color:#059669;font-size:16px">${bSoldProds.length}</div>
-              <div style="color:#9ca3af;font-size:16px">点</div>
+              <div style="font-weight:700;color:#059669;font-size:17px">${bSoldProds.length}</div>
+              <div style="color:#9ca3af;font-size:14px">点</div>
             </div>
             <div style="background:#eff6ff;border-radius:8px;padding:8px;text-align:center">
               <div style="color:#9ca3af;margin-bottom:2px">出品中</div>
-              <div style="font-weight:700;color:#3b82f6;font-size:16px">${bListingB}</div>
-              <div style="color:#9ca3af;font-size:16px">点</div>
+              <div style="font-weight:700;color:#3b82f6;font-size:17px">${bListingB}</div>
+              <div style="color:#9ca3af;font-size:14px">点</div>
             </div>
             <div style="background:#fff1f2;border-radius:8px;padding:8px;text-align:center">
               <div style="color:#9ca3af;margin-bottom:2px">廃棄・不良</div>
-              <div style="font-weight:700;color:#dc2626;font-size:16px">${bDefectB+bCancelB}</div>
-              <div style="color:#9ca3af;font-size:16px">点</div>
+              <div style="font-weight:700;color:#dc2626;font-size:17px">${bDefectB+bCancelB}</div>
+              <div style="color:#9ca3af;font-size:14px">点</div>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:16px">
             <div style="background:#eff6ff;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">売上</div>
-              <div style="font-weight:700;color:#3b82f6;font-size:15px">${fmt(bSales)}</div>
+              <div style="font-weight:700;color:#3b82f6;font-size:17px">${fmt(bSales)}</div>
             </div>
             <div style="background:${bProfit>=0?'#f0fdf4':'#fff1f2'};border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">利益</div>
-              <div style="font-weight:700;color:${bProfit>=0?'#059669':'#ef4444'};font-size:15px">${bProfit>=0?'+':''}${fmt(bProfit)}</div>
+              <div style="font-weight:700;color:${bProfit>=0?'#059669':'#ef4444'};font-size:17px">${bProfit>=0?'+':''}${fmt(bProfit)}</div>
             </div>
           </div>
           <div style="font-size:16px;font-weight:600;color:#6b7280;margin-bottom:6px;border-bottom:1px solid #f3f4f6;padding-bottom:4px">【分析】</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;font-size:16px">
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">投資回収率</div>
-              <div style="font-weight:700;color:${bRecoverPct>=100?'#059669':'#f59e0b'};font-size:15px">${bRecoverPct}%</div>
+              <div style="font-weight:700;color:${bRecoverPct>=100?'#059669':'#f59e0b'};font-size:17px">${bRecoverPct}%</div>
             </div>
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">利益率</div>
-              <div style="font-weight:700;color:#374151;font-size:15px">${bProfitRate}%</div>
+              <div style="font-weight:700;color:#374151;font-size:17px">${bProfitRate}%</div>
             </div>
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">不良品率</div>
-              <div style="font-weight:700;color:${bDefectRate<=5?'#059669':bDefectRate<=15?'#f59e0b':'#ef4444'};font-size:15px">${bDefectRate}%</div>
+              <div style="font-weight:700;color:${bDefectRate<=5?'#059669':bDefectRate<=15?'#f59e0b':'#ef4444'};font-size:17px">${bDefectRate}%</div>
             </div>
             <div style="background:#f9fafb;border-radius:8px;padding:8px">
               <div style="color:#9ca3af;margin-bottom:2px">1商品あたり利益</div>
-              <div style="font-weight:700;color:${bAvgProfit>=0?'#374151':'#ef4444'};font-size:15px">${bAvgProfit>=0?'+':''}${fmt(bAvgProfit)}</div>
+              <div style="font-weight:700;color:${bAvgProfit>=0?'#374151':'#ef4444'};font-size:17px">${bAvgProfit>=0?'+':''}${fmt(bAvgProfit)}</div>
             </div>
           </div>
           <div style="background:#f9fafb;border-radius:8px;padding:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-size:16px;color:#9ca3af">平均販売日数</span>
-            <span style="font-size:15px;font-weight:700;color:#374151">${bAvgDays!=null?bAvgDays+'日':'―'}</span>
+            <span style="font-size:17px;font-weight:700;color:#374151">${bAvgDays!=null?bAvgDays+'日':'―'}</span>
           </div>
           <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden;margin-bottom:4px">
             <div style="background:${bAchieved?'#059669':'#3b82f6'};height:100%;width:${bRecoverPct}%;border-radius:99px;transition:width 0.3s"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:16px;color:#9ca3af;margin-bottom:${isCompleteB?'12px':'0'}">
+          <div style="display:flex;justify-content:space-between;font-size:14px;color:#9ca3af;margin-bottom:${isCompleteB?'12px':'0'}">
             <span>回収率 ${bRecoverPct}%</span>
             <span>${bAchieved?'回収完了':bRemaining>0?'あと'+bRemaining+'個':''}</span>
           </div>
@@ -2302,19 +2302,19 @@ function pageAnalytics() {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:16px">
               <div>
                 <div style="color:#9ca3af">最終利益</div>
-                <div style="font-weight:700;color:${bProfit>=0?'#059669':'#ef4444'};font-size:15px">${bProfit>=0?'+':''}${fmt(bProfit)}</div>
+                <div style="font-weight:700;color:${bProfit>=0?'#059669':'#ef4444'};font-size:17px">${bProfit>=0?'+':''}${fmt(bProfit)}</div>
               </div>
               <div>
                 <div style="color:#9ca3af">目標との差</div>
-                <div style="font-weight:700;color:${targetDiffB>=0?'#059669':'#ef4444'};font-size:15px">${targetDiffB>=0?'+':''}${fmt(targetDiffB)}</div>
+                <div style="font-weight:700;color:${targetDiffB>=0?'#059669':'#ef4444'};font-size:17px">${targetDiffB>=0?'+':''}${fmt(targetDiffB)}</div>
               </div>
               <div>
                 <div style="color:#9ca3af">売れ残り数</div>
-                <div style="font-weight:700;color:#374151;font-size:15px">${bStoredB+bInSetB}点</div>
+                <div style="font-weight:700;color:#374151;font-size:17px">${bStoredB+bInSetB}点</div>
               </div>
               <div>
                 <div style="color:#9ca3af">不良率</div>
-                <div style="font-weight:700;color:${bDefectRate<=5?'#059669':bDefectRate<=15?'#f59e0b':'#ef4444'};font-size:15px">${bDefectRate}%</div>
+                <div style="font-weight:700;color:${bDefectRate<=5?'#059669':bDefectRate<=15?'#f59e0b':'#ef4444'};font-size:17px">${bDefectRate}%</div>
               </div>
             </div>
           </div>`:''}
@@ -2458,7 +2458,7 @@ function pageUnsold() {
       return `<div class="card">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <span style="font-size:32px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:700;font-size:15px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.days}日経過 · ${fmt(p.price)} · ${p.box}</div></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:17px">${p.name}</div><div style="font-size:14px;color:#9ca3af">${p.days}日経過 · ${fmt(p.price)} · ${p.box}</div></div>
           ${badge(p.status)}
         </div>
         ${dec?`<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:10px;font-size:16px">
