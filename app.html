@@ -557,6 +557,33 @@ function pageDashboard() {
         }).join('')}
       </div>
     </div>
+    ${(()=>{
+      const allSets = d.sets||[];
+      const activeSetsAll = allSets.filter(s=>s.status==='出品中');
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:16px;font-weight:700;color:#111827">📦 セット管理</div>
+          ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createLotSet')">${icon('plus',16)} セット登録</button>`:''}
+        </div>
+        ${activeSetsAll.length===0?`<div class="card" style="text-align:center;padding:14px;color:#9ca3af;font-size:15px">出品中のセットがありません</div>`:`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${activeSetsAll.map(s=>{
+            const compsLabel = s.type==='lot'
+              ? (s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty).join('＋')
+              : 'セット中('+(s.pids||[]).length+'点)';
+            return `<div class="card" style="padding:12px">
+              <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${s.name}</div>
+              <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">${compsLabel}</div>
+              <div style="font-size:15px;font-weight:700;color:#7c3aed;margin-bottom:6px">${fmt(s.price)}</div>
+              ${s.type==='lot'
+                ? `<button data-setid="${s.id}" onclick="event.stopPropagation();openRecordLotSetSale(this.dataset.setid)" style="width:100%;background:#7c3aed;color:white;border:none;border-radius:8px;padding:5px;font-size:13px;font-weight:600;cursor:pointer">売れた！</button>`
+                : `<button onclick="event.stopPropagation();S.setId='${s.id}';go('setDetail')" style="width:100%;background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:8px;padding:5px;font-size:13px;font-weight:600;cursor:pointer">詳細›</button>`
+              }
+            </div>`;
+          }).join('')}
+        </div>`}
+      </div>`;
+    })()}
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">値引き交渉シミュレーター</div>
       <div style="margin-bottom:10px">
@@ -1671,15 +1698,18 @@ function pageSets() {
       ${S.mode==='owner'?`<button class="btn btn-primary btn-sm" onclick="openModal('createSet')">${icon('plus',16)} 新規</button>`:''}
     </div>
     ${S.data.sets.map(s=>{
-      const prods = S.data.products.filter(p=>s.pids.includes(p.id));
+      const prods = (s.pids||[]).length>0 ? S.data.products.filter(p=>s.pids.includes(p.id)) : [];
+      const bodyInfo = s.type==='lot'
+        ? `<div style="font-size:15px;color:#7c3aed;margin-bottom:8px">${(s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')}</div>`
+        : `<div style="display:flex;gap:4px;margin-bottom:8px">${prods.map(p=>`<span style="font-size:22px" title="${p.name}">${p.emoji}</span>`).join('')} <span style="font-size:16px;color:#9ca3af;align-self:center">${prods.length}点</span></div>`;
       return `<div class="card ${borderColor(s.status)}" style="cursor:pointer" onclick="S.setId='${s.id}';go('setDetail')">
         <div class="flex-between" style="margin-bottom:8px">
           <span style="font-weight:700;font-size:16px">${s.name}</span>
           ${badge(s.status)}
         </div>
-        <div style="font-size:16px;color:#9ca3af;margin-bottom:8px">${s.id} · ${s.created}</div>
-        <div style="display:flex;gap:4px;margin-bottom:8px">${prods.map(p=>`<span style="font-size:22px" title="${p.name}">${p.emoji}</span>`).join('')} <span style="font-size:16px;color:#9ca3af;align-self:center">${prods.length}点</span></div>
-        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><div style="text-align:right"><span style="font-size:16px;color:#9ca3af">${s.platform}</span>${(s.qty||1)>1?`<div style="font-size:16px;font-weight:700;color:#7c3aed">${s.qty}セット出品</div>`:''}</div></div>
+        <div style="font-size:16px;color:#9ca3af;margin-bottom:8px">${s.id} · ${s.registeredDate||s.created||''}</div>
+        ${bodyInfo}
+        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><div style="text-align:right">${s.platform?`<span style="font-size:16px;color:#9ca3af">${s.platform}</span>`:''}${(s.qty||1)>1?`<div style="font-size:16px;font-weight:700;color:#7c3aed">${s.qty}セット出品</div>`:''}</div></div>
       </div>`;
     }).join('')}
   `;
@@ -1691,7 +1721,8 @@ function pageSets() {
 function pageSetDetail() {
   const s = S.data.sets.find(x=>x.id===S.setId);
   if (!s) return '<p>セットが見つかりません</p>';
-  const prods = S.data.products.filter(p=>s.pids.includes(p.id));
+  const prods = (s.pids||[]).length>0 ? S.data.products.filter(p=>s.pids.includes(p.id)) : [];
+  const isLotType = s.type==='lot';
   return `
     <div class="flex-row" style="margin-bottom:16px">
       <button class="icon-btn" onclick="go('sets')">${icon('back')}</button>
@@ -1700,24 +1731,38 @@ function pageSetDetail() {
     <div class="card">
       <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:16px;color:#9ca3af">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:16px;margin-top:8px">
-        <div><span style="color:#9ca3af">作成日: </span>${s.created}</div>
+        <div><span style="color:#9ca3af">登録日: </span>${s.registeredDate||s.created||''}</div>
         <div><span style="color:#9ca3af">販売価格: </span><strong>${fmt(s.price)}</strong></div>
-        <div><span style="color:#9ca3af">出品数: </span><strong>${s.qty||1}セット</strong></div>
-        <div><span style="color:#9ca3af">出品先: </span>${s.platform}</div>
+        ${isLotType?'':`<div><span style="color:#9ca3af">出品数: </span><strong>${s.qty||1}セット</strong></div>`}
+        ${s.platform?`<div><span style="color:#9ca3af">出品先: </span>${s.platform}</div>`:''}
         ${s.ship?`<div><span style="color:#9ca3af">発送: </span>${s.ship}</div>`:''}
       </div>
     </div>
+    ${isLotType?`
+    <div class="card"><div class="card-title">セット内容</div>
+      ${(s.lotComponents||[]).map(c=>{
+        const lot=S.data.boxes.find(x=>x.id===c.lotId);
+        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
+          <span style="font-size:16px;font-weight:600">ロット${c.lotId}</span>
+          <span style="font-size:16px;color:#9ca3af">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
+          <span style="font-size:16px;font-weight:700;color:#374151">${cph?fmt(c.qty*cph):'―'}</span>
+        </div>`;
+      }).join('')}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:16px">
+        <span>合計原価</span><span style="color:#374151">${fmt((s.lotComponents||[]).reduce((a,c)=>{const lot=S.data.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;return a+c.qty*cph;},0))}</span>
+      </div>
+    </div>`:`
     <div class="card"><div class="card-title">セット内容（${prods.length}点）</div>
       ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.box}ロット</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
-    </div>
-    ${s.notes?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
-      <div style="font-weight:700;color:#b45309;margin-bottom:8px;font-size:16px">⚠️ このセットは必ずまとめて発送してください</div>
-      <div style="font-size:16px;color:#374151;white-space:pre-line">${s.notes}</div>
+    </div>`}
+    ${(s.notes||s.memo)?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
+      <div style="font-size:16px;color:#374151;white-space:pre-line">${s.notes||s.memo}</div>
     </div>`:'' }
     ${(()=>{
       const soldRecs = s.soldRecords||[];
       const soldQty = soldRecs.length;
-      const remQty = (s.qty||1) - soldQty;
+      const remQty = isLotType ? (s.status==='出品中'?1:0) : (s.qty||1) - soldQty;
       return `
       ${soldRecs.length>0?`<div class="card" style="margin-bottom:10px">
         <div class="card-title">販売記録（${soldQty}件）</div>
@@ -1727,7 +1772,10 @@ function pageSetDetail() {
           <span style="font-size:16px;color:#6b7280">送料 ${fmt(r.soldShip||0)}</span>
         </div>`).join('')}
       </div>`:''}
-      ${remQty>0?`<div class="card" style="background:#f0fdf4;border:1px solid #6ee7b7">
+      ${remQty>0?(isLotType?`<div class="card" style="background:#f0fdf4;border:1px solid #6ee7b7">
+        <div style="font-size:16px;font-weight:700;color:#059669;margin-bottom:12px">📦 セットが売れた！</div>
+        <button class="btn btn-primary btn-full" data-setid="${s.id}" onclick="openRecordLotSetSale(this.dataset.setid)">売上を記録する</button>
+      </div>`:`<div class="card" style="background:#f0fdf4;border:1px solid #6ee7b7">
         <div style="font-size:16px;font-weight:700;color:#059669;margin-bottom:12px">📦 セットが売れた！（残り${remQty}セット）</div>
         <div style="margin-bottom:10px">
           <label class="field-label">実際の販売価格（円）</label>
@@ -1738,7 +1786,7 @@ function pageSetDetail() {
           <input id="set-sold-ship" class="input" type="number" min="0" value="0">
         </div>
         <button class="btn btn-primary btn-full" onclick="recordSetSale('${s.id}')">売上を記録する</button>
-      </div>`:`<div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;color:#059669;font-weight:600">✅ 全${s.qty||1}セット販売済み</div>`}
+      </div>`):`<div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;color:#059669;font-weight:600">✅ ${isLotType?'販売済み':'全'+(s.qty||1)+'セット販売済み'}</div>`}
       `;
     })()}
   `;
@@ -1844,7 +1892,7 @@ function pageAnalytics() {
     return lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
   };
   // すべて商品レコードから計算（b.sales/b.profitは蓄積誤差があるため使わない）
-  const soldProds = fProds.filter(p=>p.status==='売卸済');
+  const soldProds = fProds.filter(p=>p.status==='売卸済' && !p.soldViaSet);
   const indivSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
   const grossSaleProfit = soldProds.reduce((a,p)=>{
     const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
@@ -1858,11 +1906,20 @@ function pageAnalytics() {
   const soldSetsAll = (d.sets||[]).filter(s=>(s.soldRecords||[]).length>0);
   const setsSales = soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldPrice||0),0)+a,0);
   const setsProfit = soldSetsAll.reduce((a,s)=>{
-    const itemCost = s.pids.reduce((b,pid)=>{
-      const prod = d.products.find(p=>p.id===pid);
-      const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
-      return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
-    },0);
+    let itemCost;
+    if (s.type==='lot') {
+      itemCost = (s.lotComponents||[]).reduce((b,c)=>{
+        const lot=d.boxes.find(x=>x.id===c.lotId);
+        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;
+        return b+c.qty*cph;
+      },0);
+    } else {
+      itemCost = (s.pids||[]).reduce((b,pid)=>{
+        const prod=d.products.find(p=>p.id===pid);
+        const lot=prod?d.boxes.find(b=>b.id===prod.box):null;
+        return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+      },0);
+    }
     return a+(s.soldRecords||[]).reduce((b,r)=>{
       const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
       return b+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
@@ -1906,11 +1963,18 @@ function pageAnalytics() {
           const bInSet2 = d.products.filter(p=>p.box===b.id&&p.status==='セット中').length;
           const bDefect2 = d.products.filter(p=>p.box===b.id&&p.defective).length;
           const bInvest2 = (b.cost||0)+(b.ship||0);
+          const bLotSetContrib2 = (d.sets||[]).filter(s=>s.type==='lot').reduce((acc,s)=>{
+            const myComp=(s.lotComponents||[]).find(c=>c.lotId===b.id);
+            if (!myComp) return acc;
+            const totalCost=(s.lotComponents||[]).reduce((tc,c)=>{const lot2=d.boxes.find(x=>x.id===c.lotId);const cph2=lot2&&lot2.cost>0&&lot2.total>0?Math.round(lot2.cost/lot2.total):(d.defaultCostPerItem??484);return tc+c.qty*cph2;},0);
+            const myCost=myComp.qty*(b.cost>0&&b.total>0?Math.round(b.cost/b.total):(d.defaultCostPerItem??484));
+            return acc+(s.soldRecords||[]).reduce((b2,r)=>{const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);const net=(r.soldPrice||0)-(r.soldShip||0)-fee;return b2+(totalCost>0?net*myCost/totalCost:0)-myCost;},0);
+          },0);
           const bProfit2 = bSoldP.reduce((a,p)=>{
             const fee=p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1);
             const cost=b.cost>0&&b.total>0?Math.round(b.cost/b.total):(d.defaultCostPerItem??484);
             return a+(p.soldPrice||0)-(p.soldShip||0)-fee-cost;
-          },0);
+          },0) + bLotSetContrib2;
           const bRecoverPct = bInvest2>0?Math.min(100,Math.max(0,Math.round((bInvest2+bProfit2)/bInvest2*100))):100;
           const isComplete2 = bListing2===0&&bStored2===0&&bInSet2===0&&bSoldP.length>0;
           const stateLabel = isComplete2?'完了':'販売中';
@@ -2053,17 +2117,21 @@ function pageAnalytics() {
         // セット出品中（セット価格で計算）
         const allActiveSets = (d.sets||[]).filter(s=>s.status==='出品中');
         const relevantSets = selLot==='all' ? allActiveSets
-          : allActiveSets.filter(s=>s.pids.some(pid=>d.products.find(p=>p.id===pid&&p.box===selLot)));
+          : allActiveSets.filter(s=>s.type==='lot'
+            ? (s.lotComponents||[]).some(c=>c.lotId===selLot)
+            : (s.pids||[]).some(pid=>d.products.find(p=>p.id===pid&&p.box===selLot)));
         const setCalc = relevantSets.map(s=>{
           const salePrice = Math.round(s.price * (1 - discount/100));
           const fee = Math.floor(salePrice * 0.1);
           const revenue = salePrice - fee - shipOut;
-          const itemCount = s.pids.length;
-          const setCost = s.pids.reduce((a,pid)=>{
-            const prod = d.products.find(p=>p.id===pid);
-            const lot = prod ? d.boxes.find(b=>b.id===prod.box) : null;
-            return a + (lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2);
-          }, 0);
+          let itemCount, setCost;
+          if (s.type==='lot') {
+            itemCount = (s.lotComponents||[]).reduce((a,c)=>a+c.qty,0);
+            setCost = (s.lotComponents||[]).reduce((a,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return a+c.qty*cph;},0);
+          } else {
+            itemCount = (s.pids||[]).length;
+            setCost = (s.pids||[]).reduce((a,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return a+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+          }
           const netProfit = revenue - setCost;
           return {revenue, netProfit, items: itemCount};
         });
@@ -2130,11 +2198,12 @@ function pageAnalytics() {
         if (soldSets.length===0) return '';
         const setTotalSales = soldSets.reduce((a,s)=>a+(s.soldRecords||[]).reduce((b,r)=>b+(r.soldPrice||0),0),0);
         const setTotalProfit = soldSets.reduce((a,s)=>{
-          const itemCost = s.pids.reduce((b,pid)=>{
-            const prod = d.products.find(p=>p.id===pid);
-            const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
-            return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
-          },0);
+          let itemCost;
+          if (s.type==='lot') {
+            itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return b+c.qty*cph;},0);
+          } else {
+            itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+          }
           return a+(s.soldRecords||[]).reduce((b,r)=>{
             const fee = r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
             return b+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
@@ -2159,24 +2228,27 @@ function pageAnalytics() {
             </div>
           </div>
           ${soldSets.map(s=>{
-            const itemCost = s.pids.reduce((b,pid)=>{
-              const prod = d.products.find(p=>p.id===pid);
-              const lot = prod?d.boxes.find(b=>b.id===prod.box):null;
-              return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
-            },0);
+            let itemCost;
+            if (s.type==='lot') {
+              itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return b+c.qty*cph;},0);
+            } else {
+              itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+            }
             const recs = s.soldRecords||[];
             const sSales = recs.reduce((a,r)=>a+(r.soldPrice||0),0);
             const sProfit = recs.reduce((a,r)=>{
               const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
               return a+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
             },0);
-            const lots = [...new Set(s.pids.map(pid=>{ const p=d.products.find(q=>q.id===pid); return p?p.box:'?'; }))];
+            const lotsLabel = s.type==='lot'
+              ? (s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')
+              : 'ロット'+[...new Set((s.pids||[]).map(pid=>{ const p=d.products.find(q=>q.id===pid); return p?p.box:'?'; }))].join('+')+'の商品';
             return `<div style="padding:8px 0;border-top:1px solid #f3f4f6">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
                 <span style="font-size:16px;font-weight:600">${s.name}</span>
                 <span style="font-size:16px;font-weight:700;color:${sProfit>=0?'#059669':'#ef4444'}">${sProfit>=0?'+':''}${fmt(sProfit)}</span>
               </div>
-              <div style="font-size:16px;color:#9ca3af">${recs.length}件販売 · 売上${fmt(sSales)} · ロット${lots.join('+')}の商品</div>
+              <div style="font-size:16px;color:#9ca3af">${recs.length}件販売 · 売上${fmt(sSales)} · ${lotsLabel}</div>
             </div>`;
           }).join('')}
         </div>`;
@@ -2780,6 +2852,44 @@ function renderModal() {
         </div>
       </div>`;
   }
+  if (S.showModal === 'createLotSet') {
+    return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+          <div class="modal-header"><h2>セット登録（ロット別）</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
+          <div style="margin-bottom:12px"><label class="field-label">セット名</label><input id="ls-name" class="input" placeholder="例: サンリオ3点セット"></div>
+          <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="ls-price" class="input" type="number" min="0" placeholder="例: 3000"></div>
+          <div style="margin-bottom:12px">
+            <label class="field-label">ロット別点数</label>
+            ${S.data.boxes.length===0?'<div style="color:#9ca3af;font-size:15px">ロットがまだありません</div>':S.data.boxes.map(b=>`
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:16px;font-weight:600;min-width:64px">ロット${b.id}</span>
+                <input id="ls-lot-${b.id}" class="input" type="number" min="0" placeholder="0" style="flex:1;text-align:center">
+                <span style="font-size:16px;color:#9ca3af">点</span>
+              </div>`).join('')}
+          </div>
+          <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><input id="ls-memo" class="input" placeholder="例: A＋B混合セット"></div>
+          <button class="btn btn-primary btn-full" onclick="saveLotSet()">登録する</button>
+        </div>
+      </div>`;
+  }
+  if (S.showModal === 'recordLotSetSale') {
+    const s = S.data.sets.find(x=>x.id===S.selSetId);
+    if (!s) return '';
+    return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+          <div class="modal-header"><h2>セット売上を記録</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
+          <div style="padding:12px;background:#f5f3ff;border-radius:10px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:16px">${s.name}</div>
+            <div style="font-size:15px;color:#9ca3af;margin-top:4px">${(s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')}</div>
+          </div>
+          <div style="margin-bottom:12px"><label class="field-label">実売価格（円）</label><input id="lss-price" class="input" type="number" value="${s.price}"></div>
+          <div style="margin-bottom:16px"><label class="field-label">送料（円）</label><input id="lss-ship" class="input" type="number" value="0"></div>
+          <button class="btn btn-primary btn-full" onclick="confirmLotSetSale()">売上を記録する</button>
+        </div>
+      </div>`;
+  }
   return '';
 }
 
@@ -3105,6 +3215,45 @@ function saveSet() {
   closeModal();
 }
 
+function saveLotSet() {
+  const name = document.getElementById('ls-name')?.value?.trim();
+  if (!name) { alert('セット名を入力してください'); return; }
+  const price = parseInt(document.getElementById('ls-price')?.value) || 0;
+  if (!price) { alert('販売価格を入力してください'); return; }
+  const memo = document.getElementById('ls-memo')?.value || '';
+  const lotComponents = S.data.boxes.map(b=>{
+    const qty = parseInt(document.getElementById('ls-lot-'+b.id)?.value) || 0;
+    return qty > 0 ? {lotId: b.id, qty} : null;
+  }).filter(Boolean);
+  if (lotComponents.length === 0) { alert('ロットと点数を入力してください'); return; }
+  const usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
+  const newId = 'S' + (Math.max(29, ...usedNums) + 1);
+  S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate:today(), soldRecords:[], memo});
+  saveData();
+  closeModal();
+}
+
+function openRecordLotSetSale(setId) {
+  S.selSetId = setId;
+  openModal('recordLotSetSale');
+}
+
+function confirmLotSetSale() {
+  const setId = S.selSetId;
+  if (!setId) return;
+  const soldPrice = parseInt(document.getElementById('lss-price')?.value) || 0;
+  const soldShip  = parseInt(document.getElementById('lss-ship')?.value)  || 0;
+  const soldFee   = Math.floor(soldPrice * 0.1);
+  const rec = {soldPrice, soldFee, soldShip, soldDate: today()};
+  S.data.sets = S.data.sets.map(s=>{
+    if (s.id !== setId) return s;
+    const recs = [...(s.soldRecords||[]), rec];
+    return {...s, soldRecords: recs, status: '売卸済'};
+  });
+  saveData();
+  closeModal();
+}
+
 function recordSetSale(setId) {
   const soldPrice = parseInt(document.getElementById('set-sold-price')?.value) || 0;
   const soldShip  = parseInt(document.getElementById('set-sold-ship')?.value)  || 0;
@@ -3117,7 +3266,7 @@ function recordSetSale(setId) {
     const newStatus = allSold ? '売却済' : s.status;
     if (allSold) {
       S.data.products = S.data.products.map(p =>
-        s.pids.includes(p.id) ? {...p, status:'売卸済', soldPrice: Math.round(soldPrice/s.pids.length), soldDate: today()} : p
+        s.pids.includes(p.id) ? {...p, status:'売卸済', soldViaSet: s.id, soldPrice: Math.round(soldPrice/s.pids.length), soldDate: today()} : p
       );
     }
     return {...s, soldRecords: recs, status: newStatus};
