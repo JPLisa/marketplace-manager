@@ -1387,6 +1387,43 @@ function filterProductList(q) {
     </div>`).join('') + (shown.length===0?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':'');
 }
 
+function renderLotProducts(boxId) {
+  const prods = S.data.products.filter(p=>p.box===boxId);
+  if (!prods.length) return '<div style="text-align:center;color:#9ca3af;font-size:12px;padding:8px 0">このロットにはまだ登録された商品がありません</div>';
+  return `<div style="font-size:11px;color:#6b7280;font-weight:600;margin-bottom:4px">${boxId}ロット 登録済み ${prods.length}点</div>`+
+    prods.map(p=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:12px">
+      <span style="font-size:16px">${p.emoji}</span>
+      <span style="flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</span>
+      <span style="font-size:11px;color:#9ca3af;flex-shrink:0">${p.status}</span>
+    </div>`).join('');
+}
+
+function updateLotPreview() {
+  const box = document.getElementById('reg-box')?.value || '';
+  const el = document.getElementById('lot-preview-wrap');
+  if (el) el.innerHTML = renderLotProducts(box);
+  checkDuplicateName();
+}
+
+function checkDuplicateName() {
+  const name = (document.getElementById('reg-name')?.value || '').trim();
+  const box = document.getElementById('reg-box')?.value || '';
+  const el = document.getElementById('dup-warning');
+  if (!el) return;
+  if (name.length < 4) { el.style.display='none'; return; }
+  const lower = name.toLowerCase();
+  const key = lower.slice(0, Math.min(lower.length, 8));
+  const similar = S.data.products.filter(p=>
+    p.box===box && (p.name.toLowerCase().includes(key) || lower.includes(p.name.toLowerCase().slice(0,Math.min(p.name.length,8))))
+  );
+  if (similar.length > 0) {
+    el.style.display = 'block';
+    el.innerHTML = `⚠️ 同じロットに似た商品が${similar.length}点あります。重複登録の可能性を確認してください。<br><span style="color:#374151">${similar.map(p=>`・${p.name}`).join('<br>')}</span>`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 function updateIdPreview() {
   const box = document.getElementById('reg-box')?.value || '';
   const num = document.getElementById('reg-num')?.value || '';
@@ -1431,10 +1468,10 @@ function pageProductReg() {
   const cats = [...allCats].sort((a,b)=>(catCount[b]||0)-(catCount[a]||0));
   const isOwner = S.mode === 'owner';
   const defaultBox = S.regBoxId || S.data.boxes[0]?.id || '';
-  const lotSelector = `
-    <select id="reg-box" class="input">
-      ${S.data.boxes.length ? S.data.boxes.map(b=>`<option value="${b.id}" ${b.id===defaultBox?'selected':''}>${b.id}ロット（${b.date}）</option>`).join('') : '<option value="">ロットがありません</option>'}
-    </select>`;
+  const lotPreviewBlock = `
+    <div style="margin-top:8px;margin-bottom:4px;max-height:180px;overflow-y:auto;background:#f9fafb;border-radius:8px;padding:8px 10px" id="lot-preview-wrap">
+      ${renderLotProducts(defaultBox)}
+    </div>`;
 
   if (isOwner) {
     return `
@@ -1442,13 +1479,20 @@ function pageProductReg() {
     <div class="card">
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
-        <input id="reg-name" class="input" placeholder="商品名を入力">
+        <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
+        <div id="dup-warning" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;font-size:12px;color:#c2410c;margin-top:6px;line-height:1.6"></div>
       </div>
       <div style="margin-bottom:12px">
         <label class="field-label">カテゴリー</label>
         <select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select>
       </div>
-      <div style="margin-bottom:12px"><label class="field-label">登録先ロット</label>${lotSelector}</div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">登録先ロット</label>
+        <select id="reg-box" class="input" onchange="updateLotPreview()">
+          ${S.data.boxes.map(b=>`<option value="${b.id}" ${b.id===defaultBox?'selected':''}>${b.id}ロット（${b.date}）</option>`).join('')}
+        </select>
+        ${lotPreviewBlock}
+      </div>
       <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><textarea id="reg-memo" class="input" placeholder="状態・特記事項など"></textarea></div>
       <button class="btn btn-primary btn-full" onclick="saveProduct()" id="save-btn">登録する</button>
@@ -1458,9 +1502,19 @@ function pageProductReg() {
   return `
     <div class="page-title">商品登録</div>
     <div class="card">
-      <div style="margin-bottom:12px"><label class="field-label">商品名</label><input id="reg-name" class="input" placeholder="商品名を入力"></div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">商品名</label>
+        <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
+        <div id="dup-warning" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 10px;font-size:12px;color:#c2410c;margin-top:6px;line-height:1.6"></div>
+      </div>
       <div style="margin-bottom:12px"><label class="field-label">カテゴリー</label><select id="reg-cat" class="input">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
-      <div style="margin-bottom:12px"><label class="field-label">登録先ロット</label>${lotSelector}</div>
+      <div style="margin-bottom:12px">
+        <label class="field-label">登録先ロット</label>
+        <select id="reg-box" class="input" onchange="updateLotPreview()">
+          ${S.data.boxes.map(b=>`<option value="${b.id}" ${b.id===defaultBox?'selected':''}>${b.id}ロット（${b.date}）</option>`).join('')}
+        </select>
+        ${lotPreviewBlock}
+      </div>
       <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:12px"><label class="field-label">LINEアルバムURL</label><input id="reg-album" class="input" placeholder="https://line.me/..."></div>
       <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><textarea id="reg-memo" class="input" placeholder="状態・特記事項など"></textarea></div>
