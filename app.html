@@ -489,39 +489,55 @@ function pageDashboard() {
         <span style="font-size:18px;font-weight:800;color:#7c3aed">${inSet}点</span>
       </div>`:''}
     </div>`:''}
-    <div class="card" style="margin-bottom:14px;padding:12px 14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:14px;font-weight:700;color:#111827">📦 ロット管理</div>
         ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
       </div>
-      ${d.boxes.length===0?`<div style="text-align:center;padding:20px;color:#9ca3af">ロットがまだありません</div>`:''}
-      <div style="display:flex;flex-direction:column;gap:0">
-        ${d.boxes.map((b,i)=>{
+      ${d.boxes.length===0?`<div class="card" style="text-align:center;padding:20px;color:#9ca3af">ロットがまだありません</div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${d.boxes.map(b=>{
           const bListing = d.products.filter(p=>p.box===b.id&&p.status==='出品中').length;
           const bStored  = d.products.filter(p=>p.box===b.id&&p.status==='保管中').length;
           const bSold    = d.products.filter(p=>p.box===b.id&&p.status==='売卸済').length;
-          const bTotal   = d.products.filter(p=>p.box===b.id).length;
-          const pct      = bTotal>0 ? Math.round(bSold/bTotal*100) : 0;
-          return `<div style="${i>0?'border-top:1px solid #f3f4f6;':''} padding:10px 0">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-              <span style="font-size:13px;font-weight:700;color:#111827;min-width:52px">ロット${b.id}</span>
-              <div style="display:flex;gap:8px;flex:1;font-size:12px">
-                <span style="color:#059669;font-weight:600">📢${bListing}</span>
-                <span style="color:#3b82f6;font-weight:600">✅${bSold}</span>
-                <span style="color:#9ca3af">📋${bTotal}</span>
-                ${bStored>0?`<span style="color:#d97706;font-weight:600">📦${bStored}</span>`:''}
+          const bCancel  = d.products.filter(p=>p.box===b.id&&p.status==='キャンセル').length;
+          const bDefect  = d.products.filter(p=>p.box===b.id&&p.defective).length;
+          const bReg     = d.products.filter(p=>p.box===b.id).length;
+          const lotTotal = b.total || 75;
+          const regPct   = lotTotal>0 ? Math.min(100,Math.round(bReg/lotTotal*100)) : 0;
+          const soldPct  = bReg>0 ? Math.round(bSold/bReg*100) : 0;
+          const regColor = regPct>=80?'#059669':regPct>=50?'#f59e0b':'#ef4444';
+          return `<div class="card" style="padding:12px;cursor:pointer" onclick="S.boxId='${b.id}';go('boxDetail')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:16px;font-weight:800;color:#111827">ロット${b.id}</span>
+              <span style="font-size:11px;color:#9ca3af">${b.date}</span>
+            </div>
+            <div style="margin-bottom:6px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+                <span style="font-size:11px;color:#6b7280">登録数</span>
+                <span style="font-size:14px;font-weight:700;color:${regColor}">${bReg}<span style="font-size:11px;font-weight:400;color:#9ca3af"> / ${lotTotal}点</span></span>
               </div>
-              <div style="display:flex;gap:4px">
-                ${canDo('lots')?`<button class="btn btn-sm" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;font-size:11px;padding:3px 8px" onclick="event.stopPropagation();S.regBoxId='${b.id}';go('productReg')">＋登録</button>`:''}
-                <button class="btn btn-sm" style="background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb;font-size:11px;padding:3px 8px" onclick="S.boxId='${b.id}';go('boxDetail')">詳細›</button>
+              <div style="background:#f3f4f6;border-radius:99px;height:5px;overflow:hidden">
+                <div style="background:${regColor};height:100%;width:${regPct}%;border-radius:99px;transition:width 0.3s"></div>
+              </div>
+              <div style="font-size:10px;color:#9ca3af;text-align:right;margin-top:2px">登録率 ${regPct}%</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">
+              <div style="background:#f0fdf4;border-radius:6px;padding:5px 6px;text-align:center">
+                <div style="font-size:10px;color:#059669">📢 出品中</div>
+                <div style="font-size:16px;font-weight:700;color:#059669">${bListing}</div>
+              </div>
+              <div style="background:#eff6ff;border-radius:6px;padding:5px 6px;text-align:center">
+                <div style="font-size:10px;color:#3b82f6">✅ 売れた</div>
+                <div style="font-size:16px;font-weight:700;color:#3b82f6">${bSold}</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="flex:1;background:#f3f4f6;border-radius:99px;height:5px;overflow:hidden">
-                <div style="background:#3b82f6;height:100%;width:${pct}%;border-radius:99px;transition:width 0.3s"></div>
-              </div>
-              <span style="font-size:10px;color:#9ca3af;white-space:nowrap">売卸${pct}%</span>
-            </div>
+            ${(bStored>0||bDefect>0||bCancel>0)?`<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">
+              ${bStored>0?`<span style="font-size:10px;background:#fffbeb;color:#92400e;border-radius:4px;padding:2px 6px">保管${bStored}</span>`:''}
+              ${bDefect>0?`<span style="font-size:10px;background:#fff1f2;color:#dc2626;border-radius:4px;padding:2px 6px">⚠️不良${bDefect}</span>`:''}
+              ${bCancel>0?`<span style="font-size:10px;background:#f3f4f6;color:#6b7280;border-radius:4px;padding:2px 6px">取消${bCancel}</span>`:''}
+            </div>`:''}
+            ${canDo('lots')?`<button onclick="event.stopPropagation();S.regBoxId='${b.id}';go('productReg')" style="width:100%;background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px;font-size:12px;font-weight:600;cursor:pointer">＋ 商品登録</button>`:''}
           </div>`;
         }).join('')}
       </div>
