@@ -2860,12 +2860,18 @@ function renderModal() {
           <div style="margin-bottom:12px"><label class="field-label">セット名</label><input id="ls-name" class="input" placeholder="例: サンリオ3点セット"></div>
           <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="ls-price" class="input" type="number" min="0" placeholder="例: 3000"></div>
           <div style="margin-bottom:12px">
-            <label class="field-label">ロット別点数</label>
+            <label class="field-label">使用するロットを選択して点数を入力</label>
             ${S.data.boxes.length===0?'<div style="color:#9ca3af;font-size:15px">ロットがまだありません</div>':S.data.boxes.map(b=>`
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:16px;font-weight:600;min-width:64px">ロット${b.id}</span>
-                <input id="ls-lot-${b.id}" class="input" type="number" min="0" placeholder="0" style="flex:1;text-align:center">
-                <span style="font-size:16px;color:#9ca3af">点</span>
+              <div style="margin-bottom:6px">
+                <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;background:#fff" id="ls-row-${b.id}"
+                  onclick="(function(){const cb=document.getElementById('ls-cb-${b.id}');cb.checked=!cb.checked;const row=document.getElementById('ls-row-${b.id}');const wrap=document.getElementById('ls-qty-${b.id}');row.style.borderColor=cb.checked?'#7c3aed':'#e5e7eb';row.style.background=cb.checked?'#f5f3ff':'#fff';wrap.style.display=cb.checked?'flex':'none';})()">
+                  <input type="checkbox" id="ls-cb-${b.id}" style="accent-color:#7c3aed;width:18px;height:18px" onclick="event.stopPropagation()">
+                  <span style="font-size:16px;font-weight:600;flex:1">ロット${b.id}</span>
+                  <div id="ls-qty-${b.id}" style="display:none;align-items:center;gap:6px" onclick="event.stopPropagation()">
+                    <input id="ls-lot-${b.id}" class="input" type="number" min="1" placeholder="1" style="width:60px;text-align:center;padding:4px 8px">
+                    <span style="font-size:15px;color:#9ca3af">点</span>
+                  </div>
+                </label>
               </div>`).join('')}
           </div>
           <div style="margin-bottom:16px"><label class="field-label">メモ（任意）</label><input id="ls-memo" class="input" placeholder="例: A＋B混合セット"></div>
