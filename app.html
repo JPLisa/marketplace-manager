@@ -947,7 +947,9 @@ function pageBoxDetail() {
   const defectProds = prods.filter(p=>p.defective);
   const r = sellRate(b);
   const tab = S.tab.boxDetail || 'all';
-  const shown = tab==='all' ? prods : tab==='sold' ? prods.filter(p=>p.status==='売卸済') : tab==='不良品' ? defectProds : prods.filter(p=>p.status!=='売卸済');
+  const bq = (S.tab.boxDetailSearch||'').trim();
+  const tabFiltered = tab==='all' ? prods : tab==='sold' ? prods.filter(p=>p.status==='売卸済') : tab==='不良品' ? defectProds : prods.filter(p=>p.status!=='売卸済');
+  const shown = bq ? tabFiltered.filter(p=>matchProductSearch(p,bq)) : tabFiltered;
   return `
     <div class="flex-between" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px">
@@ -1003,12 +1005,14 @@ function pageBoxDetail() {
         <div><div style="font-size:16px;color:#9ca3af">利益</div><div style="font-size:18px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div></div>
       </div>`:''}
     </div>`}
+    <div class="search-bar" style="margin-bottom:8px">${icon('search')}<input id="box-search" placeholder="商品名・IDで検索" value="${S.tab.boxDetailSearch||''}" oninput="S.tab.boxDetailSearch=this.value;filterBoxProductList()"></div>
     <div class="tabs">
       <button class="tab ${tab==='all'?'active':''}" onclick="S.tab.boxDetail='all';render()">すべて</button>
       <button class="tab ${tab==='unsold'?'active':''}" onclick="S.tab.boxDetail='unsold';render()">未売卸</button>
       <button class="tab ${tab==='sold'?'active':''}" onclick="S.tab.boxDetail='sold';render()">売卸済</button>
       ${defectProds.length?`<button class="tab ${tab==='不良品'?'active':''}" onclick="S.tab.boxDetail='不良品';render()" style="${tab==='不良品'?'':'color:#dc2626'}">⚠️ 不良品(${defectProds.length})</button>`:''}
     </div>
+    <div id="box-product-list">
     ${shown.map(p=>`
       <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
@@ -1021,6 +1025,8 @@ function pageBoxDetail() {
         </div>
         ${p.album?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6"><a href="${p.album}" onclick="event.stopPropagation()" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#065f46;font-size:16px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none">📷 LINEアルバムを開く</a></div>`:''}
       </div>`).join('')}
+    ${shown.length===0&&bq?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':''}
+    </div>
   `;
 }
 
@@ -1412,6 +1418,29 @@ function filterProductList(q) {
         <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280">${p.memo}</div>`:''}</div>
         <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge(p.status)}<div style="font-size:16px;font-weight:700">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669">📷 写真あり</div>':''}<span style="font-size:16px;color:#d1d5db">›</span></div>
       </div>
+    </div>`).join('') + (shown.length===0?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':'');
+}
+
+function filterBoxProductList() {
+  const q = (S.tab.boxDetailSearch||'').trim();
+  const tab = S.tab.boxDetail || 'all';
+  const prods = S.data.products.filter(p=>p.box===S.boxId);
+  const defectProds = prods.filter(p=>p.defective);
+  const tabFiltered = tab==='all' ? prods : tab==='sold' ? prods.filter(p=>p.status==='売卸済') : tab==='不良品' ? defectProds : prods.filter(p=>p.status!=='売卸済');
+  const shown = q ? tabFiltered.filter(p=>matchProductSearch(p,q)) : tabFiltered;
+  const el = document.getElementById('box-product-list');
+  if (!el) return;
+  el.innerHTML = shown.map(p=>`
+    <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:26px">${p.emoji}</span>
+        <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700;margin-top:4px">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
+          ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+        </div>
+      </div>
+      ${p.album?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6"><a href="${p.album}" onclick="event.stopPropagation()" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#065f46;font-size:16px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none">📷 LINEアルバムを開く</a></div>`:''}
     </div>`).join('') + (shown.length===0?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':'');
 }
 
