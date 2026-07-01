@@ -2616,6 +2616,7 @@ function render() {
   migrateProductIds();
   migratePermissions();
   if (!S.data.rules || S.data.rules.length === 0) { S.data.rules = JSON.parse(JSON.stringify(INIT.rules)); saveData(); }
+  S.data.boxes = S.data.boxes.slice().sort((a,b)=>a.id.localeCompare(b.id));
   // p.days を registeredDate から毎回動的に計算
   const todayStr = today();
   S.data.products = S.data.products.map(p => {
