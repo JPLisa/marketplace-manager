@@ -480,11 +480,15 @@ function pageDashboard() {
     <div style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:14px;font-weight:700;color:#111827">📦 ロット管理</div>
-        ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:#9ca3af">${d.boxes.filter(b=>b.homeVisible!==false).length}/${d.boxes.length}表示</span>
+          <button onclick="go('boxes')" style="font-size:11px;color:#3b82f6;background:none;border:none;cursor:pointer;padding:0;font-weight:600">表示変更›</button>
+          ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
+        </div>
       </div>
       ${d.boxes.length===0?`<div class="card" style="text-align:center;padding:20px;color:#9ca3af">ロットがまだありません</div>`:''}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${d.boxes.map(b=>{
+        ${d.boxes.filter(b=>b.homeVisible!==false).map(b=>{
           const bListing = d.products.filter(p=>p.box===b.id&&p.status==='出品中').length;
           const bStored  = d.products.filter(p=>p.box===b.id&&p.status==='保管中').length;
           const bSold    = d.products.filter(p=>p.box===b.id&&p.status==='売卸済').length;
@@ -886,9 +890,11 @@ function pageBoxList() {
       <div class="page-title" style="margin-bottom:0">ロット管理</div>
       ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
     </div>
+    <div style="font-size:12px;color:#9ca3af;margin-bottom:8px">👁 ホーム表示のON/OFFを切り替えられます</div>
     ${d.boxes.map(b=>{
       const r = sellRate(b);
-      return `<div class="card" onclick="S.boxId='${b.id}';go('boxDetail')" style="cursor:pointer">
+      const visible = b.homeVisible !== false;
+      return `<div class="card" style="cursor:pointer;opacity:${visible?1:0.55}" onclick="S.boxId='${b.id}';go('boxDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:32px">📦</span>
           <div style="flex:1">
@@ -905,12 +911,15 @@ function pageBoxList() {
             <div class="progress"><div class="progress-fill" style="width:${r}%"></div></div>
             <div style="font-size:11px;color:#9ca3af;margin-top:3px">売卸率 ${r}%</div>
           </div>
-          ${S.mode==='owner'?`<div style="text-align:right;margin-left:8px">
-            <div style="font-size:14px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div>
-            <div style="font-size:11px;color:#9ca3af">利益</div>
-            <div style="font-size:14px;font-weight:700;color:#3b82f6">${fmt(b.sales)}</div>
-            <div style="font-size:11px;color:#9ca3af">売上</div>
-          </div>`:''}
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:8px">
+            ${S.mode==='owner'?`<div style="text-align:right">
+              <div style="font-size:14px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div>
+              <div style="font-size:11px;color:#9ca3af">利益</div>
+            </div>`:''}
+            <button onclick="event.stopPropagation();toggleLotHomeVisible('${b.id}')" style="font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid ${visible?'#6ee7b7':'#e5e7eb'};background:${visible?'#f0fdf4':'#f9fafb'};color:${visible?'#059669':'#9ca3af'};cursor:pointer;font-weight:600;white-space:nowrap">
+              ${visible?'👁 表示中':'非表示'}
+            </button>
+          </div>
         </div>
       </div>`;
     }).join('')}
@@ -2744,6 +2753,11 @@ function closeModal() {
   render();
 }
 
+
+function toggleLotHomeVisible(id) {
+  S.data.boxes = S.data.boxes.map(b=>b.id===id?{...b,homeVisible:b.homeVisible===false?true:false}:b);
+  saveData(); render();
+}
 
 function toLotLetter(n) {
   let result = '';
