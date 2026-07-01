@@ -3236,6 +3236,7 @@ function saveLotSet() {
     return qty > 0 ? {lotId: b.id, qty} : null;
   }).filter(Boolean);
   if (lotComponents.length === 0) { alert('ロットと点数を入力してください'); return; }
+  if (!S.data.sets) S.data.sets = [];
   const usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
   const newId = 'S' + (Math.max(29, ...usedNums) + 1);
   S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate:today(), soldRecords:[], memo});
