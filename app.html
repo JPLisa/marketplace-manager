@@ -1752,18 +1752,18 @@ function pageSetDetail() {
     </div>
     ${isLotType?`
     <div class="card"><div class="card-title">セット内容</div>
-      ${(s.lotComponents||[]).map(c=>{
-        const lot=S.data.boxes.find(x=>x.id===c.lotId);
-        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
+      ${(()=>{
+        const defCph = S.data.defaultCostPerItem ?? 484;
+        const totalQty = (s.lotComponents||[]).reduce((a,c)=>a+c.qty,0);
+        const totalCost = totalQty * defCph;
+        return (s.lotComponents||[]).map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
           <span style="font-size:16px;font-weight:600">ロット${c.lotId}</span>
-          <span style="font-size:17px;color:#6b7280">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
-          <span style="font-size:16px;font-weight:700;color:#374151">${cph?fmt(c.qty*cph):'―'}</span>
+          <span style="font-size:17px;color:#6b7280">${c.qty}点 × ${fmt(defCph)}/点</span>
+          <span style="font-size:16px;font-weight:700;color:#374151">${fmt(c.qty*defCph)}</span>
+        </div>`).join('') + `<div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:16px">
+          <span>合計原価</span><span style="color:#374151">${fmt(totalCost)}</span>
         </div>`;
-      }).join('')}
-      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:16px">
-        <span>合計原価</span><span style="color:#374151">${fmt((s.lotComponents||[]).reduce((a,c)=>{const lot=S.data.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;return a+c.qty*cph;},0))}</span>
-      </div>
+      })()}
     </div>`:`
     <div class="card"><div class="card-title">セット内容（${prods.length}点）</div>
       ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.box}ロット</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
@@ -1920,11 +1920,7 @@ function pageAnalytics() {
   const setsProfit = soldSetsAll.reduce((a,s)=>{
     let itemCost;
     if (s.type==='lot') {
-      itemCost = (s.lotComponents||[]).reduce((b,c)=>{
-        const lot=d.boxes.find(x=>x.id===c.lotId);
-        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;
-        return b+c.qty*cph;
-      },0);
+      itemCost = (s.lotComponents||[]).reduce((b,c)=>b+c.qty*defCost2, 0);
     } else {
       itemCost = (s.pids||[]).reduce((b,pid)=>{
         const prod=d.products.find(p=>p.id===pid);
@@ -1975,11 +1971,13 @@ function pageAnalytics() {
           const bInSet2 = d.products.filter(p=>p.box===b.id&&p.status==='セット中').length;
           const bDefect2 = d.products.filter(p=>p.box===b.id&&p.defective).length;
           const bInvest2 = (b.cost||0)+(b.ship||0);
+          const defCph = d.defaultCostPerItem??484;
           const bLotSetContrib2 = (d.sets||[]).filter(s=>s.type==='lot').reduce((acc,s)=>{
             const myComp=(s.lotComponents||[]).find(c=>c.lotId===b.id);
             if (!myComp) return acc;
-            const totalCost=(s.lotComponents||[]).reduce((tc,c)=>{const lot2=d.boxes.find(x=>x.id===c.lotId);const cph2=lot2&&lot2.cost>0&&lot2.total>0?Math.round(lot2.cost/lot2.total):(d.defaultCostPerItem??484);return tc+c.qty*cph2;},0);
-            const myCost=myComp.qty*(b.cost>0&&b.total>0?Math.round(b.cost/b.total):(d.defaultCostPerItem??484));
+            const totalQty=(s.lotComponents||[]).reduce((tc,c)=>tc+c.qty,0);
+            const myCost=myComp.qty*defCph;
+            const totalCost=totalQty*defCph;
             return acc+(s.soldRecords||[]).reduce((b2,r)=>{const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);const net=(r.soldPrice||0)-(r.soldShip||0)-fee;return b2+(totalCost>0?net*myCost/totalCost:0)-myCost;},0);
           },0);
           const bProfit2 = bSoldP.reduce((a,p)=>{
