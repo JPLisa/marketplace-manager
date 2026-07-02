@@ -1735,17 +1735,7 @@ function pageSetDetail() {
     <div class="flex-row" style="margin-bottom:16px">
       <button class="icon-btn" onclick="go('sets')">${icon('back')}</button>
       <div class="page-title" style="margin-bottom:0">セット詳細</div>
-      <button onclick="S.tab.editSet=!S.tab.editSet;render()" style="margin-left:auto;background:#f3f4f6;border:none;border-radius:8px;padding:6px 14px;font-size:16px;font-weight:600;cursor:pointer;color:#374151">✏️ 編集</button>
-    </div>
-    <div class="card">
-      <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:17px;color:#6b7280">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:16px;margin-top:8px">
-        <div><span style="color:#9ca3af">登録日: </span>${s.registeredDate||s.created||''}</div>
-        <div><span style="color:#9ca3af">販売価格: </span><strong>${fmt(s.price)}</strong></div>
-        ${isLotType?'':`<div><span style="color:#9ca3af">出品数: </span><strong>${s.qty||1}セット</strong></div>`}
-        ${s.platform?`<div><span style="color:#9ca3af">出品先: </span>${s.platform}</div>`:''}
-        ${s.ship?`<div><span style="color:#9ca3af">発送: </span>${s.ship}</div>`:''}
-      </div>
+      <button onclick="S.tab.editSet=!S.tab.editSet;render()" style="margin-left:auto;background:${S.tab.editSet?'#3b82f6':'#f3f4f6'};color:${S.tab.editSet?'white':'#374151'};border:none;border-radius:8px;padding:6px 14px;font-size:16px;font-weight:600;cursor:pointer">✏️ 編集</button>
     </div>
     ${S.tab.editSet?`
     <div class="card" style="margin-bottom:12px;border:2px solid #3b82f6">
@@ -1756,9 +1746,9 @@ function pageSetDetail() {
       <div style="margin-bottom:10px">
         <label class="field-label">ロット構成</label>
         ${S.data.boxes.map(b=>{
-          const existing = (s.lotComponents||[]).find(c=>c.lotId===b.id);
-          const isChecked = !!existing;
-          return `<div id="se-lot-row-${b.id}" data-selected="${isChecked?'1':'0'}" onclick="(function(){const row=document.getElementById('se-lot-row-${b.id}');const wrap=document.getElementById('se-lot-qty-${b.id}');const sel=row.dataset.selected==='1';row.dataset.selected=sel?'0':'1';row.style.borderColor=sel?'#e5e7eb':'#7c3aed';row.style.background=sel?'#fff':'#f5f3ff';wrap.style.display=sel?'none':'flex';})()" style="padding:10px 12px;border:2px solid ${isChecked?'#7c3aed':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${isChecked?'#f5f3ff':'#fff'};margin-bottom:6px">
+          const existing=(s.lotComponents||[]).find(c=>c.lotId===b.id);
+          const isChecked=!!existing;
+          return `<div id="se-lot-row-${b.id}" data-selected="${isChecked?'1':'0'}" onclick="toggleSeEditLot('${b.id}')" style="padding:10px 12px;border:2px solid ${isChecked?'#7c3aed':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${isChecked?'#f5f3ff':'#fff'};margin-bottom:6px">
             <div style="display:flex;align-items:center;justify-content:space-between">
               <span style="font-size:16px;font-weight:700">ロット${b.id}</span>
             </div>
@@ -1776,6 +1766,16 @@ function pageSetDetail() {
         <button class="btn btn-secondary" style="flex:1" onclick="S.tab.editSet=false;render()">キャンセル</button>
       </div>
     </div>`:''}
+    <div class="card">
+      <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:17px;color:#6b7280">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:16px;margin-top:8px">
+        <div><span style="color:#9ca3af">登録日: </span>${s.registeredDate||s.created||''}</div>
+        <div><span style="color:#9ca3af">販売価格: </span><strong>${fmt(s.price)}</strong></div>
+        ${isLotType?'':`<div><span style="color:#9ca3af">出品数: </span><strong>${s.qty||1}セット</strong></div>`}
+        ${s.platform?`<div><span style="color:#9ca3af">出品先: </span>${s.platform}</div>`:''}
+        ${s.ship?`<div><span style="color:#9ca3af">発送: </span>${s.ship}</div>`:''}
+      </div>
+    </div>
     ${isLotType?`
     <div class="card"><div class="card-title">セット内容</div>
       ${(s.lotComponents||[]).map(c=>{
@@ -3327,6 +3327,17 @@ function saveHomeSet() {
   S.tab.homeSetOpen = false;
   saveData();
   render();
+}
+
+function toggleSeEditLot(lotId) {
+  const row = document.getElementById('se-lot-row-' + lotId);
+  const wrap = document.getElementById('se-lot-qty-' + lotId);
+  if (!row) return;
+  const sel = row.dataset.selected === '1';
+  row.dataset.selected = sel ? '0' : '1';
+  row.style.borderColor = sel ? '#e5e7eb' : '#7c3aed';
+  row.style.background = sel ? '#fff' : '#f5f3ff';
+  if (wrap) wrap.style.display = sel ? 'none' : 'flex';
 }
 
 function saveSetEdit(setId) {
