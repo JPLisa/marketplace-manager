@@ -2903,7 +2903,8 @@ function renderModal() {
             <div style="font-size:15px;color:#9ca3af;margin-top:4px">${(s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')}</div>
           </div>
           <div style="margin-bottom:12px"><label class="field-label">実売価格（円）</label><input id="lss-price" class="input" type="number" value="${s.price}"></div>
-          <div style="margin-bottom:16px"><label class="field-label">送料（円）</label><input id="lss-ship" class="input" type="number" value="0"></div>
+          <div style="margin-bottom:12px"><label class="field-label">送料（円）</label><input id="lss-ship" class="input" type="number" value="0"></div>
+          <div style="margin-bottom:16px"><label class="field-label">売却日</label>${dateSelects('lss-date', today())}</div>
           <button class="btn btn-primary btn-full" onclick="confirmLotSetSale()">売上を記録する</button>
         </div>
       </div>`;
@@ -3322,7 +3323,8 @@ function confirmLotSetSale() {
   const soldPrice = parseInt(document.getElementById('lss-price')?.value) || 0;
   const soldShip  = parseInt(document.getElementById('lss-ship')?.value)  || 0;
   const soldFee   = Math.floor(soldPrice * 0.1);
-  const rec = {soldPrice, soldFee, soldShip, soldDate: today()};
+  const soldDate  = getDateFromSelects('lss-date') || today();
+  const rec = {soldPrice, soldFee, soldShip, soldDate};
   S.data.sets = S.data.sets.map(s=>{
     if (s.id !== setId) return s;
     const recs = [...(s.soldRecords||[]), rec];
