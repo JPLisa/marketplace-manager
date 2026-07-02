@@ -1736,7 +1736,7 @@ function pageSetDetail() {
       <button class="icon-btn" onclick="go('sets')">${icon('back')}</button>
       <div class="page-title" style="margin-bottom:0">セット詳細</div>
       <div style="margin-left:auto;display:flex;gap:6px">
-        <button onclick="openModal('editSet')" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">✏️ 編集</button>
+        <button onclick="S.setId='${s.id}';openModal('editSet')" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">✏️ 編集</button>
         <button onclick="deleteSet('${s.id}')" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">🗑️</button>
       </div>
     </div>
