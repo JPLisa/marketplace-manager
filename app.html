@@ -37,11 +37,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 @media(min-width:768px){.sidebar{display:flex}}
 .sidebar-logo{padding:16px;border-bottom:1px solid #f3f4f6}
 .sidebar-logo h1{font-size:16px;font-weight:700;color:#111827}
-.sidebar-logo p{font-size:16px;color:#9ca3af;margin-top:2px}
+.sidebar-logo p{font-size:17px;color:#6b7280;margin-top:2px}
 .mode-chip{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;margin:8px;cursor:pointer;border:none;width:calc(100% - 16px);background:#f9fafb;text-align:left}
 .mode-chip.owner{background:#fdf2f8;border:1px solid #fbcfe8}
 .mode-chip span.label{font-size:16px;font-weight:700;color:#374151}
-.mode-chip span.sub{font-size:16px;color:#9ca3af;display:block}
+.mode-chip span.sub{font-size:17px;color:#6b7280;display:block}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-radius:8px;margin:2px 8px;font-size:16px;color:#374151;transition:all 0.15s;border:none;background:none;width:calc(100% - 16px);text-align:left}
 .nav-item:hover{background:#f3f4f6}
 .nav-item.active{background:#d1fae5;color:#059669;font-weight:600}
@@ -53,7 +53,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .top-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30}
 @media(min-width:768px){.top-bar{display:none}}
 .top-bar h2{font-size:16px;font-weight:700;color:#111827}
-.top-bar p{font-size:16px;color:#9ca3af}
+.top-bar p{font-size:17px;color:#6b7280}
 .top-actions{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:#374151;position:relative;display:flex}
 .icon-btn:hover{background:#f3f4f6}
@@ -66,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 /* Bottom nav */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e7eb;display:flex;z-index:30}
 @media(min-width:768px){.bottom-nav{display:none}}
-.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;font-size:16px;color:#9ca3af;cursor:pointer;border:none;background:none;gap:3px}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;font-size:17px;color:#6b7280;cursor:pointer;border:none;background:none;gap:3px}
 .bnav-btn.active{color:#059669}
 .bnav-btn svg{width:26px;height:26px;flex-shrink:0}
 /* Cards */
@@ -77,7 +77,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
 @media(max-width:600px){.grid4{grid-template-columns:1fr 1fr}}
 .stat-card{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);text-align:center}
-.stat-card .label{font-size:16px;color:#9ca3af;margin-bottom:4px}
+.stat-card .label{font-size:17px;color:#6b7280;margin-bottom:4px}
 .stat-card .value{font-size:20px;font-weight:700;color:#111827}
 .stat-card .value.green{color:#059669}
 /* Badges */
@@ -102,8 +102,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .btn-full{width:100%;display:flex}
 .btn-sm{padding:7px 14px;font-size:16px}
 /* Input */
-.field-label{font-size:16px;font-weight:600;color:#6b7280;margin-bottom:4px;display:block}
-.input{width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;font-size:16px;outline:none;font-family:inherit;transition:border 0.15s;background:#fff}
+.field-label{font-size:17px;font-weight:600;color:#374151;margin-bottom:4px;display:block}
+.input{width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px;font-size:17px;outline:none;font-family:inherit;transition:border 0.15s;background:#fff}
 .input:focus{border-color:#059669}
 select.input{cursor:pointer}
 textarea.input{resize:vertical;min-height:72px}
@@ -120,7 +120,7 @@ textarea.input{resize:vertical;min-height:72px}
 .list-item .emoji{font-size:26px;flex-shrink:0}
 .list-item .info{flex:1;min-width:0}
 .list-item .name{font-size:16px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.list-item .sub{font-size:16px;color:#9ca3af;margin-top:2px}
+.list-item .sub{font-size:17px;color:#6b7280;margin-top:2px}
 .list-item .right{text-align:right;flex-shrink:0}
 /* Alert rows */
 .alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:16px}
@@ -462,7 +462,7 @@ function pageDashboard() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:16px;font-weight:700;color:#111827">📦 ロット管理</div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:16px;color:#9ca3af">${d.boxes.filter(b=>b.homeVisible!==false).length}/${d.boxes.length}表示</span>
+          <span style="font-size:17px;color:#6b7280">${d.boxes.filter(b=>b.homeVisible!==false).length}/${d.boxes.length}表示</span>
           <button onclick="go('boxes')" style="font-size:16px;color:#3b82f6;background:none;border:none;cursor:pointer;padding:0;font-weight:600">表示変更›</button>
           ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
         </div>
@@ -608,7 +608,7 @@ function pageDashboard() {
     </div>
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">配送方法・必要資材ガイド</div>
-      <div style="font-size:16px;color:#9ca3af;margin-bottom:10px">※2026年5月時点 / メルカリ公式資料より</div>
+      <div style="font-size:17px;color:#6b7280;margin-bottom:10px">※2026年5月時点 / メルカリ公式資料より</div>
 
       <!-- ゆうゆうメルカリ便 -->
       <div style="background:#f0fdf4;border-radius:10px;padding:10px;margin-bottom:12px">
@@ -888,7 +888,7 @@ function pageBoxList() {
       <div class="page-title" style="margin-bottom:0">ロット管理</div>
       ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createBox')">${icon('plus',16)} 新しいロット</button>`:''}
     </div>
-    <div style="font-size:16px;color:#9ca3af;margin-bottom:8px">👁 ホーム表示のON/OFFを切り替えられます</div>
+    <div style="font-size:17px;color:#6b7280;margin-bottom:8px">👁 ホーム表示のON/OFFを切り替えられます</div>
     ${d.boxes.map(b=>{
       const r = sellRate(b);
       const visible = b.homeVisible !== false;
@@ -898,7 +898,7 @@ function pageBoxList() {
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
               <span style="font-weight:700;font-size:16px">${b.id}</span>
-              <span style="font-size:16px;color:#9ca3af">${b.date}</span>
+              <span style="font-size:17px;color:#6b7280">${b.date}</span>
             </div>
             <div style="display:flex;gap:16px;font-size:16px;margin-bottom:6px">
               ${b.boxes?`<span style="color:#6b7280">${b.boxes}箱×${b.perBox}点</span>`:''}
@@ -907,12 +907,12 @@ function pageBoxList() {
               <span style="color:#ef4444">未 ${b.total-b.sold}点</span>
             </div>
             <div class="progress"><div class="progress-fill" style="width:${r}%"></div></div>
-            <div style="font-size:16px;color:#9ca3af;margin-top:3px">売卸率 ${r}%</div>
+            <div style="font-size:17px;color:#6b7280;margin-top:3px">売卸率 ${r}%</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:8px">
             ${S.mode==='owner'?`<div style="text-align:right">
               <div style="font-size:16px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div>
-              <div style="font-size:16px;color:#9ca3af">利益</div>
+              <div style="font-size:17px;color:#6b7280">利益</div>
             </div>`:''}
             <button onclick="event.stopPropagation();toggleLotHomeVisible('${b.id}')" style="font-size:16px;padding:4px 10px;border-radius:8px;border:1px solid ${visible?'#6ee7b7':'#e5e7eb'};background:${visible?'#f0fdf4':'#f9fafb'};color:${visible?'#059669':'#9ca3af'};cursor:pointer;font-weight:600;white-space:nowrap">
               ${visible?'👁 表示中':'非表示'}
@@ -964,7 +964,7 @@ function pageBoxDetail() {
     </div>` : `
     <div class="card">
       <div class="flex-between" style="margin-bottom:12px">
-        <div style="font-size:16px;color:#9ca3af">入荷日：${b.date}</div>
+        <div style="font-size:17px;color:#6b7280">入荷日：${b.date}</div>
         <div style="display:flex;gap:6px">
           ${b.lineAlbumUrl?`<button class="btn btn-sm" style="background:#06c755;color:#fff;border:none;font-size:16px;padding:5px 10px" onclick="window.open('${b.lineAlbumUrl}','_blank')">📷 LINEアルバム</button>`:''}
           ${canDo('lots')?`<button class="btn btn-secondary btn-sm" onclick="S.tab.editBox='${b.id}';render()">編集</button>
@@ -972,24 +972,24 @@ function pageBoxDetail() {
         </div>
       </div>
       <div class="grid3" style="text-align:center;margin-bottom:${defectProds.length?'10px':'16px'}">
-        <div><div style="font-size:16px;color:#9ca3af">商品数</div><div style="font-size:22px;font-weight:700">${b.total}</div></div>
-        <div><div style="font-size:16px;color:#9ca3af">売卸済</div><div style="font-size:22px;font-weight:700;color:#059669">${b.sold}</div></div>
-        <div><div style="font-size:16px;color:#9ca3af">未売卸</div><div style="font-size:22px;font-weight:700;color:#ef4444">${b.total-b.sold}</div></div>
+        <div><div style="font-size:17px;color:#6b7280">商品数</div><div style="font-size:22px;font-weight:700">${b.total}</div></div>
+        <div><div style="font-size:17px;color:#6b7280">売卸済</div><div style="font-size:22px;font-weight:700;color:#059669">${b.sold}</div></div>
+        <div><div style="font-size:17px;color:#6b7280">未売卸</div><div style="font-size:22px;font-weight:700;color:#ef4444">${b.total-b.sold}</div></div>
       </div>
       ${defectProds.length?`<div style="background:#fff1f2;border-radius:8px;padding:10px 12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:16px">⚠️</span>
           <div>
             <div style="font-size:16px;font-weight:700;color:#dc2626">不良品 ${defectProds.length}点</div>
-            <div style="font-size:16px;color:#9ca3af">${defectProds.map(p=>p.name).join('、').slice(0,40)}${defectProds.map(p=>p.name).join('、').length>40?'…':''}</div>
+            <div style="font-size:17px;color:#6b7280">${defectProds.map(p=>p.name).join('、').slice(0,40)}${defectProds.map(p=>p.name).join('、').length>40?'…':''}</div>
           </div>
         </div>
         <button onclick="S.tab.boxDetail='不良品';render()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">一覧 ›</button>
       </div>`:''}
       <div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:16px;margin-bottom:3px"><span>売卸率</span><span style="font-weight:700">${r}%</span></div><div class="progress"><div class="progress-fill" style="width:${r}%"></div></div></div>
       ${S.mode==='owner'?`<div class="grid2" style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;text-align:center">
-        <div><div style="font-size:16px;color:#9ca3af">売上</div><div style="font-size:18px;font-weight:700;color:#3b82f6">${fmt(b.sales)}</div></div>
-        <div><div style="font-size:16px;color:#9ca3af">利益</div><div style="font-size:18px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div></div>
+        <div><div style="font-size:17px;color:#6b7280">売上</div><div style="font-size:18px;font-weight:700;color:#3b82f6">${fmt(b.sales)}</div></div>
+        <div><div style="font-size:17px;color:#6b7280">利益</div><div style="font-size:18px;font-weight:700;color:#ef4444">${fmt(b.profit)}</div></div>
       </div>`:''}
     </div>`}
     <div class="search-bar" style="margin-bottom:8px">${icon('search')}<input id="box-search" placeholder="商品名・IDで検索" value="${S.tab.boxDetailSearch||''}" oninput="S.tab.boxDetailSearch=this.value;filterBoxProductList()"></div>
@@ -1004,7 +1004,7 @@ function pageBoxDetail() {
       <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700;margin-top:4px">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
             ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
@@ -1099,38 +1099,38 @@ function pageProductDetail() {
         <span style="font-size:48px">${p.emoji}</span>
         <div>
           <div style="font-size:18px;font-weight:700;color:#111827">${p.name}</div>
-          <div style="font-size:16px;color:#9ca3af;margin-top:2px">${p.box}ロット</div>
+          <div style="font-size:17px;color:#6b7280;margin-top:2px">${p.box}ロット</div>
           ${badge(p.status)}
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">出品価格（登録時）</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">出品価格（登録時）</div>
           <div style="font-size:18px;font-weight:700;color:#374151">${fmt(p.listPrice||p.price)}</div>
         </div>
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">現在の販売価格</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">現在の販売価格</div>
           <div style="font-size:18px;font-weight:700;color:#059669">${fmt(p.price)}</div>
         </div>
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">ロット</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">ロット</div>
           <div style="font-size:16px;font-weight:700;color:#374151">${p.box}</div>
         </div>
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">カテゴリー</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">カテゴリー</div>
           <div style="font-size:16px;font-weight:600;color:#374151">${p.cat||'未設定'}</div>
         </div>
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">登録日</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">登録日</div>
           <div style="font-size:16px;font-weight:600;color:#374151">${p.registeredDate||'―'}</div>
         </div>
         <div style="background:#f9fafb;border-radius:10px;padding:12px">
-          <div style="font-size:16px;color:#9ca3af;margin-bottom:4px">${sold?'販売日数':'出品中日数'}</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:4px">${sold?'販売日数':'出品中日数'}</div>
           <div style="font-size:16px;font-weight:700;color:${(!sold&&p.days>=14)||(!sold&&p.days>=7)?p.days>=14?'#ef4444':'#f59e0b':'#374151'}">${sold?(p.daysToSell!=null?p.daysToSell+'日':'―'):p.days+'日'}</div>
         </div>
       </div>
-      ${p.memo?`<div style="background:#fffbeb;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:16px;color:#9ca3af;margin-bottom:4px">メモ</div><div style="font-size:16px;color:#374151">${p.memo}</div></div>`:''}
-      ${sold&&p.soldPrice?`<div style="background:#eff6ff;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:16px;color:#9ca3af;margin-bottom:8px">売却情報</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"><div><div style="font-size:16px;color:#6b7280">実売価格</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${fmt(p.soldPrice)}</div></div><div><div style="font-size:16px;color:#6b7280">売却日</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.soldDate||'―'}</div></div><div><div style="font-size:16px;color:#6b7280">販売日数</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.daysToSell!=null?p.daysToSell+'日':'―'}</div></div></div><div style="border-top:1px solid #dbeafe;padding-top:8px;display:flex;flex-wrap:wrap;gap:10px"><div><div style="font-size:16px;color:#6b7280">送料</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldShip||0)}</div></div><div><div style="font-size:16px;color:#6b7280">手数料(10%)</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))}</div></div><div><div style="font-size:16px;color:#6b7280">仕入原価</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldCost??S.data.defaultCostPerItem??484)}</div></div><div><div style="font-size:16px;color:#6b7280">純利益</div><div style="font-size:16px;font-weight:700;color:#059669">+${fmt((p.soldPrice||0)-(p.soldShip||0)-(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))-(p.soldCost??S.data.defaultCostPerItem??484))}</div></div></div></div>`:''}
+      ${p.memo?`<div style="background:#fffbeb;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:17px;color:#6b7280;margin-bottom:4px">メモ</div><div style="font-size:16px;color:#374151">${p.memo}</div></div>`:''}
+      ${sold&&p.soldPrice?`<div style="background:#eff6ff;border-radius:10px;padding:12px;margin-bottom:16px"><div style="font-size:17px;color:#6b7280;margin-bottom:8px">売却情報</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px"><div><div style="font-size:17px;color:#6b7280">実売価格</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${fmt(p.soldPrice)}</div></div><div><div style="font-size:17px;color:#6b7280">売却日</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.soldDate||'―'}</div></div><div><div style="font-size:17px;color:#6b7280">販売日数</div><div style="font-size:16px;font-weight:700;color:#1d4ed8">${p.daysToSell!=null?p.daysToSell+'日':'―'}</div></div></div><div style="border-top:1px solid #dbeafe;padding-top:8px;display:flex;flex-wrap:wrap;gap:10px"><div><div style="font-size:17px;color:#6b7280">送料</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldShip||0)}</div></div><div><div style="font-size:17px;color:#6b7280">手数料(10%)</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))}</div></div><div><div style="font-size:17px;color:#6b7280">仕入原価</div><div style="font-size:16px;font-weight:700;color:#374151">-${fmt(p.soldCost??S.data.defaultCostPerItem??484)}</div></div><div><div style="font-size:17px;color:#6b7280">純利益</div><div style="font-size:16px;font-weight:700;color:#059669">+${fmt((p.soldPrice||0)-(p.soldShip||0)-(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1))-(p.soldCost??S.data.defaultCostPerItem??484))}</div></div></div></div>`:''}
       ${p.album?`<a href="${p.album}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#dcfce7;color:#065f46;font-size:16px;font-weight:600;padding:12px;border-radius:10px;text-decoration:none;margin-bottom:16px">📷 LINEアルバムを開く</a>`:''}
     </div>
     ${!sold?`
@@ -1138,7 +1138,7 @@ function pageProductDetail() {
       <div style="font-size:16px;font-weight:600;color:#374151;margin-bottom:12px">アクション</div>
       <button class="btn btn-primary btn-full" style="margin-bottom:10px" onclick="S.selPid='${p.id}';go('salesInput')">💰 売上を入力する</button>
       <div style="display:flex;align-items:center;gap:10px">
-        <label style="font-size:16px;color:#6b7280;white-space:nowrap">ステータス変更</label>
+        <label style="font-size:17px;color:#6b7280;white-space:nowrap">ステータス変更</label>
         <select class="input" style="flex:1" onchange="changeProductStatus('${p.id}',this.value)">
           ${statusList.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
         </select>
@@ -1422,7 +1422,7 @@ function filterProductList(q) {
     <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="S.viewPid='${p.id}';go('productDetail')">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:26px">${p.emoji}</span>
-        <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280">${p.memo}</div>`:''}</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280">${p.memo}</div>`:''}</div>
         <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">${badge(p.status)}<div style="font-size:16px;font-weight:700">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669">📷 写真あり</div>':''}<span style="font-size:16px;color:#d1d5db">›</span></div>
       </div>
     </div>`).join('') + (shown.length===0?'<div style="text-align:center;padding:40px;color:#9ca3af">商品が見つかりません</div>':'');
@@ -1441,7 +1441,7 @@ function filterBoxProductList() {
     <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:26px">${p.emoji}</span>
-        <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
+        <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700;margin-top:4px">${fmt(p.price)}</div>${p.album?'<div style="font-size:16px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
           ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
@@ -1454,11 +1454,11 @@ function filterBoxProductList() {
 function renderLotProducts(boxId) {
   const prods = S.data.products.filter(p=>p.box===boxId);
   if (!prods.length) return '<div style="text-align:center;color:#9ca3af;font-size:16px;padding:8px 0">このロットにはまだ登録された商品がありません</div>';
-  return `<div style="font-size:16px;color:#6b7280;font-weight:600;margin-bottom:4px">${boxId}ロット 登録済み ${prods.length}点</div>`+
+  return `<div style="font-size:17px;color:#6b7280;font-weight:600;margin-bottom:4px">${boxId}ロット 登録済み ${prods.length}点</div>`+
     prods.map(p=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:16px">
       <span style="font-size:16px">${p.emoji}</span>
       <span style="flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</span>
-      <span style="font-size:16px;color:#9ca3af;flex-shrink:0">${p.status}</span>
+      <span style="font-size:17px;color:#6b7280;flex-shrink:0">${p.status}</span>
     </div>`).join('');
 }
 
@@ -1613,7 +1613,7 @@ function pageSalesInput() {
         active.map(p=>`
         <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;margin-bottom:6px;cursor:pointer;background:${S.selPid===p.id?'#ecfdf5':'#f9fafb'};border:2px solid ${S.selPid===p.id?'#059669':'transparent'}" onclick="S.selPid='${p.id}';render()">
           <span style="font-size:24px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box} · ${p.days}日経過</div></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:16px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box} · ${p.days}日経過</div></div>
           <div style="font-weight:700;font-size:17px">${fmt(p.price)}</div>
           ${S.selPid===p.id?'<span style="color:#059669;font-size:18px">✓</span>':''}
         </div>`).join('')
@@ -1629,7 +1629,7 @@ function pageSalesInput() {
     <div class="card"><div class="card-title">② 販売情報を入力</div>
       <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f0fdf4;border-radius:10px;margin-bottom:16px">
         <span style="font-size:24px">${prod.emoji}</span>
-        <div><div style="font-weight:600;font-size:16px">${prod.name}</div><div style="font-size:16px;color:#9ca3af">${prod.box}</div></div>
+        <div><div style="font-weight:600;font-size:16px">${prod.name}</div><div style="font-size:17px;color:#6b7280">${prod.box}</div></div>
       </div>
       <div class="grid2" style="margin-bottom:16px">
         <div><label class="field-label">販売価格（円）</label><input id="sale-price" class="input" type="number" value="${S.salePrice||prod.price}" oninput="updateSalePreview()"></div>
@@ -1658,7 +1658,7 @@ function pageSalesInput() {
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:16px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-${fmt(fee)}</span></div>
         <div style="display:flex;justify-content:space-between;border-top:2px solid #e5e7eb;padding-top:12px"><span style="font-weight:700;font-size:16px">利益</span><span style="font-size:26px;font-weight:700;color:#ef4444">${fmt(profit)}</span></div>
       </div>
-      <div style="font-size:16px;color:#9ca3af;text-align:center;margin-bottom:16px">販売日: ${today()}</div>
+      <div style="font-size:17px;color:#6b7280;text-align:center;margin-bottom:16px">販売日: ${today()}</div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary" style="flex:1" onclick="S.salesStep=2;render()">← 戻る</button>
         <button class="btn btn-primary" style="flex:1;font-size:16px;padding:14px" onclick="saveSale(${price},${ship},${profit})">✓ 登録する</button>
@@ -1681,15 +1681,15 @@ function pageSets() {
       const prods = (s.pids||[]).length>0 ? S.data.products.filter(p=>s.pids.includes(p.id)) : [];
       const bodyInfo = s.type==='lot'
         ? `<div style="font-size:15px;color:#7c3aed;margin-bottom:8px">${(s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')}</div>`
-        : `<div style="display:flex;gap:4px;margin-bottom:8px">${prods.map(p=>`<span style="font-size:22px" title="${p.name}">${p.emoji}</span>`).join('')} <span style="font-size:16px;color:#9ca3af;align-self:center">${prods.length}点</span></div>`;
+        : `<div style="display:flex;gap:4px;margin-bottom:8px">${prods.map(p=>`<span style="font-size:22px" title="${p.name}">${p.emoji}</span>`).join('')} <span style="font-size:17px;color:#6b7280;align-self:center">${prods.length}点</span></div>`;
       return `<div class="card ${borderColor(s.status)}" style="cursor:pointer" onclick="S.setId='${s.id}';go('setDetail')">
         <div class="flex-between" style="margin-bottom:8px">
           <span style="font-weight:700;font-size:16px">${s.name}</span>
           ${badge(s.status)}
         </div>
-        <div style="font-size:16px;color:#9ca3af;margin-bottom:8px">${s.id} · ${s.registeredDate||s.created||''}</div>
+        <div style="font-size:17px;color:#6b7280;margin-bottom:8px">${s.id} · ${s.registeredDate||s.created||''}</div>
         ${bodyInfo}
-        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><div style="text-align:right">${s.platform?`<span style="font-size:16px;color:#9ca3af">${s.platform}</span>`:''}${(s.qty||1)>1?`<div style="font-size:16px;font-weight:700;color:#7c3aed">${s.qty}セット出品</div>`:''}</div></div>
+        <div class="flex-between"><span style="font-size:18px;font-weight:700">${fmt(s.price)}</span><div style="text-align:right">${s.platform?`<span style="font-size:17px;color:#6b7280">${s.platform}</span>`:''}${(s.qty||1)>1?`<div style="font-size:16px;font-weight:700;color:#7c3aed">${s.qty}セット出品</div>`:''}</div></div>
       </div>`;
     }).join('')}
   `;
@@ -1709,7 +1709,7 @@ function pageSetDetail() {
       <div class="page-title" style="margin-bottom:0">セット詳細</div>
     </div>
     <div class="card">
-      <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:16px;color:#9ca3af">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
+      <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:17px;color:#6b7280">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:16px;margin-top:8px">
         <div><span style="color:#9ca3af">登録日: </span>${s.registeredDate||s.created||''}</div>
         <div><span style="color:#9ca3af">販売価格: </span><strong>${fmt(s.price)}</strong></div>
@@ -1725,7 +1725,7 @@ function pageSetDetail() {
         const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;
         return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
           <span style="font-size:16px;font-weight:600">ロット${c.lotId}</span>
-          <span style="font-size:16px;color:#9ca3af">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
+          <span style="font-size:17px;color:#6b7280">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
           <span style="font-size:16px;font-weight:700;color:#374151">${cph?fmt(c.qty*cph):'―'}</span>
         </div>`;
       }).join('')}
@@ -1747,9 +1747,9 @@ function pageSetDetail() {
       ${soldRecs.length>0?`<div class="card" style="margin-bottom:10px">
         <div class="card-title">販売記録（${soldQty}件）</div>
         ${soldRecs.map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;${i>0?'border-top:1px solid #f3f4f6':''}">
-          <span style="font-size:16px;color:#9ca3af">${r.soldDate}</span>
+          <span style="font-size:17px;color:#6b7280">${r.soldDate}</span>
           <span style="font-size:16px;font-weight:700;color:#059669">${fmt(r.soldPrice)}</span>
-          <span style="font-size:16px;color:#6b7280">送料 ${fmt(r.soldShip||0)}</span>
+          <span style="font-size:17px;color:#6b7280">送料 ${fmt(r.soldShip||0)}</span>
         </div>`).join('')}
       </div>`:''}
       ${remQty>0?(isLotType?`<div class="card" style="background:#f0fdf4;border:1px solid #6ee7b7">
@@ -1798,7 +1798,7 @@ function pageWork() {
               <span style="font-weight:700;font-size:16px">${w.name}</span>
               ${w.urgent?'<span class="badge badge-red" style="font-size:16px">急ぎ</span>':''}
             </div>
-            ${w.orderId?`<div style="font-size:16px;color:#9ca3af">注文ID: ${w.orderId}</div>`:''}
+            ${w.orderId?`<div style="font-size:17px;color:#6b7280">注文ID: ${w.orderId}</div>`:''}
             ${w.deadline?`<div style="font-size:16px;font-weight:600;color:${w.urgent?'#dc2626':'#6b7280'}">期限: ${w.deadline}</div>`:''}
           </div>
           ${badge(w.status)}
@@ -1830,7 +1830,7 @@ function pageMessages() {
           return `<div class="msg-row ${mine?'right':''}">
             ${!mine?`<div class="avatar">${m.from===S.ownerName?'👑':'🐰'}</div>`:''}
             <div>
-              <div style="font-size:16px;color:#9ca3af;margin-bottom:3px;${mine?'text-align:right':''}">${m.from} · ${m.time}</div>
+              <div style="font-size:17px;color:#6b7280;margin-bottom:3px;${mine?'text-align:right':''}">${m.from} · ${m.time}</div>
               <div class="${mine?'msg-bubble-right':'msg-bubble-left'}">${m.body}</div>
             </div>
           </div>`;
@@ -1839,7 +1839,7 @@ function pageMessages() {
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
             <span>${m.type==='set'?'🎁':m.type==='alert'?'⚠️':'💬'}</span>
             <span style="font-weight:700;font-size:16px">${m.title||m.from}</span>
-            <span style="margin-left:auto;font-size:16px;color:#9ca3af">${m.time}</span>
+            <span style="margin-left:auto;font-size:17px;color:#6b7280">${m.time}</span>
           </div>
           <div style="font-size:16px;white-space:pre-line">${m.body}</div>
           ${m.type==='set'?`<button style="color:#059669;font-size:16px;font-weight:600;background:none;border:none;cursor:pointer;margin-top:6px;padding:0">指示書を確認する →</button>`:''}
@@ -1970,7 +1970,7 @@ function pageAnalytics() {
                 <div style="flex:1;background:#f3f4f6;border-radius:99px;height:4px;overflow:hidden">
                   <div style="background:${bRecoverPct>=100?'#059669':'#3b82f6'};height:100%;width:${bRecoverPct}%;border-radius:99px"></div>
                 </div>
-                <span style="font-size:16px;color:#9ca3af;white-space:nowrap">回収率 ${bRecoverPct}%</span>
+                <span style="font-size:17px;color:#6b7280;white-space:nowrap">回収率 ${bRecoverPct}%</span>
               </div>
             </div>
           </div>`;
@@ -1997,15 +1997,15 @@ function pageAnalytics() {
           <div class="card-title">損益分岐点${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
           <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:16px;color:#6b7280">未回収投資額</span>
+              <span style="font-size:17px;color:#6b7280">未回収投資額</span>
               <span style="font-size:17px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
             </div>
-            <div style="font-size:14px;color:#9ca3af;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
+            <div style="font-size:17px;color:#6b7280;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:16px;color:#6b7280">利益累計</span>
+              <span style="font-size:17px;color:#6b7280">利益累計</span>
               <span style="font-size:17px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
             </div>
-            <div style="font-size:14px;color:#9ca3af;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
+            <div style="font-size:17px;color:#6b7280;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
             <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
               <span style="font-size:16px;font-weight:600;color:#374151">現在の損益</span>
               <span style="font-size:17px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
@@ -2015,19 +2015,19 @@ function pageAnalytics() {
           <div style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
             <div style="font-size:20px;margin-bottom:4px">🎉</div>
             <div style="font-size:16px;font-weight:700;color:#059669">黒字達成！</div>
-            <div style="font-size:16px;color:#6b7280;margin-top:4px">投資回収済み・${fmt(trueProfit)}の利益</div>
+            <div style="font-size:17px;color:#6b7280;margin-top:4px">投資回収済み・${fmt(trueProfit)}の利益</div>
           </div>`:`
           <div style="background:#fff1f2;border-radius:10px;padding:14px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:16px;color:#6b7280">損益分岐まで</span>
+              <span style="font-size:17px;color:#6b7280">損益分岐まで</span>
               <span style="font-size:20px;font-weight:700;color:#ef4444">あと${remaining}個</span>
             </div>
             <div style="background:#fecaca;border-radius:6px;height:8px;overflow:hidden">
               <div style="background:#ef4444;height:100%;width:${recoverPct}%;border-radius:6px;transition:width 0.3s"></div>
             </div>
             <div style="display:flex;justify-content:space-between;margin-top:4px">
-              <span style="font-size:16px;color:#9ca3af">回収率 ${recoverPct}%</span>
-              <span style="font-size:16px;color:#9ca3af">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
+              <span style="font-size:17px;color:#6b7280">回収率 ${recoverPct}%</span>
+              <span style="font-size:17px;color:#6b7280">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
             </div>
           </div>`}
         </div>`;
@@ -2057,20 +2057,20 @@ function pageAnalytics() {
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
               <div style="background:#f9fafb;border-radius:8px;padding:8px">
-                <div style="font-size:16px;color:#9ca3af;margin-bottom:2px">不良品数</div>
+                <div style="font-size:17px;color:#6b7280;margin-bottom:2px">不良品数</div>
                 <div style="font-size:18px;font-weight:700;color:${defColor}">${defectCount}点</div>
-                <div style="font-size:16px;color:#9ca3af">登録${totalReg}点中</div>
+                <div style="font-size:17px;color:#6b7280">登録${totalReg}点中</div>
               </div>
               <div style="background:#f9fafb;border-radius:8px;padding:8px">
-                <div style="font-size:16px;color:#9ca3af;margin-bottom:2px">出品可能率</div>
+                <div style="font-size:17px;color:#6b7280;margin-bottom:2px">出品可能率</div>
                 <div style="font-size:18px;font-weight:700;color:${listColor}">${listRate}%</div>
-                <div style="font-size:16px;color:#9ca3af">${activeCount}点 / ${b.total||75}点</div>
+                <div style="font-size:17px;color:#6b7280">${activeCount}点 / ${b.total||75}点</div>
               </div>
             </div>
             <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden;margin-bottom:2px">
               <div style="background:${defColor};height:100%;width:${Math.min(defectRate,100)}%;border-radius:99px;transition:width 0.3s"></div>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:16px;color:#9ca3af">
+            <div style="display:flex;justify-content:space-between;font-size:17px;color:#6b7280">
               <span>不良品率</span>
               <span>${cancelCount>0?`キャンセル${cancelCount}点含む`:''}</span>
             </div>
@@ -2136,22 +2136,22 @@ function pageAnalytics() {
         return `
         <div class="card" style="margin-bottom:12px">
           <div class="card-title">概算売上シミュレーション${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
-          <div style="font-size:16px;color:#6b7280;margin-bottom:12px">${estListings}件（個別${indivProds.length}点 + セット${relevantSets.length}件）が全て売れた場合</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:12px">${estListings}件（個別${indivProds.length}点 + セット${relevantSets.length}件）が全て売れた場合</div>
           <div style="background:#f9fafb;border-radius:10px;padding:10px;margin-bottom:10px">
-            <div style="font-size:16px;color:#9ca3af;margin-bottom:6px;font-weight:600">固定コスト</div>
+            <div style="font-size:17px;color:#6b7280;margin-bottom:6px;font-weight:600">固定コスト</div>
             <div style="display:flex;gap:12px">
               <div style="flex:1;text-align:center;background:#fff;border-radius:8px;padding:8px">
-                <div style="font-size:14px;color:#9ca3af">メルカリ手数料</div>
+                <div style="font-size:17px;color:#6b7280">メルカリ手数料</div>
                 <div style="font-size:17px;font-weight:700;color:#374151">10%</div>
               </div>
               <div style="flex:1;text-align:center;background:#fff;border-radius:8px;padding:8px">
-                <div style="font-size:14px;color:#9ca3af">仕入コスト</div>
+                <div style="font-size:17px;color:#6b7280">仕入コスト</div>
                 <div style="font-size:17px;font-weight:700;color:#374151">${fmt(defCost2)}/点</div>
               </div>
             </div>
           </div>
           <div style="margin-bottom:10px">
-            <div style="font-size:16px;color:#9ca3af;margin-bottom:6px;font-weight:600">変動コスト・条件</div>
+            <div style="font-size:17px;color:#6b7280;margin-bottom:6px;font-weight:600">変動コスト・条件</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div>
                 <label class="field-label">発送送料（実績平均: ${fmt(avgActualShip)}円）</label>
@@ -2165,10 +2165,10 @@ function pageAnalytics() {
           </div>
           <button onclick="S.tab.discountRate=document.getElementById('discount-rate').value;S.tab.simShipOut=document.getElementById('sim-ship-out').value;render()" style="width:100%;background:#3b82f6;color:white;border:none;border-radius:8px;padding:10px;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:12px">計算する</button>
           <div style="background:#f0fdf4;border-radius:10px;padding:14px">
-            <div style="font-size:16px;color:#6b7280;margin-bottom:4px">概算手取り（手数料・送料${fmt(shipOut)}・仕入コスト差引）</div>
+            <div style="font-size:17px;color:#6b7280;margin-bottom:4px">概算手取り（手数料・送料${fmt(shipOut)}・仕入コスト差引）</div>
             <div style="font-size:26px;font-weight:700;color:${estProfit>=0?'#059669':'#ef4444'}">${estProfit>=0?'+':''}${fmt(estProfit)}</div>
             ${discount>0?`<div style="font-size:16px;color:#f59e0b;margin-top:4px">${discount}%引き / 割引なし: ${estProfitNoDisc>=0?'+':''}${fmt(estProfitNoDisc)}</div>`:''}
-            <div style="font-size:16px;color:#9ca3af;margin-top:4px">手数料・送料のみ差引: ${fmt(estRevenue)}</div>
+            <div style="font-size:17px;color:#6b7280;margin-top:4px">手数料・送料のみ差引: ${fmt(estRevenue)}</div>
           </div>
         </div>`;
       })()}
@@ -2196,7 +2196,7 @@ function pageAnalytics() {
             <div style="background:#f5f3ff;border-radius:8px;padding:10px;text-align:center">
               <div style="font-size:16px;color:#7c3aed;margin-bottom:2px">販売数</div>
               <div style="font-size:20px;font-weight:700;color:#7c3aed">${setTotalCount}</div>
-              <div style="font-size:16px;color:#9ca3af">セット</div>
+              <div style="font-size:17px;color:#6b7280">セット</div>
             </div>
             <div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center">
               <div style="font-size:14px;color:#3b82f6;margin-bottom:2px">売上</div>
@@ -2228,7 +2228,7 @@ function pageAnalytics() {
                 <span style="font-size:16px;font-weight:600">${s.name}</span>
                 <span style="font-size:16px;font-weight:700;color:${sProfit>=0?'#059669':'#ef4444'}">${sProfit>=0?'+':''}${fmt(sProfit)}</span>
               </div>
-              <div style="font-size:16px;color:#9ca3af">${recs.length}件販売 · 売上${fmt(sSales)} · ${lotsLabel}</div>
+              <div style="font-size:17px;color:#6b7280">${recs.length}件販売 · 売上${fmt(sSales)} · ${lotsLabel}</div>
             </div>`;
           }).join('')}
         </div>`;
@@ -2347,13 +2347,13 @@ function pageAnalytics() {
             </div>
           </div>
           <div style="background:#f9fafb;border-radius:8px;padding:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-size:16px;color:#9ca3af">平均販売日数</span>
+            <span style="font-size:17px;color:#6b7280">平均販売日数</span>
             <span style="font-size:17px;font-weight:700;color:#374151">${bAvgDays!=null?bAvgDays+'日':'―'}</span>
           </div>
           <div style="background:#f3f4f6;border-radius:99px;height:6px;overflow:hidden;margin-bottom:4px">
             <div style="background:${bAchieved?'#059669':'#3b82f6'};height:100%;width:${bRecoverPct}%;border-radius:99px;transition:width 0.3s"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:14px;color:#9ca3af;margin-bottom:${isCompleteB?'12px':'0'}">
+          <div style="display:flex;justify-content:space-between;font-size:17px;color:#6b7280;margin-bottom:${isCompleteB?'12px':'0'}">
             <span>回収率 ${bRecoverPct}%</span>
             <span>${bAchieved?'回収完了':bRemaining>0?'あと'+bRemaining+'個':''}</span>
           </div>
@@ -2404,9 +2404,9 @@ function pageAnalytics() {
             return '<div style="margin-bottom:12px">' +
               '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
               '<span style="font-size:16px;font-weight:600">'+name+'</span>' +
-              '<span style="font-size:16px;color:#6b7280">'+s.total+'件中 '+s.sold+'件売却（'+rate+'%）</span></div>' +
+              '<span style="font-size:17px;color:#6b7280">'+s.total+'件中 '+s.sold+'件売却（'+rate+'%）</span></div>' +
               '<div class="progress"><div class="progress-fill" style="width:'+rate+'%;background:'+col+'"></div></div>' +
-              (s.revenue>0?'<div style="font-size:16px;color:#6b7280;margin-top:2px">売上合計: '+fmt(s.revenue)+'</div>':'') +
+              (s.revenue>0?'<div style="font-size:17px;color:#6b7280;margin-top:2px">売上合計: '+fmt(s.revenue)+'</div>':'') +
               '</div>';
           }).join('') + '</div>';
       })()}
@@ -2433,7 +2433,7 @@ function pageAlertAction() {
     </div>
     <div style="background:#fff8f1;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;margin-bottom:16px">
       <div style="font-size:16px;font-weight:700;color:${color};margin-bottom:2px">${icon2} ${minDays}日以上出品中 — ${prods.length}件</div>
-      <div style="font-size:16px;color:#6b7280">推奨アクション：<strong style="color:${color}">${rule.action}</strong></div>
+      <div style="font-size:17px;color:#6b7280">推奨アクション：<strong style="color:${color}">${rule.action}</strong></div>
     </div>
     ${prods.length===0?`<div class="card" style="text-align:center;padding:40px;color:#9ca3af">対象商品はありません</div>`:''}
     ${prods.map(p=>`
@@ -2442,9 +2442,9 @@ function pageAlertAction() {
           <span style="font-size:24px">${p.emoji}</span>
           <div style="flex:1;min-width:0">
             <div style="font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-            <div style="font-size:16px;color:#9ca3af">${p.box}ロット · <span style="color:${color};font-weight:700">${p.days}日経過</span></div>
+            <div style="font-size:17px;color:#6b7280">${p.box}ロット · <span style="color:${color};font-weight:700">${p.days}日経過</span></div>
           </div>
-          <button onclick="S.viewPid='${p.id}';go('productDetail')" style="font-size:16px;color:#6b7280;background:#f3f4f6;border:none;border-radius:6px;padding:4px 8px;cursor:pointer">詳細</button>
+          <button onclick="S.viewPid='${p.id}';go('productDetail')" style="font-size:17px;color:#6b7280;background:#f3f4f6;border:none;border-radius:6px;padding:4px 8px;cursor:pointer">詳細</button>
         </div>
         ${isChannel ? `
         <div style="background:#fef3c7;border-radius:8px;padding:10px;margin-bottom:6px">
@@ -2453,17 +2453,17 @@ function pageAlertAction() {
             <div style="background:#fff;border:1px solid #fde68a;border-radius:8px;padding:8px;text-align:center;cursor:pointer" onclick="alert('ラクマ・ヤフオク・Facebookマーケットへの出品を検討してください')">
               <div style="font-size:18px">🛒</div>
               <div style="font-size:16px;font-weight:600;color:#374151;margin-top:3px">他プラットフォーム</div>
-              <div style="font-size:16px;color:#9ca3af">ラクマ・ヤフオク等</div>
+              <div style="font-size:17px;color:#6b7280">ラクマ・ヤフオク等</div>
             </div>
             <div style="background:#fff;border:1px solid #fde68a;border-radius:8px;padding:8px;text-align:center;cursor:pointer" onclick="go('sets')">
               <div style="font-size:18px">📦</div>
               <div style="font-size:16px;font-weight:600;color:#374151;margin-top:3px">セットにまとめる</div>
-              <div style="font-size:16px;color:#9ca3af">セット管理へ</div>
+              <div style="font-size:17px;color:#6b7280">セット管理へ</div>
             </div>
             <div style="background:#fff;border:1px solid #fde68a;border-radius:8px;padding:8px;text-align:center">
               <div style="font-size:18px">🏪</div>
               <div style="font-size:16px;font-weight:600;color:#374151;margin-top:3px">リサイクルショップ</div>
-              <div style="font-size:16px;color:#9ca3af">持ち込み・買取</div>
+              <div style="font-size:17px;color:#6b7280">持ち込み・買取</div>
             </div>
             <div style="background:#fff;border:1px solid #fde68a;border-radius:8px;padding:8px">
               <div style="font-size:16px;font-weight:600;color:#374151;margin-bottom:4px">💸 大幅値下げ</div>
@@ -2471,19 +2471,19 @@ function pageAlertAction() {
                 <input id="ap-${p.id}" class="input" type="number" value="${Math.round(p.price*0.5)}" style="flex:1;font-size:16px;padding:4px 6px">
                 <button id="apbtn-${p.id}" onclick="saveAlertPrice('${p.id}')" style="background:#ef4444;color:white;border:none;border-radius:6px;padding:5px 8px;font-size:16px;font-weight:700;cursor:pointer">保存</button>
               </div>
-              <div style="font-size:16px;color:#9ca3af;margin-top:2px">現在 ¥${p.price.toLocaleString()}</div>
+              <div style="font-size:17px;color:#6b7280;margin-top:2px">現在 ¥${p.price.toLocaleString()}</div>
             </div>
           </div>
         </div>` : isSet ? `
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f5f3ff;border-radius:8px">
           <div>
             <div style="font-size:16px;font-weight:600;color:#7c3aed">セット販売を検討</div>
-            <div style="font-size:16px;color:#9ca3af">現在値 ${fmt(p.price)}</div>
+            <div style="font-size:17px;color:#6b7280">現在値 ${fmt(p.price)}</div>
           </div>
           <button onclick="go('sets')" style="background:#7c3aed;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:16px;font-weight:700;cursor:pointer">セット管理へ</button>
         </div>` : `
         <div style="background:#fafafa;border-radius:8px;padding:10px">
-          <div style="font-size:16px;color:#6b7280;margin-bottom:8px">現在の価格：<strong>¥${p.price.toLocaleString()}</strong> → 新しい価格に変更</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:8px">現在の価格：<strong>¥${p.price.toLocaleString()}</strong> → 新しい価格に変更</div>
           <div style="display:flex;gap:8px;align-items:center">
             <span style="font-size:16px;color:#374151;font-weight:600">¥</span>
             <input id="ap-${p.id}" class="input" type="number" placeholder="${Math.round(p.price*0.8)}" style="flex:1;font-size:16px;font-weight:700" value="${p.price}">
@@ -2519,7 +2519,7 @@ function pageUnsold() {
       return `<div class="card">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <span style="font-size:32px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:700;font-size:17px">${p.name}</div><div style="font-size:14px;color:#9ca3af">${p.days}日経過 · ${fmt(p.price)} · ${p.box}</div></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:17px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.days}日経過 · ${fmt(p.price)} · ${p.box}</div></div>
           ${badge(p.status)}
         </div>
         ${dec?`<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:10px;font-size:16px">
@@ -2529,11 +2529,11 @@ function pageUnsold() {
           <div style="font-size:16px;font-weight:700;color:#1d4ed8;margin-bottom:8px">${icon('ai',13)} AIの提案</div>
           ${ai.opts.map((o,i)=>`
             <div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer;margin-bottom:6px;background:#fff${i===0?';border:1.5px solid #93c5fd':''}" onclick="${S.mode==='owner'?`decideAI('${p.id}','${o.label.replace(/'/g,"\\'")}')`:''}" >
-              <div style="flex:1"><div style="font-size:16px;font-weight:500">${o.label}</div><div style="font-size:16px;color:#9ca3af">推定売却率: ${o.prob}% · ${fmt(o.est)}</div></div>
+              <div style="flex:1"><div style="font-size:16px;font-weight:500">${o.label}</div><div style="font-size:17px;color:#6b7280">推定売却率: ${o.prob}% · ${fmt(o.est)}</div></div>
               <div style="width:48px;height:6px;background:#e5e7eb;border-radius:3px;flex-shrink:0"><div style="height:100%;width:${o.prob}%;background:#3b82f6;border-radius:3px"></div></div>
             </div>`).join('')}
-          ${S.mode==='owner'?'<div style="font-size:16px;color:#9ca3af;text-align:center;margin-top:4px">タップして判断してください</div>':'<div style="font-size:16px;color:#9ca3af;text-align:center">オーナーが判断します</div>'}
-        </div>`:`<div style="font-size:16px;color:#9ca3af;text-align:center;padding:12px">AI分析データがありません</div>`}
+          ${S.mode==='owner'?'<div style="font-size:17px;color:#6b7280;text-align:center;margin-top:4px">タップして判断してください</div>':'<div style="font-size:17px;color:#6b7280;text-align:center">オーナーが判断します</div>'}
+        </div>`:`<div style="font-size:17px;color:#6b7280;text-align:center;padding:12px">AI分析データがありません</div>`}
       </div>`;
     }).join('')}
     ${unsold.length===0?`<div class="card" style="text-align:center;padding:40px;color:#9ca3af"><div style="font-size:40px;margin-bottom:8px">✅</div><div>${thr}日以上の未売卸商品はありません</div></div>`:''}
@@ -2554,7 +2554,7 @@ function pageSettings() {
 
     <div class="card" style="border:2px solid #059669">
       <div class="card-title" style="color:#059669">💾 データバックアップ・復元</div>
-      <p style="font-size:16px;color:#6b7280;margin-bottom:12px">データはこの端末のブラウザにのみ保存されています。定期的にバックアップを取ることを強くおすすめします。</p>
+      <p style="font-size:17px;color:#6b7280;margin-bottom:12px">データはこの端末のブラウザにのみ保存されています。定期的にバックアップを取ることを強くおすすめします。</p>
       <button onclick="exportData()" class="btn btn-primary btn-full" style="margin-bottom:8px">⬇️ バックアップを保存する</button>
       <button onclick="restoreFromFirebase()" class="btn btn-full" style="margin-bottom:8px;background:#f59e0b;color:white;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer">☁️ Firebaseからデータを復元する</button>
       <label style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#f3f4f6;border-radius:10px;font-size:16px;font-weight:600;color:#374151;cursor:pointer;box-sizing:border-box">
@@ -2573,19 +2573,19 @@ function pageSettings() {
 
     <div class="card">
       <div class="card-title">デフォルト仕入原価（1点あたり）</div>
-      <div style="font-size:16px;color:#6b7280;margin-bottom:8px">ロット登録時に原価を入力しなかった場合に使用されます</div>
+      <div style="font-size:17px;color:#6b7280;margin-bottom:8px">ロット登録時に原価を入力しなかった場合に使用されます</div>
       <div style="display:flex;gap:8px;align-items:center">
         <input id="default-cost-input" class="input" style="flex:1" type="number" value="${S.data.defaultCostPerItem??484}" placeholder="484">
-        <span style="font-size:16px;color:#6b7280">円</span>
+        <span style="font-size:17px;color:#6b7280">円</span>
         <button class="btn btn-primary btn-sm" onclick="(function(){const v=parseInt(document.getElementById('default-cost-input').value);if(!isNaN(v)&&v>=0){S.data.defaultCostPerItem=v;saveData();render();alert('保存しました');}})()">保存</button>
       </div>
     </div>
     <div class="card">
       <div class="card-title">目標利益（1ロットあたり）</div>
-      <div style="font-size:16px;color:#6b7280;margin-bottom:8px">ホーム画面の達成率・ロット分析の目標との差に使用されます</div>
+      <div style="font-size:17px;color:#6b7280;margin-bottom:8px">ホーム画面の達成率・ロット分析の目標との差に使用されます</div>
       <div style="display:flex;gap:8px;align-items:center">
         <input id="target-profit-input" class="input" style="flex:1" type="number" value="${S.data.targetProfitPerLot??10000}" placeholder="10000">
-        <span style="font-size:16px;color:#6b7280">円</span>
+        <span style="font-size:17px;color:#6b7280">円</span>
         <button class="btn btn-primary btn-sm" onclick="(function(){const v=parseInt(document.getElementById('target-profit-input').value);if(!isNaN(v)&&v>=0){S.data.targetProfitPerLot=v;saveData();render();alert('保存しました');}})()">保存</button>
       </div>
     </div>
@@ -2607,7 +2607,7 @@ function pageSettings() {
         <div style="display:flex;align-items:center;gap:8px;padding:10px;background:#f9fafb;border-radius:8px;margin-bottom:6px">
           <div style="flex:1">
             <div style="font-size:16px;font-weight:600">${r.name}</div>
-            <div style="font-size:16px;color:#9ca3af">${r.days}日経過 → ${r.action}</div>
+            <div style="font-size:17px;color:#6b7280">${r.days}日経過 → ${r.action}</div>
           </div>
           <button class="btn btn-secondary btn-sm" onclick="S.tab.editRule=${r.id};render()">編集</button>
           <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:none;padding:6px 10px;border-radius:6px;cursor:pointer" onclick="deleteRule(${r.id})">削除</button>
@@ -2618,11 +2618,11 @@ function pageSettings() {
     <div class="card">
       <div class="card-title">データ管理</div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:8px;margin-bottom:8px">
-        <div><div style="font-size:16px;font-weight:600">データバックアップ</div><div style="font-size:16px;color:#9ca3af">JSONファイルとして保存</div></div>
+        <div><div style="font-size:16px;font-weight:600">データバックアップ</div><div style="font-size:17px;color:#6b7280">JSONファイルとして保存</div></div>
         <button class="btn btn-primary btn-sm" onclick="downloadBackup()">ダウンロード</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:8px">
-        <div><div style="font-size:16px;font-weight:600">商品データエクスポート</div><div style="font-size:16px;color:#9ca3af">CSV形式（Excel対応）</div></div>
+        <div><div style="font-size:16px;font-weight:600">商品データエクスポート</div><div style="font-size:17px;color:#6b7280">CSV形式（Excel対応）</div></div>
         <button class="btn btn-primary btn-sm" onclick="exportCSV()">エクスポート</button>
       </div>
     </div>
@@ -2661,7 +2661,7 @@ function pagePermissions() {
           </div>
         </div>`).join('')}
     </div>
-    <div style="padding:12px 4px;font-size:16px;color:#9ca3af;text-align:center">スタッフ列のトグルをタップして切り替え</div>
+    <div style="padding:12px 4px;font-size:17px;color:#6b7280;text-align:center">スタッフ列のトグルをタップして切り替え</div>
   `;
 }
 
@@ -2698,7 +2698,7 @@ function renderModal() {
         <div class="modal-header"><h2>売上を記録</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
         <div style="display:flex;align-items:center;gap:10px;padding:12px;background:#f0fdf4;border-radius:10px;margin-bottom:16px">
           <span style="font-size:28px">${p.emoji}</span>
-          <div><div style="font-weight:700;font-size:16px">${p.name}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット</div></div>
+          <div><div style="font-weight:700;font-size:16px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット</div></div>
         </div>
         <div style="margin-bottom:10px">
           <label class="field-label">実売価格（円）</label>
@@ -2765,16 +2765,16 @@ function renderModal() {
         <div class="modal" onclick="event.stopPropagation()">
           <div class="modal-header"><h2>新しいセットを登録</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
           <div style="background:#f0fdf4;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
-            <span style="font-size:16px;color:#6b7280">セット管理番号</span>
+            <span style="font-size:17px;color:#6b7280">セット管理番号</span>
             <span style="font-size:22px;font-weight:700;color:#059669;letter-spacing:2px">${nextSetId}</span>
-            <span style="font-size:16px;color:#9ca3af;margin-left:auto">自動採番</span>
+            <span style="font-size:17px;color:#6b7280;margin-left:auto">自動採番</span>
           </div>
           ${prePids.length>0?`<script>setTimeout(updateSetPreview,50)<\/script>`:''}
           <div style="margin-bottom:16px"><label class="field-label">セット名</label><input id="ms-name" class="input" placeholder="例: サンリオまとめセット"></div>
           <div style="margin-bottom:16px">
             <label class="field-label">出品数（何セット出品しますか）</label>
             <input id="ms-qty" class="input" type="number" min="1" value="1" placeholder="例: 3">
-            <div style="font-size:16px;color:#9ca3af;margin-top:4px">※ ホーム画面の出品数合計に加算されます</div>
+            <div style="font-size:17px;color:#6b7280;margin-top:4px">※ ホーム画面の出品数合計に加算されます</div>
           </div>
           <div style="margin-bottom:16px">
             <label class="field-label">セットに入れる商品をタップして選択</label>
@@ -2786,7 +2786,7 @@ function renderModal() {
                 <span style="font-size:22px">${p.emoji}</span>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-                  <div style="font-size:16px;color:#9ca3af">${p.id} · ${p.box}</div>
+                  <div style="font-size:17px;color:#6b7280">${p.id} · ${p.box}</div>
                 </div>
                 <div style="font-size:16px;font-weight:700;color:#374151;white-space:nowrap">${fmt(p.price)}</div>
               </label>`}).join('')}
