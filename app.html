@@ -2184,11 +2184,12 @@ function pageAnalytics() {
           return a + p.price - Math.floor(p.price*0.1) - shipOut - cpi;
         },0) + relevantSets.reduce((a,s)=>{
           const fee = Math.floor(s.price*0.1);
-          const setCost = s.pids.reduce((ac,pid)=>{
-            const prod=d.products.find(p=>p.id===pid);
-            const lot=prod?d.boxes.find(b=>b.id===prod.box):null;
-            return ac+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
-          },0);
+          let setCost;
+          if (s.type==='lot') {
+            setCost = (s.lotComponents||[]).reduce((ac,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return ac+c.qty*cph;},0);
+          } else {
+            setCost = (s.pids||[]).reduce((ac,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return ac+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+          }
           return a + s.price - fee - shipOut - setCost;
         },0);
         return `
