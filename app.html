@@ -529,19 +529,18 @@ function pageDashboard() {
         <div class="card" style="margin-bottom:10px;border:2px solid #7c3aed">
           <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:12px">セット登録</div>
           <div style="margin-bottom:10px"><label class="field-label">セット名</label><input id="hs-name" class="input" placeholder="例: サンリオ3点セット"></div>
-          <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="hs-price" class="input" type="number" placeholder="例: 3000" oninput="updateHomeSetProfit()"></div>
+          <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="hs-price" class="input" type="number" placeholder="例: 3000"></div>
           <div style="margin-bottom:12px">
             <label class="field-label">使用するロット（タップで選択）</label>
             ${d.boxes.length===0?'<div style="color:#9ca3af;font-size:15px;padding:8px">ロットがありません</div>':d.boxes.map(b=>`
               <div id="hs-lot-row-${b.id}" data-selected="0" onclick="toggleHomeLot('${b.id}')" style="padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;background:#fff;margin-bottom:6px">
                 <div style="display:flex;align-items:center;justify-content:space-between">
                   <span style="font-size:16px;font-weight:700">ロット${b.id}</span>
-                  <span id="hs-lot-profit-${b.id}" style="font-size:15px;font-weight:700"></span>
                 </div>
                 <div id="hs-lot-qty-${b.id}" style="display:none;margin-top:8px" onclick="event.stopPropagation()">
                   <div style="display:flex;align-items:center;gap:8px">
                     <span style="font-size:15px;color:#6b7280">点数</span>
-                    <input id="hs-lot-${b.id}" class="input" type="number" min="0" value="0" style="width:70px;text-align:center" oninput="updateHomeSetProfit()">
+                    <input id="hs-lot-${b.id}" class="input" type="number" min="0" value="0" style="width:70px;text-align:center">
                     <span style="font-size:15px;color:#6b7280">点</span>
                   </div>
                 </div>
@@ -1963,8 +1962,8 @@ function pageAnalytics() {
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
       </div>
       <div class="card" style="margin-bottom:12px">
-        <div class="card-title">ロット一覧</div>
-        ${fBoxes.length===0?'<div style="text-align:center;color:#9ca3af;padding:16px">ロットがありません</div>':fBoxes.map(b=>{
+        <div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="S.tab.analyticsLotsOpen=!S.tab.analyticsLotsOpen;render()"><span>ロット一覧</span><span style="font-size:14px;color:#9ca3af">${S.tab.analyticsLotsOpen?'▲':'▼'}</span></div>
+        ${S.tab.analyticsLotsOpen?(fBoxes.length===0?'<div style="text-align:center;color:#9ca3af;padding:16px">ロットがありません</div>':fBoxes.map(b=>{
           const bSoldP = d.products.filter(p=>p.box===b.id&&p.status==='売卸済');
           const bListing2 = d.products.filter(p=>p.box===b.id&&p.status==='出品中').length;
           const bStored2 = d.products.filter(p=>p.box===b.id&&p.status==='保管中').length;
@@ -2004,7 +2003,7 @@ function pageAnalytics() {
               </div>
             </div>
           </div>`;
-        }).join('')}
+        }).join('')):''}
       </div>
       ${(()=>{
         const defCost2 = d.defaultCostPerItem??484;
@@ -2078,8 +2077,8 @@ function pageAnalytics() {
         });
         if (defectStats.length===0) return '';
         return `<div class="card" style="margin-bottom:12px">
-          <div class="card-title">不良品率・出品可能率${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
-          ${defectStats.map(({b,totalReg,defectCount,cancelCount,activeCount,defectRate,listRate,defColor,defLabel,listColor})=>`
+          <div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="S.tab.analyticsDefectOpen=!S.tab.analyticsDefectOpen;render()"><span>不良品率・出品可能率${selLot!=='all'?'（ロット'+selLot+'）':''}</span><span style="font-size:14px;color:#9ca3af">${S.tab.analyticsDefectOpen?'▲':'▼'}</span></div>
+          ${S.tab.analyticsDefectOpen?defectStats.map(({b,totalReg,defectCount,cancelCount,activeCount,defectRate,listRate,defColor,defLabel,listColor})=>`
           <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f3f4f6">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <span style="font-size:18px;font-weight:700;color:#111827">ロット${b.id}</span>
@@ -2104,7 +2103,7 @@ function pageAnalytics() {
               <span>不良品率</span>
               <span>${cancelCount>0?`キャンセル${cancelCount}点含む`:''}</span>
             </div>
-          </div>`).join('')}
+          </div>`).join(''):''}
         </div>`;
       })()}
       ${(()=>{
@@ -2246,21 +2245,24 @@ function pageAnalytics() {
               itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
             }
             const recs = s.soldRecords||[];
-            const sSales = recs.reduce((a,r)=>a+(r.soldPrice||0),0);
-            const sProfit = recs.reduce((a,r)=>{
-              const fee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
-              return a+(r.soldPrice||0)-(r.soldShip||0)-fee-itemCost;
-            },0);
             const lotsLabel = s.type==='lot'
               ? (s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty+'点').join('＋')
               : 'ロット'+[...new Set((s.pids||[]).map(pid=>{ const p=d.products.find(q=>q.id===pid); return p?p.box:'?'; }))].join('+')+'の商品';
-            return `<div style="padding:8px 0;border-top:1px solid #f3f4f6">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                <span style="font-size:16px;font-weight:600">${s.name}</span>
-                <span style="font-size:18px;font-weight:700;color:${sProfit>=0?'#059669':'#ef4444'}">${sProfit>=0?'+':''}${fmt(sProfit)}</span>
-              </div>
-              <div style="font-size:16px;color:#6b7280">${recs.length}件販売 · 売上${fmt(sSales)} · ${lotsLabel}</div>
-            </div>`;
+            return recs.map((r,ri)=>{
+              const rFee=r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
+              const rProfit=(r.soldPrice||0)-(r.soldShip||0)-rFee-itemCost;
+              return `<div style="padding:8px 0;border-top:1px solid #f3f4f6">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+                  <span style="font-size:16px;font-weight:600">${s.name}${recs.length>1?' #'+(ri+1):''}</span>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:17px;font-weight:700;color:${rProfit>=0?'#059669':'#ef4444'}">${rProfit>=0?'+':''}${fmt(rProfit)}</span>
+                    <button onclick="openEditSetSaleRecord('${s.id}',${ri})" style="background:#f3f4f6;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:14px">✏️</button>
+                    <button onclick="deleteSetSaleRecord('${s.id}',${ri})" style="background:#fee2e2;border:none;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:14px">🗑️</button>
+                  </div>
+                </div>
+                <div style="font-size:15px;color:#6b7280">${r.soldDate||''} · 売上${fmt(r.soldPrice||0)} · ${lotsLabel}</div>
+              </div>`;
+            }).join('');
           }).join('')}
         </div>`;
       })()}
@@ -2913,6 +2915,21 @@ function renderModal() {
         </div>
       </div>`;
   }
+  if (S.showModal === 'editSetSaleRecord') {
+    const s = S.data.sets.find(x=>x.id===S.editSetSaleId);
+    if (!s) return '';
+    const rec = (s.soldRecords||[])[S.editSetSaleIdx];
+    if (!rec) return '';
+    return `
+      <div class="modal-bg" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+          <div class="modal-header"><h2>売上記録を編集</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
+          <div style="margin-bottom:12px"><label class="field-label">実売価格（円）</label><input id="essr-price" class="input" type="number" value="${rec.soldPrice||0}"></div>
+          <div style="margin-bottom:16px"><label class="field-label">送料（円）</label><input id="essr-ship" class="input" type="number" value="${rec.soldShip||0}"></div>
+          <button class="btn btn-primary btn-full" onclick="saveSetSaleRecord('${s.id}',${S.editSetSaleIdx})">保存する</button>
+        </div>
+      </div>`;
+  }
   if (S.showModal === 'editSet') {
     const s = S.data.sets.find(x=>x.id===S.setId);
     if (!s) return '';
@@ -3281,35 +3298,6 @@ function toggleHomeLot(lotId) {
   row.style.borderColor = isSelected ? '#e5e7eb' : '#7c3aed';
   row.style.background = isSelected ? '#fff' : '#f5f3ff';
   qtyWrap.style.display = isSelected ? 'none' : 'flex';
-  updateHomeSetProfit();
-}
-
-function updateHomeSetProfit() {
-  const price = parseInt(document.getElementById('hs-price')?.value) || 0;
-  if (!price) {
-    S.data.boxes.forEach(b => { const el = document.getElementById('hs-lot-profit-' + b.id); if (el) el.textContent = ''; });
-    return;
-  }
-  const net = price - Math.floor(price * 0.1);
-  const defCost = S.data.defaultCostPerItem ?? 484;
-  let totalCost = 0;
-  const lotCosts = {};
-  S.data.boxes.forEach(b => {
-    const row = document.getElementById('hs-lot-row-' + b.id);
-    if (!row || row.dataset.selected !== '1') return;
-    const qty = parseInt(document.getElementById('hs-lot-' + b.id)?.value) || 1;
-    const cph = b.cost > 0 && b.total > 0 ? Math.round(b.cost / b.total) : defCost;
-    lotCosts[b.id] = cph * qty;
-    totalCost += cph * qty;
-  });
-  S.data.boxes.forEach(b => {
-    const el = document.getElementById('hs-lot-profit-' + b.id);
-    if (!el) return;
-    if (!lotCosts[b.id]) { el.textContent = ''; return; }
-    const p = totalCost > 0 ? Math.round(net * lotCosts[b.id] / totalCost) - lotCosts[b.id] : 0;
-    el.textContent = (p >= 0 ? '+' : '') + p.toLocaleString() + '円';
-    el.style.color = p >= 0 ? '#059669' : '#ef4444';
-  });
 }
 
 function saveHomeSet() {
@@ -3362,6 +3350,37 @@ function saveSetEdit(setId) {
   } else {
     S.data.sets[idx] = {...s, name, price, memo};
   }
+  closeModal();
+  saveData();
+  render();
+}
+
+function deleteSetSaleRecord(setId, idx) {
+  if (!confirm('この売上記録を削除しますか？')) return;
+  S.data.sets = S.data.sets.map(s=>{
+    if (s.id!==setId) return s;
+    const recs = (s.soldRecords||[]).filter((_,i)=>i!==idx);
+    return {...s, soldRecords: recs, status: recs.length===0?'出品中':s.status};
+  });
+  saveData();
+  render();
+}
+
+function openEditSetSaleRecord(setId, idx) {
+  S.editSetSaleId = setId;
+  S.editSetSaleIdx = idx;
+  openModal('editSetSaleRecord');
+}
+
+function saveSetSaleRecord(setId, idx) {
+  const soldPrice = parseInt(document.getElementById('essr-price')?.value)||0;
+  const soldShip = parseInt(document.getElementById('essr-ship')?.value)||0;
+  const soldFee = Math.floor(soldPrice*0.1);
+  S.data.sets = S.data.sets.map(s=>{
+    if (s.id!==setId) return s;
+    const recs = (s.soldRecords||[]).map((r,i)=>i===idx?{...r,soldPrice,soldShip,soldFee}:r);
+    return {...s, soldRecords: recs};
+  });
   closeModal();
   saveData();
   render();
