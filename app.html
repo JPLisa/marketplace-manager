@@ -81,7 +81,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .stat-card .value{font-size:20px;font-weight:700;color:#111827}
 .stat-card .value.green{color:#059669}
 /* Badges */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:16px;font-weight:600;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:17px;font-weight:600;white-space:nowrap}
 .badge-green{background:#d1fae5;color:#047857}
 .badge-blue{background:#dbeafe;color:#1d4ed8}
 .badge-orange{background:#fed7aa;color:#c2410c}
@@ -110,7 +110,7 @@ textarea.input{resize:vertical;min-height:72px}
 /* Tabs */
 .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:6px 16px;font-size:16px;border-radius:20px;border:none;cursor:pointer;font-weight:500;white-space:nowrap;transition:all 0.15s}
+.tab{padding:6px 16px;font-size:17px;border-radius:20px;border:none;cursor:pointer;font-weight:500;white-space:nowrap;transition:all 0.15s}
 .tab.active{background:#059669;color:#fff}
 .tab:not(.active){background:#f3f4f6;color:#6b7280}
 /* List items */
@@ -1036,16 +1036,16 @@ function pageProducts() {
   const tabLabel = f2 => {
     if (f2==='all') return 'すべて';
     if (f2==='不良品') return '⚠️不良品';
-    if (cnt[f2]!=null) return `${f2}<span style="font-size:13px;opacity:0.75;margin-left:3px">(${cnt[f2]})</span>`;
+    if (cnt[f2]!=null) return `${f2}<span style="font-size:15px;opacity:0.75;margin-left:3px">(${cnt[f2]})</span>`;
     return f2;
   };
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
       <div class="page-title" style="margin-bottom:0">商品一覧</div>
       <div style="display:flex;gap:6px;align-items:center">
-        ${minDays ? `<button onclick="S.tab.productMinDays=0;render()" style="font-size:16px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🔴 ${minDaysLabel} ✕</button>` : ''}
-        <button onclick="S.createSetPrePids=[];openModal('createSet')" style="background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">📦 セット登録</button>
-        <button onclick="go('productReg')" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px 12px;font-size:16px;font-weight:600;cursor:pointer">＋ 商品登録</button>
+        ${minDays ? `<button onclick="S.tab.productMinDays=0;render()" style="font-size:17px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 10px;cursor:pointer">🔴 ${minDaysLabel} ✕</button>` : ''}
+        <button onclick="S.createSetPrePids=[];openModal('createSet')" style="background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:8px;padding:6px 12px;font-size:17px;font-weight:600;cursor:pointer">📦 セット登録</button>
+        <button onclick="go('productReg')" style="background:#f0fdf4;color:#059669;border:1px solid #6ee7b7;border-radius:8px;padding:6px 12px;font-size:17px;font-weight:600;cursor:pointer">＋ 商品登録</button>
       </div>
     </div>
     <div class="search-bar">${icon('search')}<input id="prod-search" placeholder="商品名・IDで検索" value="${S.tab.productSearch||''}" oninput="filterProductList(this.value)"></div>
@@ -1053,11 +1053,11 @@ function pageProducts() {
       ${['all','出品中','セット中','売卸済','保管中','キャンセル','不良品'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${tabLabel(f2)}</button>`).join('')}
     </div>
     ${f==='セット中'&&S.data.products.some(p=>p.status==='セット中')?`
-    <button onclick="S.createSetPrePids=S.data.products.filter(p=>p.status==='セット中').map(p=>p.id);openModal('createSet')" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #ddd6fe;border-radius:12px;background:#f5f3ff;color:#7c3aed;font-size:16px;font-weight:600;cursor:pointer">
+    <button onclick="S.createSetPrePids=S.data.products.filter(p=>p.status==='セット中').map(p=>p.id);openModal('createSet')" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #ddd6fe;border-radius:12px;background:#f5f3ff;color:#7c3aed;font-size:17px;font-weight:600;cursor:pointer">
       📦 セット中の商品をセット登録する（${S.data.products.filter(p=>p.status==='セット中').length}点）
     </button>`:''}
     ${f==='キャンセル'&&S.data.products.some(p=>p.status==='キャンセル')?`
-    <button onclick="deleteAllCancelled()" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:16px;font-weight:600;cursor:pointer">
+    <button onclick="deleteAllCancelled()" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #fee2e2;border-radius:12px;background:white;color:#ef4444;font-size:17px;font-weight:600;cursor:pointer">
       🗑 キャンセル済みをすべて削除（${S.data.products.filter(p=>p.status==='キャンセル').length}件）
     </button>`:''}
     <div id="product-list">
@@ -1065,12 +1065,12 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:16px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:16px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:16px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:16px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:17px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:17px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:17px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-            <div style="text-align:right">${badge(p.status)}<div style="font-size:16px;font-weight:700">${fmt(p.price)}</div></div>
+            <div style="text-align:right">${badge(p.status)}<div style="font-size:17px;font-weight:700">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
-              ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer;font-weight:600">売れた！</button>`:''}
-              <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer">🗑</button>
+              ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:17px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+              <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:17px;cursor:pointer">🗑</button>
             </div>
           </div>
         </div>
