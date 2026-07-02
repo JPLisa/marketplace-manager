@@ -1281,7 +1281,7 @@ function confirmQuickSale() {
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
   const pid    = S.selPid;
-  const soldDate = today();
+  const soldDate = getDateFromSelects('qs-date') || today();
   const prod   = S.data.products.find(p=>p.id===pid);
   const lotId  = prod?.box;
   const daysToSell = (()=>{
@@ -2735,6 +2735,10 @@ function renderModal() {
         <div id="qs-ship-other-wrap" style="display:none;margin-bottom:10px">
           <label class="field-label">送料を入力（円）</label>
           <input id="qs-ship-other" class="input" type="number" min="0" placeholder="例: 350" oninput="updateQuickSalePreview()">
+        </div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">売却日</label>
+          ${dateSelects('qs-date', today())}
         </div>
         <div id="qs-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:16px;display:none"></div>
         <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="confirmQuickSale()">✓ 売上を登録する</button>
