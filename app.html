@@ -1747,27 +1747,6 @@ function pageSetDetail() {
         ${s.ship?`<div><span style="color:#9ca3af">発送: </span>${s.ship}</div>`:''}
       </div>
     </div>
-    ${isLotType?`
-    <div class="card"><div class="card-title">セット内容</div>
-      ${(s.lotComponents||[]).map(c=>{
-        const lot=S.data.boxes.find(x=>x.id===c.lotId);
-        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
-          <span style="font-size:16px;font-weight:600">ロット${c.lotId}</span>
-          <span style="font-size:17px;color:#6b7280">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
-          <span style="font-size:16px;font-weight:700;color:#374151">${cph?fmt(c.qty*cph):'―'}</span>
-        </div>`;
-      }).join('')}
-      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:16px">
-        <span>合計原価</span><span style="color:#374151">${fmt((s.lotComponents||[]).reduce((a,c)=>{const lot=S.data.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;return a+c.qty*cph;},0))}</span>
-      </div>
-    </div>`:`
-    <div class="card"><div class="card-title">セット内容（${prods.length}点）</div>
-      ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.box}ロット</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
-    </div>`}
-    ${(s.notes||s.memo)?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
-      <div style="font-size:16px;color:#374151;white-space:pre-line">${s.notes||s.memo}</div>
-    </div>`:'' }
     ${S.tab.editSet?`
     <div class="card" style="margin-bottom:12px;border:2px solid #3b82f6">
       <div style="font-size:16px;font-weight:700;color:#3b82f6;margin-bottom:12px">✏️ セットを編集</div>
@@ -1797,6 +1776,27 @@ function pageSetDetail() {
         <button class="btn btn-secondary" style="flex:1" onclick="S.tab.editSet=false;render()">キャンセル</button>
       </div>
     </div>`:''}
+    ${isLotType?`
+    <div class="card"><div class="card-title">セット内容</div>
+      ${(s.lotComponents||[]).map(c=>{
+        const lot=S.data.boxes.find(x=>x.id===c.lotId);
+        const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6">
+          <span style="font-size:16px;font-weight:600">ロット${c.lotId}</span>
+          <span style="font-size:17px;color:#6b7280">${c.qty}点 × ${cph?fmt(cph):'―'}/点</span>
+          <span style="font-size:16px;font-weight:700;color:#374151">${cph?fmt(c.qty*cph):'―'}</span>
+        </div>`;
+      }).join('')}
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-weight:700;font-size:16px">
+        <span>合計原価</span><span style="color:#374151">${fmt((s.lotComponents||[]).reduce((a,c)=>{const lot=S.data.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):0;return a+c.qty*cph;},0))}</span>
+      </div>
+    </div>`:`
+    <div class="card"><div class="card-title">セット内容（${prods.length}点）</div>
+      ${prods.map(p=>`<div class="list-item"><div class="emoji">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="sub">${p.box}ロット</div></div><span style="font-weight:700">${fmt(p.price)}</span></div>`).join('')}
+    </div>`}
+    ${(s.notes||s.memo)?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
+      <div style="font-size:16px;color:#374151;white-space:pre-line">${s.notes||s.memo}</div>
+    </div>`:'' }
     ${(()=>{
       const soldRecs = s.soldRecords||[];
       const soldQty = soldRecs.length;
