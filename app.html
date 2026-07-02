@@ -1065,12 +1065,12 @@ function pageProducts() {
       <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:17px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:17px;color:#9ca3af">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:17px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:20px;line-height:1.3">${p.name}${p.defective?'<span style="margin-left:6px;background:#fee2e2;color:#dc2626;font-size:16px;font-weight:700;padding:2px 7px;border-radius:99px;vertical-align:middle">⚠️ 不良品</span>':''}</div><div style="font-size:17px;color:#6b7280;margin-top:2px">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#374151;margin-top:2px">${p.memo}</div>`:''}${p.defective&&p.defectMemo?`<div style="font-size:17px;color:#dc2626;margin-top:2px">不具合: ${p.defectMemo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-            <div style="text-align:right">${badge(p.status)}<div style="font-size:17px;font-weight:700">${fmt(p.price)}</div></div>
+            <div style="text-align:right">${badge(p.status)}<div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(p.price)}</div></div>
             <div style="display:flex;gap:4px">
-              ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:4px 10px;font-size:17px;cursor:pointer;font-weight:600">売れた！</button>`:''}
-              <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:17px;cursor:pointer">🗑</button>
+              ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:5px 12px;font-size:17px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+              <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:5px 12px;font-size:17px;cursor:pointer">🗑</button>
             </div>
           </div>
         </div>
