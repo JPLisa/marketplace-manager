@@ -559,7 +559,7 @@ function pageDashboard() {
             const compsLabel = s.type==='lot'
               ? (s.lotComponents||[]).map(c=>'ロット'+c.lotId+'×'+c.qty).join('＋')
               : 'セット中('+(s.pids||[]).length+'点)';
-            return `<div class="card" style="padding:12px">
+            return `<div class="card" style="padding:12px;cursor:pointer" onclick="S.setId='${s.id}';go('setDetail')">
               <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${s.name}</div>
               <div style="font-size:12px;color:#9ca3af;margin-bottom:6px">${compsLabel}</div>
               <div style="font-size:15px;font-weight:700;color:#7c3aed;margin-bottom:6px">${fmt(s.price)}</div>
