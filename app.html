@@ -1735,6 +1735,7 @@ function pageSetDetail() {
     <div class="flex-row" style="margin-bottom:16px">
       <button class="icon-btn" onclick="go('sets')">${icon('back')}</button>
       <div class="page-title" style="margin-bottom:0">セット詳細</div>
+      <button onclick="S.tab.editSet=!S.tab.editSet;render()" style="margin-left:auto;background:#f3f4f6;border:none;border-radius:8px;padding:6px 14px;font-size:16px;font-weight:600;cursor:pointer;color:#374151">✏️ 編集</button>
     </div>
     <div class="card">
       <div class="flex-between" style="margin-bottom:8px"><div><div style="font-size:17px;color:#6b7280">${s.id}</div><div style="font-weight:700;font-size:16px">${s.name}</div></div>${badge(s.status)}</div>
@@ -1767,6 +1768,35 @@ function pageSetDetail() {
     ${(s.notes||s.memo)?`<div class="card" style="background:#fffbeb;border:1px solid #fde68a">
       <div style="font-size:16px;color:#374151;white-space:pre-line">${s.notes||s.memo}</div>
     </div>`:'' }
+    ${S.tab.editSet?`
+    <div class="card" style="margin-bottom:12px;border:2px solid #3b82f6">
+      <div style="font-size:16px;font-weight:700;color:#3b82f6;margin-bottom:12px">✏️ セットを編集</div>
+      <div style="margin-bottom:10px"><label class="field-label">セット名</label><input id="se-name" class="input" value="${s.name||''}"></div>
+      <div style="margin-bottom:10px"><label class="field-label">販売価格（円）</label><input id="se-price" class="input" type="number" value="${s.price||''}"></div>
+      ${isLotType?`
+      <div style="margin-bottom:10px">
+        <label class="field-label">ロット構成</label>
+        ${S.data.boxes.map(b=>{
+          const existing = (s.lotComponents||[]).find(c=>c.lotId===b.id);
+          const isChecked = !!existing;
+          return `<div id="se-lot-row-${b.id}" data-selected="${isChecked?'1':'0'}" onclick="(function(){const row=document.getElementById('se-lot-row-${b.id}');const wrap=document.getElementById('se-lot-qty-${b.id}');const sel=row.dataset.selected==='1';row.dataset.selected=sel?'0':'1';row.style.borderColor=sel?'#e5e7eb':'#7c3aed';row.style.background=sel?'#fff':'#f5f3ff';wrap.style.display=sel?'none':'flex';})()" style="padding:10px 12px;border:2px solid ${isChecked?'#7c3aed':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${isChecked?'#f5f3ff':'#fff'};margin-bottom:6px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:16px;font-weight:700">ロット${b.id}</span>
+            </div>
+            <div id="se-lot-qty-${b.id}" style="display:${isChecked?'flex':'none'};margin-top:8px;align-items:center;gap:8px" onclick="event.stopPropagation()">
+              <span style="font-size:15px;color:#6b7280">点数</span>
+              <input id="se-lot-${b.id}" class="input" type="number" min="0" value="${existing?existing.qty:0}" style="width:70px;text-align:center">
+              <span style="font-size:15px;color:#6b7280">点</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+      <div style="margin-bottom:12px"><label class="field-label">メモ</label><textarea id="se-memo" class="input">${s.memo||s.notes||''}</textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveSetEdit('${s.id}')">保存する</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="S.tab.editSet=false;render()">キャンセル</button>
+      </div>
+    </div>`:''}
     ${(()=>{
       const soldRecs = s.soldRecords||[];
       const soldQty = soldRecs.length;
@@ -3295,6 +3325,30 @@ function saveHomeSet() {
   const newId = 'S' + (Math.max(29, ...usedNums) + 1);
   S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate, soldRecords:[], memo:''});
   S.tab.homeSetOpen = false;
+  saveData();
+  render();
+}
+
+function saveSetEdit(setId) {
+  const idx = S.data.sets.findIndex(s=>s.id===setId);
+  if (idx < 0) return;
+  const s = S.data.sets[idx];
+  const name = document.getElementById('se-name')?.value?.trim();
+  if (!name) { alert('セット名を入力してください'); return; }
+  const price = parseInt(document.getElementById('se-price')?.value) || 0;
+  if (!price) { alert('販売価格を入力してください'); return; }
+  const memo = document.getElementById('se-memo')?.value?.trim() || '';
+  if (s.type === 'lot') {
+    const lotComponents = (S.data.boxes||[]).filter(b=>{
+      const row = document.getElementById('se-lot-row-' + b.id);
+      return row && row.dataset.selected === '1';
+    }).map(b=>({lotId: b.id, qty: parseInt(document.getElementById('se-lot-' + b.id)?.value)||1}));
+    if (lotComponents.length === 0) { alert('ロットを選択してください'); return; }
+    S.data.sets[idx] = {...s, name, price, lotComponents, memo};
+  } else {
+    S.data.sets[idx] = {...s, name, price, memo};
+  }
+  S.tab.editSet = false;
   saveData();
   render();
 }
