@@ -547,6 +547,7 @@ function pageDashboard() {
                 </div>
               </div>`).join('')}
           </div>
+          <div style="margin-bottom:12px"><label class="field-label">登録日</label>${dateSelects('hs-date', today())}</div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-primary" style="flex:1" onclick="saveHomeSet()">登録する</button>
             <button class="btn btn-secondary" style="flex:1" onclick="S.tab.homeSetOpen=false;render()">キャンセル</button>
@@ -3284,10 +3285,11 @@ function saveHomeSet() {
     return row && row.dataset.selected === '1';
   }).map(b => ({lotId: b.id, qty: parseInt(document.getElementById('hs-lot-' + b.id)?.value) || 1}));
   if (lotComponents.length === 0) { alert('ロットを選択してください'); return; }
+  const registeredDate = getDateFromSelects('hs-date') || today();
   if (!S.data.sets) S.data.sets = [];
   const usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
   const newId = 'S' + (Math.max(29, ...usedNums) + 1);
-  S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate:today(), soldRecords:[], memo:''});
+  S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate, soldRecords:[], memo:''});
   S.tab.homeSetOpen = false;
   saveData();
   render();
