@@ -523,8 +523,35 @@ function pageDashboard() {
       return `<div style="margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="font-size:16px;font-weight:700;color:#111827">📦 セット管理</div>
-          ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="openModal('createLotSet')">${icon('plus',16)} セット登録</button>`:''}
+          ${canDo('lots')?`<button class="btn btn-primary btn-sm" onclick="S.tab.homeSetOpen=!S.tab.homeSetOpen;render()">${icon('plus',16)} セット登録</button>`:''}
         </div>
+        ${S.tab.homeSetOpen?`
+        <div class="card" style="margin-bottom:10px;border:2px solid #7c3aed">
+          <div style="font-size:16px;font-weight:700;color:#7c3aed;margin-bottom:12px">セット登録</div>
+          <div style="margin-bottom:10px"><label class="field-label">セット名</label><input id="hs-name" class="input" placeholder="例: サンリオ3点セット"></div>
+          <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="hs-price" class="input" type="number" placeholder="例: 3000" oninput="updateHomeSetProfit()"></div>
+          <div style="margin-bottom:12px">
+            <label class="field-label">使用するロット（タップで選択）</label>
+            ${d.boxes.length===0?'<div style="color:#9ca3af;font-size:15px;padding:8px">ロットがありません</div>':d.boxes.map(b=>`
+              <div id="hs-lot-row-${b.id}" data-selected="0" onclick="toggleHomeLot('${b.id}')" style="padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;background:#fff;margin-bottom:6px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:16px;font-weight:700">ロット${b.id}</span>
+                  <span id="hs-lot-profit-${b.id}" style="font-size:15px;font-weight:700"></span>
+                </div>
+                <div id="hs-lot-qty-${b.id}" style="display:none;margin-top:8px" onclick="event.stopPropagation()">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:15px;color:#6b7280">点数</span>
+                    <input id="hs-lot-${b.id}" class="input" type="number" min="1" value="1" style="width:70px;text-align:center" oninput="updateHomeSetProfit()">
+                    <span style="font-size:15px;color:#6b7280">点</span>
+                  </div>
+                </div>
+              </div>`).join('')}
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" style="flex:1" onclick="saveHomeSet()">登録する</button>
+            <button class="btn btn-secondary" style="flex:1" onclick="S.tab.homeSetOpen=false;render()">キャンセル</button>
+          </div>
+        </div>`:''}
         ${activeSetsAll.length===0?`<div class="card" style="text-align:center;padding:14px;color:#9ca3af;font-size:15px">出品中のセットがありません</div>`:`
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           ${activeSetsAll.map(s=>{
@@ -3208,6 +3235,61 @@ function saveSet() {
   S.data.products = S.data.products.map(p=>pids.includes(p.id)?{...p,status:'セット中'}:p);
   saveData();
   closeModal();
+}
+
+function toggleHomeLot(lotId) {
+  const row = document.getElementById('hs-lot-row-' + lotId);
+  const qtyWrap = document.getElementById('hs-lot-qty-' + lotId);
+  if (!row) return;
+  const isSelected = row.dataset.selected === '1';
+  row.dataset.selected = isSelected ? '0' : '1';
+  row.style.borderColor = isSelected ? '#e5e7eb' : '#7c3aed';
+  row.style.background = isSelected ? '#fff' : '#f5f3ff';
+  qtyWrap.style.display = isSelected ? 'none' : 'flex';
+  updateHomeSetProfit();
+}
+
+function updateHomeSetProfit() {
+  const price = parseInt(document.getElementById('hs-price')?.value) || 0;
+  const net = price - Math.floor(price * 0.1);
+  const defCost = S.data.defaultCostPerItem ?? 484;
+  let totalCost = 0;
+  const lotCosts = {};
+  S.data.boxes.forEach(b => {
+    const row = document.getElementById('hs-lot-row-' + b.id);
+    if (!row || row.dataset.selected !== '1') return;
+    const qty = parseInt(document.getElementById('hs-lot-' + b.id)?.value) || 1;
+    const cph = b.cost > 0 && b.total > 0 ? Math.round(b.cost / b.total) : defCost;
+    lotCosts[b.id] = cph * qty;
+    totalCost += cph * qty;
+  });
+  S.data.boxes.forEach(b => {
+    const el = document.getElementById('hs-lot-profit-' + b.id);
+    if (!el) return;
+    if (!lotCosts[b.id]) { el.textContent = ''; return; }
+    const p = totalCost > 0 ? Math.round(net * lotCosts[b.id] / totalCost) - lotCosts[b.id] : 0;
+    el.textContent = (p >= 0 ? '+' : '') + p.toLocaleString() + '円';
+    el.style.color = p >= 0 ? '#059669' : '#ef4444';
+  });
+}
+
+function saveHomeSet() {
+  const name = document.getElementById('hs-name')?.value?.trim();
+  if (!name) { alert('セット名を入力してください'); return; }
+  const price = parseInt(document.getElementById('hs-price')?.value) || 0;
+  if (!price) { alert('販売価格を入力してください'); return; }
+  const lotComponents = S.data.boxes.filter(b => {
+    const row = document.getElementById('hs-lot-row-' + b.id);
+    return row && row.dataset.selected === '1';
+  }).map(b => ({lotId: b.id, qty: parseInt(document.getElementById('hs-lot-' + b.id)?.value) || 1}));
+  if (lotComponents.length === 0) { alert('ロットを選択してください'); return; }
+  if (!S.data.sets) S.data.sets = [];
+  const usedNums = S.data.sets.map(s=>{const m=s.id.match(/^S(\d+)$/);return m?parseInt(m[1]):0;});
+  const newId = 'S' + (Math.max(29, ...usedNums) + 1);
+  S.data.sets.unshift({id:newId, name, type:'lot', lotComponents, price, status:'出品中', registeredDate:today(), soldRecords:[], memo:''});
+  S.tab.homeSetOpen = false;
+  saveData();
+  render();
 }
 
 function saveLotSet() {
