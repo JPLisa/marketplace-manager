@@ -2919,28 +2919,27 @@ function renderModal() {
     const s = S.data.sets.find(x=>x.id===S.setId);
     if (!s) return '';
     const isLot = s.type==='lot';
+    const lotRows = isLot ? S.data.boxes.map(b=>{
+      const ex=(s.lotComponents||[]).find(c=>c.lotId===b.id);
+      const chk=!!ex;
+      return `<div style="margin-bottom:6px">
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px solid ${chk?'#7c3aed':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${chk?'#f5f3ff':'#fff'}" id="se-row-${b.id}" onclick="(function(){const cb=document.getElementById('se-cb-${b.id}');cb.checked=!cb.checked;const row=document.getElementById('se-row-${b.id}');const wrap=document.getElementById('se-qty-${b.id}');row.style.borderColor=cb.checked?'#7c3aed':'#e5e7eb';row.style.background=cb.checked?'#f5f3ff':'#fff';wrap.style.display=cb.checked?'flex':'none';})()">
+          <input type="checkbox" id="se-cb-${b.id}" ${chk?'checked':''} style="accent-color:#7c3aed;width:18px;height:18px" onclick="event.stopPropagation()">
+          <span style="font-size:16px;font-weight:600;flex:1">ロット${b.id}</span>
+          <div id="se-qty-${b.id}" style="display:${chk?'flex':'none'};align-items:center;gap:6px" onclick="event.stopPropagation()">
+            <input id="se-lot-${b.id}" class="input" type="number" min="0" value="${ex?ex.qty:1}" style="width:60px;text-align:center;padding:4px 8px">
+            <span style="font-size:15px;color:#9ca3af">点</span>
+          </div>
+        </label>
+      </div>`;
+    }).join('') : '';
     return `
       <div class="modal-bg" onclick="closeModal()">
-        <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto">
+        <div class="modal" onclick="event.stopPropagation()">
           <div class="modal-header"><h2>セットを編集</h2><button class="icon-btn" onclick="closeModal()">${icon('x')}</button></div>
           <div style="margin-bottom:12px"><label class="field-label">セット名</label><input id="se-name" class="input" value="${s.name||''}"></div>
           <div style="margin-bottom:12px"><label class="field-label">販売価格（円）</label><input id="se-price" class="input" type="number" value="${s.price||''}"></div>
-          ${isLot?`
-          <div style="margin-bottom:12px">
-            <label class="field-label">ロット構成</label>
-            ${S.data.boxes.map(b=>{
-              const ex=(s.lotComponents||[]).find(c=>c.lotId===b.id);
-              const chk=!!ex;
-              return `<div id="se-lot-row-${b.id}" data-selected="${chk?'1':'0'}" onclick="toggleSeEditLot('${b.id}')" style="padding:10px 12px;border:2px solid ${chk?'#7c3aed':'#e5e7eb'};border-radius:10px;cursor:pointer;background:${chk?'#f5f3ff':'#fff'};margin-bottom:6px">
-                <div style="font-size:16px;font-weight:700">ロット${b.id}</div>
-                <div id="se-lot-qty-${b.id}" style="display:${chk?'flex':'none'};margin-top:8px;align-items:center;gap:8px" onclick="event.stopPropagation()">
-                  <span style="font-size:15px;color:#6b7280">点数</span>
-                  <input id="se-lot-${b.id}" class="input" type="number" min="0" value="${ex?ex.qty:0}" style="width:70px;text-align:center">
-                  <span style="font-size:15px;color:#6b7280">点</span>
-                </div>
-              </div>`;
-            }).join('')}
-          </div>`:''}
+          ${isLot?`<div style="margin-bottom:12px"><label class="field-label">ロット構成</label>${lotRows}</div>`:''}
           <div style="margin-bottom:16px"><label class="field-label">メモ</label><textarea id="se-memo" class="input">${s.memo||s.notes||''}</textarea></div>
           <button class="btn btn-primary btn-full" onclick="saveSetEdit('${s.id}')">保存する</button>
         </div>
@@ -3357,8 +3356,8 @@ function saveSetEdit(setId) {
   const memo = document.getElementById('se-memo')?.value?.trim() || '';
   if (s.type === 'lot') {
     const lotComponents = (S.data.boxes||[]).filter(b=>{
-      const row = document.getElementById('se-lot-row-' + b.id);
-      return row && row.dataset.selected === '1';
+      const cb = document.getElementById('se-cb-' + b.id);
+      return cb && cb.checked;
     }).map(b=>({lotId: b.id, qty: parseInt(document.getElementById('se-lot-' + b.id)?.value)||1}));
     if (lotComponents.length === 0) { alert('ロットを選択してください'); return; }
     S.data.sets[idx] = {...s, name, price, lotComponents, memo};
