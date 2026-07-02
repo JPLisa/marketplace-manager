@@ -3253,6 +3253,10 @@ function toggleHomeLot(lotId) {
 
 function updateHomeSetProfit() {
   const price = parseInt(document.getElementById('hs-price')?.value) || 0;
+  if (!price) {
+    S.data.boxes.forEach(b => { const el = document.getElementById('hs-lot-profit-' + b.id); if (el) el.textContent = ''; });
+    return;
+  }
   const net = price - Math.floor(price * 0.1);
   const defCost = S.data.defaultCostPerItem ?? 484;
   let totalCost = 0;
