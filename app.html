@@ -1997,8 +1997,7 @@ function pageAnalytics() {
           },0);
           const bProfit2 = bSoldP.reduce((a,p)=>{
             const fee=p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1);
-            const cost=b.cost>0&&b.total>0?Math.round(b.cost/b.total):(d.defaultCostPerItem??484);
-            return a+(p.soldPrice||0)-(p.soldShip||0)-fee-cost;
+            return a+(p.soldPrice||0)-(p.soldShip||0)-fee-(d.defaultCostPerItem??484);
           },0) + bLotSetContrib2;
           const bRecoverPct = bInvest2>0?Math.min(100,Math.max(0,Math.round((bInvest2+bProfit2)/bInvest2*100))):100;
           const isComplete2 = bListing2===0&&bStored2===0&&bInSet2===0&&bSoldP.length>0;
@@ -2301,8 +2300,7 @@ function pageAnalytics() {
         const bSales = bSoldProds.reduce((a,p)=>a+(p.soldPrice||0),0);
         const bProfit = bSoldProds.reduce((a,p)=>{
           const fee=p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1);
-          const cost=p.soldCost??defCostB;
-          return a+(p.soldPrice||0)-(p.soldShip||0)-fee-cost;
+          return a+(p.soldPrice||0)-(p.soldShip||0)-fee-defCostB;
         },0);
         const bRecoverPct = bInvest>0?Math.min(100,Math.max(0,Math.round((bInvest+bProfit)/bInvest*100))):100;
         const bAchieved = bInvest===0?bProfit>=0:bRecoverPct>=100;
