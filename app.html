@@ -2004,18 +2004,18 @@ function pageAnalytics() {
           const isComplete2 = bListing2===0&&bStored2===0&&bInSet2===0&&bSoldP.length>0;
           const stateLabel = isComplete2?'完了':'販売中';
           const stateColor = isComplete2?'#059669':'#3b82f6';
-          return `<div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6;gap:8px" onclick="S.tab.analytics='boxes';render()" style="cursor:pointer">
-            <div style="font-size:17px;font-weight:800;color:#111827;min-width:52px">ロット${b.id}</div>
+          return `<div style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #f3f4f6;gap:10px" onclick="S.tab.analytics='boxes';render()" style="cursor:pointer">
+            <div style="font-size:19px;font-weight:800;color:#111827;min-width:58px">ロット${b.id}</div>
             <div style="flex:1">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
-                <span style="font-size:18px;font-weight:700;color:${bProfit2>=0?'#059669':'#ef4444'}">利益：${bProfit2>=0?'+':''}${fmt(bProfit2)}</span>
-                <span style="font-size:18px;background:${stateColor}1a;color:${stateColor};border-radius:4px;padding:2px 8px;font-weight:600">${stateLabel}</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:20px;font-weight:700;color:${bProfit2>=0?'#059669':'#ef4444'}">利益：${bProfit2>=0?'+':''}${fmt(bProfit2)}</span>
+                <span style="font-size:17px;background:${stateColor}1a;color:${stateColor};border-radius:4px;padding:2px 8px;font-weight:600">${stateLabel}</span>
               </div>
               <div style="display:flex;align-items:center;gap:6px">
-                <div style="flex:1;background:#f3f4f6;border-radius:99px;height:4px;overflow:hidden">
+                <div style="flex:1;background:#f3f4f6;border-radius:99px;height:5px;overflow:hidden">
                   <div style="background:${bRecoverPct>=100?'#059669':'#3b82f6'};height:100%;width:${bRecoverPct}%;border-radius:99px"></div>
                 </div>
-                <span style="font-size:16px;color:#6b7280;white-space:nowrap">回収率 ${bRecoverPct}%</span>
+                <span style="font-size:17px;color:#374151;white-space:nowrap">回収率 ${bRecoverPct}%</span>
               </div>
             </div>
           </div>`;
@@ -2042,18 +2042,18 @@ function pageAnalytics() {
           <div class="card-title">損益分岐点${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
           <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:17px;color:#374151">未回収投資額</span>
-              <span style="font-size:20px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
+              <span style="font-size:18px;color:#374151">未回収投資額</span>
+              <span style="font-size:22px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
             </div>
             <div style="font-size:16px;color:#6b7280;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:17px;color:#374151">利益累計</span>
-              <span style="font-size:20px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
+              <span style="font-size:18px;color:#374151">利益累計</span>
+              <span style="font-size:22px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
             </div>
             <div style="font-size:16px;color:#6b7280;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
             <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:17px;font-weight:600;color:#374151">現在の損益</span>
-              <span style="font-size:22px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
+              <span style="font-size:18px;font-weight:600;color:#374151">現在の損益</span>
+              <span style="font-size:26px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
             </div>
           </div>
           ${totalInvest===0?'<div style="text-align:center;color:#9ca3af;font-size:18px;padding:8px">ロットを登録すると表示されます</div>':achieved?`
@@ -2064,15 +2064,15 @@ function pageAnalytics() {
           </div>`:`
           <div style="background:#fff1f2;border-radius:10px;padding:14px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:16px;color:#6b7280">損益分岐まで</span>
-              <span style="font-size:20px;font-weight:700;color:#ef4444">あと${remaining}個</span>
+              <span style="font-size:18px;color:#374151">損益分岐まで</span>
+              <span style="font-size:24px;font-weight:700;color:#ef4444">あと${remaining}個</span>
             </div>
             <div style="background:#fecaca;border-radius:6px;height:8px;overflow:hidden">
               <div style="background:#ef4444;height:100%;width:${recoverPct}%;border-radius:6px;transition:width 0.3s"></div>
             </div>
             <div style="display:flex;justify-content:space-between;margin-top:4px">
-              <span style="font-size:16px;color:#6b7280">回収率 ${recoverPct}%</span>
-              <span style="font-size:16px;color:#6b7280">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
+              <span style="font-size:17px;color:#374151">回収率 ${recoverPct}%</span>
+              <span style="font-size:17px;color:#374151">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
             </div>
           </div>`}
         </div>`;
