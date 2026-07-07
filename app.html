@@ -2317,13 +2317,11 @@ function pageAnalytics() {
         },0);
         const bRemaining = bProfit<0&&bSoldProds.length>0?Math.ceil(-bProfit/(bGrossSaleProfit/bSoldProds.length)):0;
         const bListingProds = bAllProds.filter(p=>p.status==='出品中');
-        const bCostPerItem = b.cost>0&&b.total>0 ? Math.round(b.cost/b.total) : defCostB;
-        const bSoldWithShip = bSoldProds.filter(p=>(p.soldShip||0)>0);
-        const bAvgShip = bSoldWithShip.length>0 ? Math.round(bSoldWithShip.reduce((a,p)=>a+(p.soldShip||0),0)/bSoldWithShip.length) : 500;
+        const bSimShip = parseInt(S.tab.simShipOut||0)||500;
         const bProjAddSales = bListingProds.reduce((a,p)=>a+(p.price||0), 0);
         const bProjAddProfit = bListingProds.reduce((a,p)=>{
           const fee=Math.floor((p.price||0)*0.1);
-          return a+(p.price||0)-fee-bAvgShip-bCostPerItem;
+          return a+(p.price||0)-fee-bSimShip-defCostB;
         },0);
         const bTotalProjSales = bSales + bProjAddSales;
         const bTotalProjProfit = bProfit + bProjAddProfit;
@@ -2389,7 +2387,7 @@ function pageAnalytics() {
           </div>
           ${bListingProds.length>0?`
           <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:6px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">【全販売時（概算）】</div>
-          <div style="font-size:17px;color:#6b7280;margin-bottom:8px">出品中 ${bListingProds.length}点が現在価格で全て売れた場合（送料平均${fmt(bAvgShip)}円）</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:8px">出品中 ${bListingProds.length}点が現在価格で全て売れた場合（送料${fmt(bSimShip)}円・原価¥484）</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
             <div style="background:#eff6ff;border-radius:8px;padding:8px">
               <div style="color:#374151;font-size:18px;margin-bottom:3px">予想売上合計</div>
