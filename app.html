@@ -3580,6 +3580,9 @@ function exportCSV() {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
+// Select all on focus for number inputs so typing replaces existing value
+document.addEventListener('focusin', e => { if (e.target.type === 'number') e.target.select(); });
+
 // Close more menu when clicking outside
 document.addEventListener('click', e => {
   if (S.showMore && !e.target.closest('#more-menu') && !e.target.closest('.bnav-btn')) {
