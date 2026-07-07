@@ -2387,17 +2387,15 @@ function pageAnalytics() {
           </div>
           ${bListingProds.length>0?`
           <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:6px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">【全販売時（概算）】</div>
-          <div style="font-size:17px;color:#6b7280;margin-bottom:8px">出品中 ${bListingProds.length}点が現在価格で全て売れた場合（送料${fmt(bSimShip)}円・原価¥484）</div>
+          <div style="font-size:17px;color:#6b7280;margin-bottom:8px">出品中 ${bListingProds.length}点 × 登録価格（手数料10%・送料${fmt(bSimShip)}・原価¥484）</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
             <div style="background:#eff6ff;border-radius:8px;padding:8px">
-              <div style="color:#374151;font-size:18px;margin-bottom:3px">予想売上合計</div>
-              <div style="font-weight:700;color:#3b82f6;font-size:20px">${fmt(bTotalProjSales)}</div>
-              <div style="font-size:17px;color:#6b7280">現在${fmt(bSales)} ＋ 残${fmt(bProjAddSales)}</div>
+              <div style="color:#374151;font-size:18px;margin-bottom:3px">予想売上</div>
+              <div style="font-weight:700;color:#3b82f6;font-size:20px">${fmt(bProjAddSales)}</div>
             </div>
-            <div style="background:${bTotalProjProfit>=0?'#f0fdf4':'#fff1f2'};border-radius:8px;padding:8px">
-              <div style="color:#374151;font-size:18px;margin-bottom:3px">予想利益合計</div>
-              <div style="font-weight:700;color:${bTotalProjProfit>=0?'#059669':'#ef4444'};font-size:20px">${bTotalProjProfit>=0?'+':''}${fmt(bTotalProjProfit)}</div>
-              <div style="font-size:17px;color:#6b7280">現在${bProfit>=0?'+':''}${fmt(bProfit)} ＋ 残${bProjAddProfit>=0?'+':''}${fmt(bProjAddProfit)}</div>
+            <div style="background:${bProjAddProfit>=0?'#f0fdf4':'#fff1f2'};border-radius:8px;padding:8px">
+              <div style="color:#374151;font-size:18px;margin-bottom:3px">予想利益</div>
+              <div style="font-weight:700;color:${bProjAddProfit>=0?'#059669':'#ef4444'};font-size:20px">${bProjAddProfit>=0?'+':''}${fmt(bProjAddProfit)}</div>
             </div>
           </div>`:''}
           <div style="font-size:17px;font-weight:700;color:#374151;margin-bottom:6px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">【分析】</div>
