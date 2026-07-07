@@ -1568,6 +1568,7 @@ function pageProductReg() {
     return `
     <div class="page-title">商品登録</div>
     <div class="card">
+      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
         <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
@@ -1584,7 +1585,6 @@ function pageProductReg() {
         </select>
         ${lotPreviewBlock}
       </div>
-      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:10px">
         <label class="field-label">不良品・不具合</label>
         <label id="reg-defect-label" style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;background:#fff">
@@ -1601,6 +1601,7 @@ function pageProductReg() {
   return `
     <div class="page-title">商品登録</div>
     <div class="card">
+      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
         <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
@@ -1614,7 +1615,6 @@ function pageProductReg() {
         </select>
         ${lotPreviewBlock}
       </div>
-      <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
       <div style="margin-bottom:12px"><label class="field-label">LINEアルバムURL</label><input id="reg-album" class="input" placeholder="https://line.me/..."></div>
       <div style="margin-bottom:10px">
         <label class="field-label">不良品・不具合</label>
