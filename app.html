@@ -420,7 +420,7 @@ function renderTopBar() {
 }
 
 function renderBottomNav() {
-  const ownerTabs = [{id:'home',ico:'home',label:'ホーム'},{id:'products',ico:'tag',label:'商品'},{id:'analytics',ico:'chart',label:'分析'},{id:'_more',ico:'cog',label:'その他'}];
+  const ownerTabs = [{id:'home',ico:'home',label:'ホーム'},{id:'products',ico:'tag',label:'商品'},{id:'analytics',ico:'chart',label:'分析'},{id:'_more',ico:'cog',label:'ペット用品','その他'}];
   return `<nav class="bottom-nav">
     ${ownerTabs.map(t=>`
       <button class="bnav-btn ${S.page===t.id?'active':''}" onclick="${t.id==='_more'?'toggleMore()':'go(\''+t.id+'\')'}">
@@ -1176,7 +1176,7 @@ function pageProductDetail() {
       <div style="margin-bottom:10px"><label class="field-label">商品名</label><input id="edit-name" class="input" value="${p.name||''}"></div>
       <div style="margin-bottom:10px"><label class="field-label">カテゴリー</label>
         <select id="edit-cat" class="input">
-          ${['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','充電器類','スマホ・カメラアクセサリー','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','アウトドア用品','工具','その他'].map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}
+          ${['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','充電器類','スマホ・カメラアクセサリー','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','自転車用品','車用品','バイク用品','アウトドア用品','工具','ペット用品','その他'].map(c=>`<option value="${c}" ${p.cat===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </div>
       <div style="margin-bottom:10px"><label class="field-label">販売価格</label><input id="edit-price" class="input" type="number" value="${p.price}"></div>
@@ -1538,7 +1538,7 @@ function saveProductEdit(pid) {
   const memo       = document.getElementById('edit-memo')?.value || '';
   const defective  = document.getElementById('edit-defective')?.checked || false;
   const defectMemo = document.getElementById('edit-defect-memo')?.value || '';
-  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','充電器類':'🔌','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','アウトドア用品':'⛺','工具':'🔧','その他':'📦'};
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','充電器類':'🔌','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','アウトドア用品':'⛺','工具':'🔧','ペット用品':'🐾','その他':'📦'};
   const emoji = emojiMap[cat] || '📦';
   S.data.products = S.data.products.map(p=>p.id===pid?{...p,name,cat,emoji,price,album,memo,defective,defectMemo}:p);
   saveData();
@@ -1553,7 +1553,7 @@ function saveProductEdit(pid) {
 // PAGE: PRODUCT REGISTRATION
 // ============================================================
 function pageProductReg() {
-  const allCats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','充電器類','スマホ・カメラアクセサリー','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','楽器類','自転車用品','車用品','バイク用品','アウトドア用品','工具','その他'];
+  const allCats = ['キャラクター','フィギュア・ぬいぐるみ','バッグ・ポーチ','ケース類','ジュエリー・アクセサリー','腕時計','電子機器・ケーブル','アダプター類','充電器類','スマホ・カメラアクセサリー','家電','コスメ・美容','文房具・ノート','食器・キッチン','おもちゃ・ゲーム','衣類・ファッション','雑貨・日用品','本・CD・DVD','楽器類','自転車用品','車用品','バイク用品','アウトドア用品','工具','ペット用品','その他'];
   const catCount = {};
   S.data.products.forEach(p=>{ if(p.cat) catCount[p.cat]=(catCount[p.cat]||0)+1; });
   const cats = [...allCats].sort((a,b)=>(catCount[b]||0)-(catCount[a]||0));
@@ -2439,7 +2439,7 @@ function pageAnalytics() {
         const colors = ['#059669','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16','#f97316','#ec4899','#6b7280'];
         const cats = {};
         fProds.forEach(p=>{
-          const c = p.cat||'その他';
+          const c = p.cat||'ペット用品','その他';
           if (!cats[c]) cats[c] = {total:0,sold:0,revenue:0};
           cats[c].total++;
           if (p.status==='売卸済'){cats[c].sold++;cats[c].revenue+=(p.soldPrice||0);}
@@ -3096,7 +3096,7 @@ function initCharts() {
 
   // Analytics donut — real data
   const catCount2 = {};
-  S.data.products.forEach(p=>{ const c=p.cat||'その他'; catCount2[c]=(catCount2[c]||0)+1; });
+  S.data.products.forEach(p=>{ const c=p.cat||'ペット用品','その他'; catCount2[c]=(catCount2[c]||0)+1; });
   const donutColors = ['#059669','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#84cc16','#f97316','#ec4899','#6b7280'];
   const donutEntries = Object.entries(catCount2).sort((a,b)=>b[1]-a[1]).slice(0,10);
   if (donutEntries.length) {
@@ -3170,7 +3170,7 @@ function saveProduct() {
   const memo = document.getElementById('reg-memo')?.value || '';
   const defective = document.getElementById('reg-defective')?.checked || false;
   const defectMemo = document.getElementById('reg-defect-memo')?.value || '';
-  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','充電器類':'🔌','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','アウトドア用品':'⛺','工具':'🔧','その他':'📦'};
+  const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','充電器類':'🔌','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','アウトドア用品':'⛺','工具':'🔧','ペット用品':'🐾','その他':'📦'};
   const newId = genProductId(box);
   S.data.products.push({id:newId,name,box,status:'出品中',listPrice:price,price,cat,emoji:emojiMap[cat]||'📦',days:0,registeredDate:today(),album,memo,defective,defectMemo});
   saveData();
