@@ -1330,8 +1330,7 @@ function confirmQuickSale() {
   saveData();
   S.selPid = null;
   S.showModal = null;
-  S.salesStep = 1;
-  go('salesInput');
+  render();
 }
 
 function updateQuickSalePreview() {
