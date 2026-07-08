@@ -1097,6 +1097,7 @@ function pageProducts() {
             <div style="text-align:right">${badge(p.status)}<div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(p.status==='売卸済'?(p.soldPrice||p.price):p.price)}</div></div>
             <div style="display:flex;gap:4px">
               ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:5px 12px;font-size:17px;cursor:pointer;font-weight:600">売れた！</button>`:''}
+              ${!p.defective?`<button data-pid="${p.id}" onclick="event.stopPropagation();markDefective(this.dataset.pid)" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:5px 12px;font-size:17px;cursor:pointer;font-weight:600">⚠️不良品</button>`:''}
               <button data-pid="${p.id}" onclick="event.stopPropagation();deleteProduct(this.dataset.pid)" style="background:#fee2e2;color:#ef4444;border:none;border-radius:8px;padding:5px 12px;font-size:17px;cursor:pointer">🗑</button>
             </div>
           </div>
@@ -1330,6 +1331,13 @@ function confirmQuickSale() {
   saveData();
   S.selPid = null;
   S.showModal = null;
+  render();
+}
+
+function markDefective(pid) {
+  if (!confirm('不良品として登録しますか？')) return;
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,defective:true}:p);
+  saveData();
   render();
 }
 
