@@ -1335,8 +1335,8 @@ function confirmQuickSale() {
 }
 
 function markDefective(pid) {
-  if (!confirm('不良品として登録しますか？')) return;
-  S.data.products = S.data.products.map(p=>p.id===pid?{...p,defective:true}:p);
+  if (!confirm('不良品として登録しますか？（ステータスをキャンセルに変更します）')) return;
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,defective:true,status:'キャンセル'}:p);
   saveData();
   render();
 }
