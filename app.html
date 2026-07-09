@@ -535,13 +535,15 @@ function pageDashboard() {
           <div style="font-size:18px;color:#dc2626;font-weight:700;margin-bottom:8px">計 ${partialProds.length}点 ／ 原価未回収</div>
           ${partialProds.map(p=>{
             const fee=Math.floor((p.soldPrice||0)*0.1);
-            const profit=(p.soldPrice||0)-(p.soldShip||0)-fee-defCostH;
-            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #fecaca">
-              <div>
-                <div style="font-size:18px;font-weight:600;color:#374151">${p.name}</div>
-                <div style="font-size:17px;color:#6b7280">${p.box}ロット・売値${(p.soldPrice||0).toLocaleString()}円</div>
+            const grossRecovery=(p.soldPrice||0)-(p.soldShip||0)-fee;
+            const profit=grossRecovery-defCostH;
+            return `<div style="padding:8px 0;border-bottom:1px solid #fecaca">
+              <div style="font-size:18px;font-weight:600;color:#374151;margin-bottom:4px">${p.name}</div>
+              <div style="font-size:17px;color:#6b7280;margin-bottom:4px">${p.box}ロット・売値${(p.soldPrice||0).toLocaleString()}円</div>
+              <div style="display:flex;gap:12px">
+                <div style="font-size:17px;color:#059669">回収額（原価前）: <span style="font-weight:700">+${grossRecovery.toLocaleString()}円</span></div>
+                <div style="font-size:17px;color:#dc2626">利益（原価後）: <span style="font-weight:700">${profit.toLocaleString()}円</span></div>
               </div>
-              <div style="font-size:18px;font-weight:700;color:#dc2626">${profit.toLocaleString()}円</div>
             </div>`;
           }).join('')}
         </div>
