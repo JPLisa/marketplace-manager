@@ -1051,18 +1051,27 @@ function pageProducts() {
   const q = (S.tab.productSearch||'').toLowerCase();
   const f = S.tab.productFilter || 'all';
   const minDays = S.tab.productMinDays || 0;
+  const defCostP = S.data.defaultCostPerItem??484;
+  const isPartialRecovery = p => {
+    if (p.status!=='売卸済') return false;
+    const fee = Math.floor((p.soldPrice||0)*0.1);
+    const profit = (p.soldPrice||0)-(p.soldShip||0)-fee-defCostP;
+    return profit < 0 && profit >= -defCostP;
+  };
   const shown = S.data.products.filter(p=>{
     const mq = !q || matchProductSearch(p, q);
-    const mf = f==='all' || (f==='不良品' ? p.defective : p.status===f);
+    const mf = f==='all' || (f==='不良品' ? p.defective : f==='原価割れ' ? isPartialRecovery(p) : p.status===f);
     const md = !minDays || (p.days||0) >= minDays;
     return mq && mf && md;
   });
   const minDaysLabel = minDays ? `${minDays}日以上未売卸` : '';
   const cnt = {'出品中':0,'セット中':0,'売卸済':0};
   S.data.products.forEach(p=>{ if(cnt[p.status]!=null) cnt[p.status]++; });
+  const partialCnt = S.data.products.filter(isPartialRecovery).length;
   const tabLabel = f2 => {
     if (f2==='all') return 'すべて';
     if (f2==='不良品') return '⚠️不良品';
+    if (f2==='原価割れ') return `📉原価割れ<span style="font-size:17px;opacity:0.75;margin-left:3px">(${partialCnt})</span>`;
     if (cnt[f2]!=null) return `${f2}<span style="font-size:17px;opacity:0.75;margin-left:3px">(${cnt[f2]})</span>`;
     return f2;
   };
@@ -1077,7 +1086,7 @@ function pageProducts() {
     </div>
     <div class="search-bar">${icon('search')}<input id="prod-search" placeholder="商品名・IDで検索" value="${S.tab.productSearch||''}" oninput="filterProductList(this.value)"></div>
     <div class="tabs">
-      ${['all','出品中','セット中','売卸済','保管中','キャンセル','不良品'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${tabLabel(f2)}</button>`).join('')}
+      ${['all','出品中','セット中','売卸済','保管中','キャンセル','不良品','原価割れ'].map(f2=>`<button class="tab ${f===f2?'active':''}" onclick="S.tab.productFilter='${f2}';render()">${tabLabel(f2)}</button>`).join('')}
     </div>
     ${f==='セット中'&&S.data.products.some(p=>p.status==='セット中')?`
     <button onclick="S.createSetPrePids=S.data.products.filter(p=>p.status==='セット中').map(p=>p.id);openModal('createSet')" style="width:100%;margin-bottom:8px;padding:12px;border:2px solid #ddd6fe;border-radius:12px;background:#f5f3ff;color:#7c3aed;font-size:17px;font-weight:600;cursor:pointer">
