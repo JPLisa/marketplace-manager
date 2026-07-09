@@ -532,7 +532,17 @@ function pageDashboard() {
           <button onclick="S.tab.productFilter='原価割れ';go('products')" style="font-size:17px;color:#dc2626;background:none;border:none;cursor:pointer;font-weight:600">一覧を見る›</button>
         </div>
         <div style="background:#fff1f2;border:1px solid #fecaca;border-radius:12px;padding:12px">
-          <div style="font-size:18px;color:#dc2626;font-weight:700;margin-bottom:8px">計 ${partialProds.length}点 ／ 原価未回収</div>
+          ${(()=>{
+            const totalPartialProfit = partialProds.reduce((a,p)=>{
+              const fee=Math.floor((p.soldPrice||0)*0.1);
+              return a+(p.soldPrice||0)-(p.soldShip||0)-fee-defCostH;
+            },0);
+            const avgPartialProfit = Math.round(totalPartialProfit/partialProds.length);
+            return `<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+              <div style="font-size:18px;color:#dc2626;font-weight:700">計 ${partialProds.length}点 ／ 原価未回収</div>
+              <div style="font-size:17px;color:#dc2626">平均利益 <span style="font-weight:700">${avgPartialProfit.toLocaleString()}円</span></div>
+            </div>`;
+          })()}
           ${partialProds.map(p=>{
             const fee=Math.floor((p.soldPrice||0)*0.1);
             const grossRecovery=(p.soldPrice||0)-(p.soldShip||0)-fee;
