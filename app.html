@@ -2176,13 +2176,11 @@ function pageAnalytics() {
         // 出品中のみ（キャンセル・保管中・不良品は概算から除外）
         const indivProds = fProds.filter(p=>p.status==='出品中');
         const indivCalc = indivProds.map(p=>{
-          const lot = d.boxes.find(b=>b.id===p.box);
-          const lotCostPerItem = lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
           const salePrice = Math.round(p.price * (1 - discount/100));
           const fee = Math.floor(salePrice * 0.1);
           const revenue = salePrice - fee - shipOut;
-          const netProfit = revenue - lotCostPerItem;
-          return {revenue, netProfit, items:1, costPerItem: lotCostPerItem};
+          const netProfit = revenue - defCost2;
+          return {revenue, netProfit, items:1};
         });
         // セット出品中（セット価格で計算）
         const allActiveSets = (d.sets||[]).filter(s=>s.status==='出品中');
@@ -2197,10 +2195,10 @@ function pageAnalytics() {
           let itemCount, setCost;
           if (s.type==='lot') {
             itemCount = (s.lotComponents||[]).reduce((a,c)=>a+c.qty,0);
-            setCost = (s.lotComponents||[]).reduce((a,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return a+c.qty*cph;},0);
+            setCost = itemCount * defCost2;
           } else {
             itemCount = (s.pids||[]).length;
-            setCost = (s.pids||[]).reduce((a,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return a+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+            setCost = itemCount * defCost2;
           }
           const netProfit = revenue - setCost;
           return {revenue, netProfit, items: itemCount};
@@ -2211,18 +2209,13 @@ function pageAnalytics() {
         const estItems   = allCalc.reduce((a,b)=>a+b.items,0);
         const estListings = indivProds.length + relevantSets.length;
         const estProfitNoDisc = indivProds.reduce((a,p)=>{
-          const lot = d.boxes.find(b=>b.id===p.box);
-          const cpi = lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
-          return a + p.price - Math.floor(p.price*0.1) - shipOut - cpi;
+          return a + p.price - Math.floor(p.price*0.1) - shipOut - defCost2;
         },0) + relevantSets.reduce((a,s)=>{
           const fee = Math.floor(s.price*0.1);
-          let setCost;
-          if (s.type==='lot') {
-            setCost = (s.lotComponents||[]).reduce((ac,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return ac+c.qty*cph;},0);
-          } else {
-            setCost = (s.pids||[]).reduce((ac,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return ac+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
-          }
-          return a + s.price - fee - shipOut - setCost;
+          const itemCount = s.type==='lot'
+            ? (s.lotComponents||[]).reduce((ac,c)=>ac+c.qty,0)
+            : (s.pids||[]).length;
+          return a + s.price - fee - shipOut - itemCount*defCost2;
         },0);
         return `
         <div class="card" style="margin-bottom:12px">
