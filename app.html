@@ -518,6 +518,36 @@ function pageDashboard() {
       </div>
     </div>
     ${(()=>{
+      const defCostH = d.defaultCostPerItem??484;
+      const partialProds = d.products.filter(p=>{
+        if (p.status!=='売卸済') return false;
+        const fee = Math.floor((p.soldPrice||0)*0.1);
+        const profit = (p.soldPrice||0)-(p.soldShip||0)-fee-defCostH;
+        return profit < 0 && profit >= -defCostH;
+      });
+      if (partialProds.length===0) return '';
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:18px;font-weight:700;color:#dc2626">📉 原価割れ商品</div>
+          <button onclick="S.tab.productFilter='原価割れ';go('products')" style="font-size:17px;color:#dc2626;background:none;border:none;cursor:pointer;font-weight:600">一覧を見る›</button>
+        </div>
+        <div style="background:#fff1f2;border:1px solid #fecaca;border-radius:12px;padding:12px">
+          <div style="font-size:18px;color:#dc2626;font-weight:700;margin-bottom:8px">計 ${partialProds.length}点 ／ 原価未回収</div>
+          ${partialProds.map(p=>{
+            const fee=Math.floor((p.soldPrice||0)*0.1);
+            const profit=(p.soldPrice||0)-(p.soldShip||0)-fee-defCostH;
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #fecaca">
+              <div>
+                <div style="font-size:18px;font-weight:600;color:#374151">${p.name}</div>
+                <div style="font-size:17px;color:#6b7280">${p.box}ロット・売値${(p.soldPrice||0).toLocaleString()}円</div>
+              </div>
+              <div style="font-size:18px;font-weight:700;color:#dc2626">${profit.toLocaleString()}円</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    })()}
+    ${(()=>{
       const allSets = d.sets||[];
       const activeSetsAll = allSets.filter(s=>s.status==='出品中');
       return `<div style="margin-bottom:14px">
