@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -1073,7 +1073,7 @@ function pageBoxDetail() {
       <div class="card" style="margin-bottom:8px;cursor:pointer" data-pid="${p.id}" onclick="S.viewPid=this.dataset.pid;go('productDetail')">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:26px">${p.emoji}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.memo?`<div style="font-size:17px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:18px">${p.name}</div><div style="font-size:17px;color:#6b7280">${p.box}ロット${p.days>0?' · '+p.days+'日経過':''}</div>${p.status==='売卸済'&&p.soldDate?`<div style="font-size:17px;color:#059669;margin-top:2px">売却日 ${p.soldDate}</div>`:''} ${p.memo?`<div style="font-size:17px;color:#6b7280;margin-top:2px">${p.memo}</div>`:''}</div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
             <div style="text-align:right">${badge(p.status)}<div style="font-size:18px;font-weight:700;margin-top:4px">${fmt(p.status==='売卸済'?(p.soldPrice||p.price):p.price)}</div>${p.album?'<div style="font-size:18px;color:#059669;margin-top:2px">📷 写真あり</div>':''}</div>
             ${p.status==='出品中'?`<button data-pid="${p.id}" onclick="event.stopPropagation();openQuickSale(this.dataset.pid)" style="background:#059669;color:white;border:none;border-radius:8px;padding:6px 14px;font-size:18px;cursor:pointer;font-weight:600">売れた！</button>`:''}
@@ -1424,16 +1424,25 @@ function cancelProduct(pid) {
 function updateSalePreview() {
   const price = parseInt(document.getElementById('sale-price')?.value) || 0;
   const ship = parseInt(document.getElementById('sale-ship')?.value) || 0;
-  const fee = Math.floor(price * 0.1);
+  const feeRate = parseInt(document.getElementById('sale-fee-rate')?.value) ?? 10;
+  const fee = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
   const el = document.getElementById('sale-preview');
   if (!el) return;
   el.innerHTML = `
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-¥${fee.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (${feeRate}%)</span><span style="color:#ef4444">-¥${fee.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span style="color:#ef4444">-¥${costPerItem.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">¥${profit.toLocaleString()}</span></div>
   `;
+}
+
+function selectPlatform(pl, fee) {
+  S.salePrice = document.getElementById('sale-price')?.value || S.salePrice || '';
+  S.saleShip = document.getElementById('sale-ship')?.value || S.saleShip || '210';
+  S.salePlatform = pl;
+  S.saleFeeRate = String(fee);
+  render();
 }
 
 function dateSelects(idPrefix, val) {
@@ -1691,12 +1700,14 @@ function pageProductReg() {
 // PAGE: SALES INPUT
 // ============================================================
 function pageSalesInput() {
+  if (!S.salesStep && S.selPid) S.salesStep = 2;
   const step = S.salesStep || 1;
   const active = S.data.products.filter(p=>p.status==='出品中');
   const prod = S.selPid ? S.data.products.find(p=>p.id===S.selPid) : null;
   const price = parseInt(S.salePrice) || (prod ? prod.price : 0);
   const ship = parseInt(S.saleShip) || 0;
-  const fee = Math.floor(price * 0.1);
+  const feeRate = parseInt(S.saleFeeRate) || 10;
+  const fee = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
   const stepBar = `<div style="display:flex;gap:6px;margin-bottom:16px">${[1,2,3].map(n=>`<div style="flex:1;height:4px;border-radius:2px;background:${step>=n?'#059669':'#e5e7eb'}"></div>`).join('')}</div>`;
@@ -1732,17 +1743,23 @@ function pageSalesInput() {
         <span style="font-size:24px">${prod.emoji}</span>
         <div><div style="font-weight:600;font-size:18px">${prod.name}</div><div style="font-size:17px;color:#6b7280">${prod.box}</div></div>
       </div>
-      <div class="grid2" style="margin-bottom:16px">
+      <div style="margin-bottom:14px">
+        <label class="field-label">販路</label>
+        <div style="display:flex;gap:6px">${[['メルカリ',10],['ヤフー',5],['ラクマ',6],['その他',0]].map(([pl,df])=>`<button onclick="selectPlatform('${pl}',${df})" style="flex:1;padding:9px 4px;border-radius:8px;border:2px solid ${S.salePlatform===pl?'#059669':'#e5e7eb'};background:${S.salePlatform===pl?'#ecfdf5':'#f9fafb'};color:${S.salePlatform===pl?'#059669':'#374151'};font-size:17px;font-weight:${S.salePlatform===pl?'700':'500'};cursor:pointer">${pl}</button>`).join('')}</div>
+      </div>
+      <div class="grid2" style="margin-bottom:12px">
         <div><label class="field-label">販売価格（円）</label><input id="sale-price" class="input" type="number" value="${S.salePrice||prod.price}" oninput="updateSalePreview()"></div>
         <div><label class="field-label">送料（円）</label><input id="sale-ship" class="input" type="number" value="${S.saleShip}" oninput="updateSalePreview()"></div>
       </div>
+      <div style="margin-bottom:16px"><label class="field-label">手数料率（%）</label><input id="sale-fee-rate" class="input" type="number" value="${feeRate}" oninput="updateSalePreview()"></div>
       <div id="sale-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:18px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-${fmt(Math.floor((S.salePrice||prod.price)*0.1))}</span></div>
-        <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">${fmt((parseInt(S.salePrice)||prod.price) - (parseInt(S.saleShip)||0) - Math.floor((parseInt(S.salePrice)||prod.price)*0.1))}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (${feeRate}%)</span><span style="color:#ef4444">-${fmt(Math.floor((parseInt(S.salePrice)||prod.price)*feeRate/100))}</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">${fmt((parseInt(S.salePrice)||prod.price) - (parseInt(S.saleShip)||0) - Math.floor((parseInt(S.salePrice)||prod.price)*feeRate/100))}</span></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary" style="flex:1" onclick="S.salesStep=1;render()">← 戻る</button>
-        <button class="btn btn-primary" style="flex:1" onclick="S.salePrice=document.getElementById('sale-price')?.value||'';S.saleShip=document.getElementById('sale-ship')?.value||'210';S.salesStep=3;render()">確認 →</button>
+        <button class="btn btn-primary" style="flex:1" onclick="S.salePrice=document.getElementById('sale-price')?.value||'';S.saleShip=document.getElementById('sale-ship')?.value||'210';S.saleFeeRate=document.getElementById('sale-fee-rate')?.value||'10';S.salesStep=3;render()">確認 →</button>
+
       </div>
     </div>`; }
 
@@ -1754,9 +1771,10 @@ function pageSalesInput() {
     <div class="card"><div class="card-title">③ 確認して登録</div>
       <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">商品名</span><span style="font-weight:600">${prod.name}</span></div>
+        ${S.salePlatform?`<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">販路</span><span style="font-weight:600;color:#059669">${S.salePlatform}</span></div>`:''}
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">販売価格</span><span style="font-weight:700">${fmt(price)}</span></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">送料</span><span>${fmt(ship)}</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">手数料 (10%)</span><span style="color:#ef4444">-${fmt(fee)}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:18px"><span style="color:#6b7280">手数料 (${feeRate}%)</span><span style="color:#ef4444">-${fmt(fee)}</span></div>
         <div style="display:flex;justify-content:space-between;border-top:2px solid #e5e7eb;padding-top:12px"><span style="font-weight:700;font-size:18px">利益</span><span style="font-size:26px;font-weight:700;color:#ef4444">${fmt(profit)}</span></div>
       </div>
       <div style="font-size:17px;color:#6b7280;text-align:center;margin-bottom:16px">販売日: ${today()}</div>
@@ -1974,10 +1992,11 @@ function pageAnalytics() {
   // ロットに実際の仕入額があればそれを使い（1点あたり）、なければデフォルト原価
   const lotCostFor = p => {
     const lot = d.boxes.find(b=>b.id===p.box);
-    return lot&&lot.cost>0&&lot.total>0 ? Math.round(lot.cost/lot.total) : defCost2;
+    return lot&&lot.total>0 ? Math.round(((lot.cost||0)+(lot.ship||0))/lot.total) : defCost2;
   };
   // すべて商品レコードから計算（b.sales/b.profitは蓄積誤差があるため使わない）
   const soldProds = fProds.filter(p=>p.status==='売卸済' && !p.soldViaSet);
+  const allSoldProds = fProds.filter(p=>p.status==='売卸済');
   const indivSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
   const grossSaleProfit = soldProds.reduce((a,p)=>{
     const fee = Math.floor((p.soldPrice||0)*0.1);
@@ -1998,7 +2017,7 @@ function pageAnalytics() {
       itemCost = (s.pids||[]).reduce((b,pid)=>{
         const prod=d.products.find(p=>p.id===pid);
         const lot=prod?d.boxes.find(b=>b.id===prod.box):null;
-        return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);
+        return b+(lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2);
       },0);
     }
     return a+(s.soldRecords||[]).reduce((b,r)=>{
@@ -2030,7 +2049,7 @@ function pageAnalytics() {
     </div>
     ${tab==='summary'?`
       <div class="grid4" style="margin-bottom:12px">
-        <div class="stat-card"><div class="label">売却済商品数</div><div class="value" style="color:#374151">${soldProds.length}点</div></div>
+        <div class="stat-card"><div class="label">売却済商品数</div><div class="value" style="color:#374151">${allSoldProds.length}点</div></div>
         <div class="stat-card"><div class="label">${selLot==='all'?'総売上':'売上'}</div><div class="value" style="color:#3b82f6">${fmt(totalSales)}</div></div>
         <div class="stat-card"><div class="label">${selLot==='all'?'総利益':'利益'}</div><div class="value" style="color:${totalProfit>=0?'#059669':'#ef4444'}">${fmt(totalProfit)}</div></div>
         <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
@@ -2086,7 +2105,8 @@ function pageAnalytics() {
         const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
         const totalInvest = totalRealCost + totalShipIn;
         // 利益累計（totalProfit）vs 未回収投資額で損益分岐を計算
-        const recoveredCost = soldProds.reduce((a,p)=>a+lotCostFor(p),0);
+        const lotTypeSetCostRecovered = (d.sets||[]).filter(s=>s.type==='lot'&&(s.soldRecords||[]).length>0).reduce((a,s)=>{const perSale=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2;return b+c.qty*cph;},0);return a+perSale*(s.soldRecords||[]).length;},0);
+        const recoveredCost = allSoldProds.reduce((a,p)=>a+lotCostFor(p),0) + lotTypeSetCostRecovered;
         const remainInvest = totalInvest - recoveredCost;
         const grossReturn = totalProfit;
         const trueProfit = grossReturn - remainInvest;
@@ -2276,9 +2296,9 @@ function pageAnalytics() {
         const setTotalProfit = soldSets.reduce((a,s)=>{
           let itemCost;
           if (s.type==='lot') {
-            itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return b+c.qty*cph;},0);
+            itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2;return b+c.qty*cph;},0);
           } else {
-            itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+            itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2);},0);
           }
           return a+(s.soldRecords||[]).reduce((b,r)=>{
             const fee = r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1);
@@ -2306,9 +2326,9 @@ function pageAnalytics() {
           ${soldSets.map(s=>{
             let itemCost;
             if (s.type==='lot') {
-              itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2;return b+c.qty*cph;},0);
+              itemCost=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2;return b+c.qty*cph;},0);
             } else {
-              itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.cost>0&&lot.total>0?Math.round(lot.cost/lot.total):defCost2);},0);
+              itemCost=(s.pids||[]).reduce((b,pid)=>{const prod=d.products.find(p=>p.id===pid);const lot=prod?d.boxes.find(b=>b.id===prod.box):null;return b+(lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2);},0);
             }
             const recs = s.soldRecords||[];
             const lotsLabel = s.type==='lot'
@@ -3257,7 +3277,8 @@ function saveProduct() {
 function saveSale(price, ship, profit) {
   if (!S.selPid) return;
   const pid = S.selPid;
-  const fee = Math.floor(price * 0.1);
+  const feeRate = parseInt(S.saleFeeRate) || 10;
+  const fee = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const trueProfit = price - ship - fee - costPerItem;
   const soldDate = today();
@@ -3269,12 +3290,13 @@ function saveSale(price, ship, profit) {
     const b = new Date(soldDate.replace(/\//g,'-'));
     return Math.round((b-a)/(1000*60*60*24));
   })();
-  S.data.products = S.data.products.map(p => p.id===pid ? {...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell} : p);
+  const soldPlatform = S.salePlatform || '';
+  S.data.products = S.data.products.map(p => p.id===pid ? {...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell,soldPlatform} : p);
   if (lotId) {
     S.data.boxes = S.data.boxes.map(b => b.id===lotId ? {...b,sold:b.sold+1,sales:b.sales+price,profit:b.profit+trueProfit} : b);
   }
   saveData();
-  S.selPid = null; S.salesStep = 1; S.salePrice = ''; S.saleShip = '210';
+  S.selPid = null; S.salesStep = 1; S.salePrice = ''; S.saleShip = '210'; S.saleFeeRate = '10'; S.salePlatform = '';
   alert('売上を登録しました！');
   render();
 }
