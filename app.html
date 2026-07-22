@@ -1999,11 +1999,11 @@ function pageAnalytics() {
   const allSoldProds = fProds.filter(p=>p.status==='売卸済');
   const indivSales = soldProds.reduce((a,p)=>a+(p.soldPrice||0), 0);
   const grossSaleProfit = soldProds.reduce((a,p)=>{
-    const fee = Math.floor((p.soldPrice||0)*0.1);
+    const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
     return a + (p.soldPrice||0) - (p.soldShip||0) - fee;
   }, 0);
   const indivProfit = soldProds.reduce((a,p)=>{
-    const fee = Math.floor((p.soldPrice||0)*0.1);
+    const fee = p.soldFee!=null ? p.soldFee : Math.floor((p.soldPrice||0)*0.1);
     return a + (p.soldPrice||0) - (p.soldShip||0) - fee - (d.defaultCostPerItem??484);
   }, 0);
   // セット売上（独立集計）
@@ -2028,6 +2028,12 @@ function pageAnalytics() {
   const totalSales = indivSales + setsSales;
   const totalProfit = indivProfit + setsProfit;
   const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
+  const totalShipOut = soldProds.reduce((a,p)=>a+(p.soldShip||0),0)
+    + soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldShip||0),0)+a,0);
+  const totalFeesOut = soldProds.reduce((a,p)=>a+(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1)),0)
+    + soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldFee!=null?r.soldFee:Math.floor((r.soldPrice||0)*0.1)),0)+a,0);
+  const totalCostAllocated = soldProds.length * defCost2
+    + soldSetsAll.reduce((a,s)=>{let c;if(s.type==='lot')c=(s.lotComponents||[]).reduce((b,x)=>b+x.qty*defCost2,0);else c=(s.pids||[]).reduce((b,pid)=>{const p2=d.products.find(p=>p.id===pid);const lt=p2?d.boxes.find(bx=>bx.id===p2.box):null;return b+(lt&&lt.total>0?Math.round(((lt.cost||0)+(lt.ship||0))/lt.total):defCost2);},0);return a+c*(s.soldRecords||[]).length;},0);
   const soldWithDays = fProds.filter(p=>p.status==='売卸済'&&p.daysToSell!=null);
   const avgDays = soldWithDays.length ? Math.round(soldWithDays.reduce((a,p)=>a+p.daysToSell,0)/soldWithDays.length) : null;
 
@@ -2048,11 +2054,35 @@ function pageAnalytics() {
       ${['summary','boxes','category'].map(t=>`<button class="tab ${tab===t?'active':''}" onclick="S.tab.analytics='${t}';render()">${t==='summary'?'概要':t==='boxes'?'ロット比較':'カテゴリー'}</button>`).join('')}
     </div>
     ${tab==='summary'?`
-      <div class="grid4" style="margin-bottom:12px">
-        <div class="stat-card"><div class="label">売却済商品数</div><div class="value" style="color:#374151">${allSoldProds.length}点</div></div>
-        <div class="stat-card"><div class="label">${selLot==='all'?'総売上':'売上'}</div><div class="value" style="color:#3b82f6">${fmt(totalSales)}</div></div>
-        <div class="stat-card"><div class="label">${selLot==='all'?'総利益':'利益'}</div><div class="value" style="color:${totalProfit>=0?'#059669':'#ef4444'}">${fmt(totalProfit)}</div></div>
-        <div class="stat-card"><div class="label">利益率</div><div class="value">${pr}%</div></div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f3f4f6">
+          <span style="font-size:17px;color:#6b7280">売却済み商品数</span>
+          <span style="font-size:20px;font-weight:700;color:#374151">${allSoldProds.length}点</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+          <span style="font-size:17px;color:#6b7280">${selLot==='all'?'総売り上げ':'売り上げ'}</span>
+          <span style="font-size:22px;font-weight:800;color:#3b82f6">${fmt(totalSales)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 4px 16px">
+          <span style="font-size:16px;color:#9ca3af">― 送料</span>
+          <span style="font-size:18px;color:#6b7280">−${fmt(totalShipOut)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 4px 16px">
+          <span style="font-size:16px;color:#9ca3af">― 手数料</span>
+          <span style="font-size:18px;color:#6b7280">−${fmt(totalFeesOut)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 10px 16px;border-bottom:1px solid #f3f4f6">
+          <span style="font-size:16px;color:#9ca3af">― 仕入れコスト</span>
+          <span style="font-size:18px;color:#6b7280">−${fmt(totalCostAllocated)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 10px;border-bottom:1px solid #f3f4f6">
+          <span style="font-size:17px;font-weight:600;color:#374151">${selLot==='all'?'総利益':'利益'}</span>
+          <span style="font-size:24px;font-weight:800;color:${totalProfit>=0?'#059669':'#ef4444'}">${totalProfit>=0?'+':''}${fmt(totalProfit)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0">
+          <span style="font-size:17px;color:#6b7280">利益率</span>
+          <span style="font-size:20px;font-weight:700;color:#374151">${pr}%</span>
+        </div>
       </div>
       <div class="card" style="margin-bottom:12px">
         <div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="S.tab.analyticsLotsOpen=!S.tab.analyticsLotsOpen;render()"><span>ロット一覧</span><span style="font-size:18px;color:#9ca3af">${S.tab.analyticsLotsOpen?'▲':'▼'}</span></div>
@@ -2097,63 +2127,6 @@ function pageAnalytics() {
           </div>`;
         }).join('')):''}
       </div>
-      ${(()=>{
-        const defCost2 = d.defaultCostPerItem??484;
-        const totalSold = soldProds.length;
-        // ロットに実際の仕入額があればそれを使い、なければ登録商品数×デフォルト原価
-        const totalRealCost = fBoxes.reduce((a,b)=>a+(b.cost||0), 0);
-        const totalShipIn = fBoxes.reduce((a,b)=>a+(b.ship||0),0);
-        const totalInvest = totalRealCost + totalShipIn;
-        // 利益累計（totalProfit）vs 未回収投資額で損益分岐を計算
-        const lotTypeSetCostRecovered = (d.sets||[]).filter(s=>s.type==='lot'&&(s.soldRecords||[]).length>0).reduce((a,s)=>{const perSale=(s.lotComponents||[]).reduce((b,c)=>{const lot=d.boxes.find(x=>x.id===c.lotId);const cph=lot&&lot.total>0?Math.round(((lot.cost||0)+(lot.ship||0))/lot.total):defCost2;return b+c.qty*cph;},0);return a+perSale*(s.soldRecords||[]).length;},0);
-        const recoveredCost = allSoldProds.reduce((a,p)=>a+lotCostFor(p),0) + lotTypeSetCostRecovered;
-        const remainInvest = totalInvest - recoveredCost;
-        const grossReturn = totalProfit;
-        const trueProfit = grossReturn - remainInvest;
-        const avgNet = totalSold>0 ? grossSaleProfit/totalSold : 0;
-        const remaining = trueProfit<0&&avgNet>0 ? Math.ceil(-trueProfit/avgNet) : 0;
-        const achieved = trueProfit >= 0;
-        const recoverPct = totalInvest>0 ? Math.min(100,Math.max(0,Math.round((recoveredCost+Math.max(0,grossReturn))/totalInvest*100))) : 100;
-        return `
-        <div class="card" style="margin-bottom:12px">
-          <div class="card-title">損益分岐点${selLot!=='all'?'（ロット'+selLot+'）':''}</div>
-          <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:18px;color:#374151">未回収投資額</span>
-              <span style="font-size:22px;font-weight:700;color:#374151">${fmt(remainInvest)}</span>
-            </div>
-            <div style="font-size:18px;color:#6b7280;text-align:right;margin-bottom:8px">総投資額${fmt(totalInvest)} − 回収済${fmt(recoveredCost)}</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-size:18px;color:#374151">利益累計</span>
-              <span style="font-size:22px;font-weight:700;color:#3b82f6">+${fmt(grossReturn)}</span>
-            </div>
-            <div style="font-size:18px;color:#6b7280;text-align:right;margin-bottom:10px">売上${fmt(totalSales)} − 手数料・発送費・仕入コスト</div>
-            <div style="border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:18px;font-weight:600;color:#374151">現在の損益</span>
-              <span style="font-size:26px;font-weight:800;color:${achieved?'#059669':'#ef4444'}">${trueProfit>=0?'+':''}${fmt(trueProfit)}</span>
-            </div>
-          </div>
-          ${totalInvest===0?'<div style="text-align:center;color:#9ca3af;font-size:18px;padding:8px">ロットを登録すると表示されます</div>':achieved?`
-          <div style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
-            <div style="font-size:20px;margin-bottom:4px">🎉</div>
-            <div style="font-size:18px;font-weight:700;color:#059669">黒字達成！</div>
-            <div style="font-size:18px;color:#6b7280;margin-top:4px">投資回収済み・${fmt(trueProfit)}の利益</div>
-          </div>`:`
-          <div style="background:#fff1f2;border-radius:10px;padding:14px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:18px;color:#374151">損益分岐まで</span>
-              <span style="font-size:24px;font-weight:700;color:#ef4444">あと${remaining}個</span>
-            </div>
-            <div style="background:#fecaca;border-radius:6px;height:8px;overflow:hidden">
-              <div style="background:#ef4444;height:100%;width:${recoverPct}%;border-radius:6px;transition:width 0.3s"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-top:4px">
-              <span style="font-size:17px;color:#374151">回収率 ${recoverPct}%</span>
-              <span style="font-size:17px;color:#374151">1個あたり平均 ${avgNet>0?fmt(Math.round(avgNet)):'―'}</span>
-            </div>
-          </div>`}
-        </div>`;
-      })()}
       ${(()=>{
         const defectStats = fBoxes.map(b=>{
           const bProds = d.products.filter(p=>p.box===b.id);
