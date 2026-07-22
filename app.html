@@ -1437,6 +1437,22 @@ function updateSalePreview() {
   `;
 }
 
+function setRegPlatform(pl, fee) {
+  S.regPlatform = pl;
+  S.regFeeRate = fee;
+  const feeInput = document.getElementById('reg-fee-rate');
+  if (feeInput) feeInput.value = fee;
+  [['メルカリ',10],['ヤフー',5],['ラクマ',6],['ジモティー',0],['その他',0]].forEach(([p])=>{
+    const btn = document.getElementById('reg-pl-'+p);
+    if (!btn) return;
+    const sel = p===pl;
+    btn.style.borderColor = sel?'#059669':'#e5e7eb';
+    btn.style.background  = sel?'#ecfdf5':'#f9fafb';
+    btn.style.color       = sel?'#059669':'#374151';
+    btn.style.fontWeight  = sel?'700':'500';
+  });
+}
+
 function selectPlatform(pl, fee) {
   S.salePrice = document.getElementById('sale-price')?.value || S.salePrice || '';
   S.saleShip = document.getElementById('sale-ship')?.value || S.saleShip || '210';
@@ -1631,11 +1647,22 @@ function pageProductReg() {
       ${renderLotProducts(defaultBox)}
     </div>`;
 
+  const platBtns = `
+    <div style="margin-bottom:12px">
+      <label class="field-label">出品販路</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        ${[['メルカリ',10],['ヤフー',5],['ラクマ',6],['ジモティー',0],['その他',0]].map(([pl,df])=>`<button id="reg-pl-${pl}" type="button" onclick="setRegPlatform('${pl}',${df})" style="padding:8px 10px;border-radius:8px;border:2px solid ${S.regPlatform===pl?'#059669':'#e5e7eb'};background:${S.regPlatform===pl?'#ecfdf5':'#f9fafb'};color:${S.regPlatform===pl?'#059669':'#374151'};font-size:17px;font-weight:${S.regPlatform===pl?'700':'500'};cursor:pointer;white-space:nowrap">${pl}</button>`).join('')}
+      </div>
+      <label class="field-label">手数料率 (%)</label>
+      <input id="reg-fee-rate" class="input" type="number" min="0" max="100" placeholder="例: 10" value="${S.regFeeRate!=null?S.regFeeRate:''}">
+    </div>`;
+
   if (isOwner) {
     return `
     <div class="page-title">商品登録</div>
     <div class="card">
       <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
+      ${platBtns}
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
         <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
@@ -1669,6 +1696,7 @@ function pageProductReg() {
     <div class="page-title">商品登録</div>
     <div class="card">
       <div style="margin-bottom:12px"><label class="field-label">販売価格</label><input id="reg-price" class="input" type="number" placeholder="0"></div>
+      ${platBtns}
       <div style="margin-bottom:12px">
         <label class="field-label">商品名</label>
         <input id="reg-name" class="input" placeholder="商品名を入力" oninput="checkDuplicateName()">
@@ -3243,10 +3271,13 @@ function saveProduct() {
   const memo = document.getElementById('reg-memo')?.value || '';
   const defective = document.getElementById('reg-defective')?.checked || false;
   const defectMemo = document.getElementById('reg-defect-memo')?.value || '';
+  const listPlatform = S.regPlatform || '';
+  const listFeeRate = document.getElementById('reg-fee-rate')?.value !== '' ? parseInt(document.getElementById('reg-fee-rate')?.value) : null;
   const emojiMap = {'キャラクター':'🎀','フィギュア・ぬいぐるみ':'🧸','バッグ・ポーチ':'👛','ケース類':'📱','ジュエリー・アクセサリー':'💍','腕時計':'⌚','電子機器・ケーブル':'🔌','アダプター類':'🔋','充電器類':'🔌','スマホ・カメラアクセサリー':'📷','家電':'📺','コスメ・美容':'💄','文房具・ノート':'✏️','食器・キッチン':'🍽️','おもちゃ・ゲーム':'🎮','衣類・ファッション':'👗','雑貨・日用品':'🎁','本・CD・DVD':'📚','自転車用品':'🚲','車用品':'🚗','バイク用品':'🏍️','アウトドア用品':'⛺','工具':'🔧','ペット用品':'🐾','その他':'📦'};
   const newId = genProductId(box);
-  S.data.products.push({id:newId,name,box,status:'出品中',listPrice:price,price,cat,emoji:emojiMap[cat]||'📦',days:0,registeredDate:today(),album,memo,defective,defectMemo});
+  S.data.products.push({id:newId,name,box,status:'出品中',listPrice:price,price,cat,emoji:emojiMap[cat]||'📦',days:0,registeredDate:today(),album,memo,defective,defectMemo,listPlatform,listFeeRate});
   saveData();
+  S.regPlatform = ''; S.regFeeRate = null;
   const btn = document.getElementById('save-btn');
   if (btn) {
     btn.textContent = '✓ 登録しました！';
