@@ -2028,6 +2028,7 @@ function pageAnalytics() {
   const totalSales = indivSales + setsSales;
   const totalProfit = indivProfit + setsProfit;
   const pr = totalSales ? Math.round(totalProfit/totalSales*100) : 0;
+  const totalInvest = fBoxes.reduce((a,b)=>a+(b.cost||0)+(b.ship||0),0);
   const totalShipOut = soldProds.reduce((a,p)=>a+(p.soldShip||0),0)
     + soldSetsAll.reduce((a,s)=>(s.soldRecords||[]).reduce((b,r)=>b+(r.soldShip||0),0)+a,0);
   const totalFeesOut = soldProds.reduce((a,p)=>a+(p.soldFee!=null?p.soldFee:Math.floor((p.soldPrice||0)*0.1)),0)
@@ -2079,9 +2080,17 @@ function pageAnalytics() {
           <span style="font-size:17px;font-weight:600;color:#374151">${selLot==='all'?'総利益':'利益'}</span>
           <span style="font-size:24px;font-weight:800;color:${totalProfit>=0?'#059669':'#ef4444'}">${totalProfit>=0?'+':''}${fmt(totalProfit)}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0 0;border-bottom:1px solid #f3f4f6;padding-bottom:10px">
           <span style="font-size:17px;color:#6b7280">利益率</span>
           <span style="font-size:20px;font-weight:700;color:#374151">${pr}%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 4px">
+          <span style="font-size:17px;color:#6b7280">総仕入れ原価</span>
+          <span style="font-size:20px;font-weight:700;color:#374151">−${fmt(totalInvest)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 0">
+          <span style="font-size:17px;color:#374151">利益 − 仕入れ原価</span>
+          <span style="font-size:22px;font-weight:800;color:${totalProfit-totalInvest>=0?'#059669':'#ef4444'}">${totalProfit-totalInvest>=0?'+':''}${fmt(totalProfit-totalInvest)}</span>
         </div>
       </div>
       <div class="card" style="margin-bottom:12px">
