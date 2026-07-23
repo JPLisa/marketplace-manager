@@ -1364,25 +1364,31 @@ function confirmQuickSale() {
   const ship  = getQsShip();
   if (!price) { alert('販売価格を入力してください'); return; }
   if (!ship && document.getElementById('qs-ship')?.value === '') { alert('送料を選択してください'); return; }
-  const fee    = Math.floor(price * 0.1);
+  const feeRate = parseInt(document.getElementById('qs-fee-rate')?.value) || 10;
+  const fee    = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
   const pid    = S.selPid;
   const soldDate = getDateFromSelects('qs-date') || today();
   const prod   = S.data.products.find(p=>p.id===pid);
   const lotId  = prod?.box;
+  const soldPlatform = S.qsPlatform || '';
   const daysToSell = (()=>{
     if (!prod?.registeredDate) return prod?.days ?? null;
     const a = new Date(prod.registeredDate.replace(/\//g,'-'));
     const b = new Date(soldDate.replace(/\//g,'-'));
     return Math.round((b-a)/(1000*60*60*24));
   })();
-  S.data.products = S.data.products.map(p=>p.id===pid?{...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell}:p);
+  S.data.products = S.data.products.map(p=>p.id===pid?{...p,status:'売卸済',soldPrice:price,soldShip:ship,soldFee:fee,soldCost:costPerItem,soldDate,daysToSell,soldPlatform}:p);
   if (lotId) S.data.boxes = S.data.boxes.map(b=>b.id===lotId?{...b,sold:b.sold+1,sales:b.sales+price,profit:b.profit+profit}:b);
   saveData();
-  S.selPid = null;
-  S.showModal = null;
+  S.selPid = null; S.showModal = null; S.qsPlatform = '';
+  const cancelPlatforms = (prod?.listPlatforms || (prod?.listPlatform ? [prod.listPlatform] : []))
+    .filter(p => p && p !== soldPlatform);
   render();
+  if (cancelPlatforms.length > 0) {
+    setTimeout(()=>alert(`売上を登録しました！\n\n⚠️ 以下の販路の出品取消を忘れずに：\n${cancelPlatforms.map(p=>`・${p}`).join('\n')}`), 100);
+  }
 }
 
 function markDefective(pid) {
@@ -1400,13 +1406,14 @@ function updateQuickSalePreview() {
   const ship  = getQsShip();
   const el = document.getElementById('qs-preview');
   if (!price || (!ship && shipSel !== 'other')) { if (el) el.style.display='none'; return; }
-  const fee   = Math.floor(price * 0.1);
+  const feeRate = parseInt(document.getElementById('qs-fee-rate')?.value) || 10;
+  const fee   = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
   if (el) {
     el.style.display = 'block';
     el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (10%)</span><span>-¥${fee.toLocaleString()}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">手数料 (${feeRate}%)</span><span>-¥${fee.toLocaleString()}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">送料</span><span>-¥${ship.toLocaleString()}</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span>-¥${costPerItem.toLocaleString()}</span></div>
       <div style="display:flex;justify-content:space-between;font-weight:700;font-size:18px"><span>利益</span><span style="color:${profit>=0?'#059669':'#ef4444'}">${profit>=0?'+':''}¥${profit.toLocaleString()}</span></div>`;
@@ -1435,6 +1442,22 @@ function updateSalePreview() {
     <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#6b7280">仕入原価</span><span style="color:#ef4444">-¥${costPerItem.toLocaleString()}</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:700"><span>概算利益</span><span style="color:#ef4444">¥${profit.toLocaleString()}</span></div>
   `;
+}
+
+function setQsPlatform(pl, fee) {
+  S.qsPlatform = pl;
+  const feeInput = document.getElementById('qs-fee-rate');
+  if (feeInput) { feeInput.value = fee; }
+  ['メルカリ','ヤフー','ラクマ','ジモティー','その他'].forEach(p=>{
+    const btn = document.getElementById('qs-pl-'+p);
+    if (!btn) return;
+    const sel = p===pl;
+    btn.style.borderColor = sel?'#059669':'#e5e7eb';
+    btn.style.background  = sel?'#ecfdf5':'#f9fafb';
+    btn.style.color       = sel?'#059669':'#374151';
+    btn.style.fontWeight  = sel?'700':'500';
+  });
+  updateQuickSalePreview();
 }
 
 function toggleRegPlatform(pl) {
@@ -2896,6 +2919,14 @@ function renderModal() {
         <div style="margin-bottom:10px">
           <label class="field-label">売却日</label>
           ${dateSelects('qs-date', today())}
+        </div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">販路</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            ${[['メルカリ',10],['ヤフー',5],['ラクマ',6],['ジモティー',0],['その他',0]].map(([pl,df])=>`<button id="qs-pl-${pl}" type="button" onclick="setQsPlatform('${pl}',${df})" style="padding:7px 10px;border-radius:8px;border:2px solid #e5e7eb;background:#f9fafb;color:#374151;font-size:16px;font-weight:500;cursor:pointer;white-space:nowrap">${pl}</button>`).join('')}
+          </div>
+          <label class="field-label">手数料率 (%)</label>
+          <input id="qs-fee-rate" class="input" type="number" min="0" max="100" placeholder="例: 10" value="10" oninput="updateQuickSalePreview()">
         </div>
         <div id="qs-preview" style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:18px;display:none"></div>
         <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="confirmQuickSale()">✓ 売上を登録する</button>
