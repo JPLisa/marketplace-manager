@@ -1364,7 +1364,8 @@ function confirmQuickSale() {
   const ship  = getQsShip();
   if (!price) { alert('販売価格を入力してください'); return; }
   if (!ship && document.getElementById('qs-ship')?.value === '') { alert('送料を選択してください'); return; }
-  const feeRate = parseInt(document.getElementById('qs-fee-rate')?.value) || 10;
+  const feeRateStr = document.getElementById('qs-fee-rate')?.value ?? '';
+  const feeRate = feeRateStr === '' ? 10 : (parseInt(feeRateStr) || 0);
   const fee    = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
@@ -1406,7 +1407,8 @@ function updateQuickSalePreview() {
   const ship  = getQsShip();
   const el = document.getElementById('qs-preview');
   if (!price || (!ship && shipSel !== 'other')) { if (el) el.style.display='none'; return; }
-  const feeRate = parseInt(document.getElementById('qs-fee-rate')?.value) || 10;
+  const feeRateStr = document.getElementById('qs-fee-rate')?.value ?? '';
+  const feeRate = feeRateStr === '' ? 10 : (parseInt(feeRateStr) || 0);
   const fee   = Math.floor(price * feeRate / 100);
   const costPerItem = S.data.defaultCostPerItem ?? 484;
   const profit = price - ship - fee - costPerItem;
